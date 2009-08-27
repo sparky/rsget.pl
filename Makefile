@@ -1,12 +1,15 @@
 
 DATADIR = /usr/share/rsget.pl
 BINDIR = /usr/bin
-
-VER = $(shell sed '4!d' .svn/entries)
+VER =
 PKGDIR = rsget.pl-$(VER)
 
-all:
+all: rsget.pl
 
+ifeq ($(VER),)
+pkg:
+	make VER="$$(svn up | sed '/At revision /!d; s/At revision //; s/\.//')" pkg
+else
 pkg:
 	rm -f {RSGet,Get,Link,data}/*~
 	install -d $(PKGDIR)/{RSGet,Get,Link,data}
@@ -17,6 +20,7 @@ pkg:
 	cp Link/* $(PKGDIR)/Link
 	cp data/* $(PKGDIR)/data
 	tar -cjf $(PKGDIR).tar.bz2 $(PKGDIR)
+endif
 
 install:
 	rm -f {RSGet,Get,Link,data}/*~
