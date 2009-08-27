@@ -1,0 +1,36 @@
+#!/usr/bin/perl
+
+name: CryptedBiz
+short: crypted.biz
+uri: qr{crypted\.biz/}
+status: OK 2009-08-27
+
+pre:
+	use MIME::Base64;
+
+start:
+	GET( $-{_uri} );
+	$-{referer} = $-{_referer};
+
+	my @list;
+	push @list, $1
+		while s/className='inner_link\d+';window\.open\('(.*?)'\)">//;
+	ERROR("no links") unless @list;
+	$-{list} = \@list;
+	$-{outlist} = [];
+
+	GET( shift @{$-{list}} );
+stage_next_uri:
+	m{var versch = '(.*?)';};
+	$_ = decode_base64( $1 );
+	m{ src="(.*?)">};
+	push @{$-{outlist}}, $1;
+
+	if ( @{$-{list}} ) {
+		$-{_referer} = $-{referer};
+		GET_NEXT( stage_next_uri, shift @{$-{list}} );
+	}
+
+	LINK( @{$-{outlist}} );
+
+# vim:ts=4:sw=4
