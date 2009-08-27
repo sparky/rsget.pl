@@ -14,10 +14,11 @@ pkg:
 	rm -f {RSGet,Get,Link,data}/*~
 	install -d $(PKGDIR)/{RSGet,Get,Link,data}
 	install rsget.pl $(PKGDIR)
-	cp Makefile $(PKGDIR)
+	cp Makefile README $(PKGDIR)
 	cp RSGet/*.pm $(PKGDIR)/RSGet
 	cp Get/* $(PKGDIR)/Get
 	cp Link/* $(PKGDIR)/Link
+	grep "status:\s*BROKEN" $(PKGDIR)/{Get,Link}/* | sed 's/:.*//' | xargs -r rm -v
 	cp data/* $(PKGDIR)/data
 	tar -cjf $(PKGDIR).tar.bz2 $(PKGDIR)
 endif

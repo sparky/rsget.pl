@@ -8,7 +8,7 @@ status: OK 2009-08-24
 pre:
 	use Image::Magick;
 
-	my $mu_font_db = $main::data_path . "/mu_font_db.png";
+	my $mu_font_db = $main::data_path . "/data/mu_font_db.png";
 	die "Font DB '$mu_font_db' does not exist\n" unless -r $mu_font_db;
 
 start:

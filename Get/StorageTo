@@ -3,7 +3,7 @@
 name: StorageTo
 short: ST
 uri: qr{storage\.to/}
-status: OK 2009-08-24
+status: OK 2009-08-28
 
 start:
 	GET( $-{_uri} );

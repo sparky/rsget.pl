@@ -3,7 +3,7 @@
 name: RapidShark
 short: RK
 uri: qr{rapidshark\.pl/}
-status: OK 2009-08-26
+status: OK 2009-08-28
 
 start:
 	GET( $-{_uri} );

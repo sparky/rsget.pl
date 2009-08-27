@@ -4,7 +4,7 @@ name: MegaShares
 short: MS
 uri: qr{d01\.megashares\.com/\?d01=}
 cookie: ms
-status: OK ?
+status: OK 2009-08-28
 
 pre:
 	use IPC::Open2;

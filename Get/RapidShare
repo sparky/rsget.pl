@@ -3,7 +3,7 @@
 name: RapidShare
 short: RS
 uri: qr{rapidshare\.com/}
-status: OK 2009-08-24
+status: OK 2009-08-28
 
 start:
 	GET( $-{_uri} );

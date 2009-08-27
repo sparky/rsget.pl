@@ -5,7 +5,7 @@ short: OS
 uri: qr{odsiebie\.com/pokaz/}
 cookie: os
 slots: 8
-status: OK 2009-08-25
+status: OK 2009-08-28
 
 start:
 	GET( $-{_uri} );
