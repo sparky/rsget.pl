@@ -25,7 +25,8 @@ endif
 install:
 	rm -f {RSGet,Get,Link,data}/*~
 	install -d $(DESTDIR)$(DATADIR)/{RSGet,Get,Link,data} $(DESTDIR)$(BINDIR)
-	install rsget.pl $(DESTDIR)$(BINDIR)
+	sed 's#\($$data_path\) =.*;#\1 = "$(DATADIR)";#' < rsget.pl > rsget.pl.datadir
+	install rsget.pl.datadir $(DESTDIR)$(BINDIR)/rsget.pl
 	cp RSGet/*.pm $(DESTDIR)$(DATADIR)/RSGet
 	cp Get/* $(DESTDIR)$(DATADIR)/Get
 	cp Link/* $(DESTDIR)$(DATADIR)/Link
