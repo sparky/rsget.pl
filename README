@@ -1,0 +1,22 @@
+
+TODO:
+- Write documentation
+
+
+Features:
+- Perfect for screen session
+- Support for many download services
+- Supports multiple network interfaces
+- Dead interfaces are kicked out (useful with unreliable vpn tunnels)
+- Continues partially downloaded files (if download service allows it)
+- Incorporates small HTTP server allowing to check the status of downloads,
+  and add new links.
+
+Bugs:
+- MicroHTTP freezes whole program if there is an open connection.
+
+
+Command-line options:
+ -s <PORT>      - starts MicroHTTP server at specified port
+ -i <IF1>,<IF2> - list of network interfaces or IP numbers
+ <FILENAME>     - file to use as link list file (must exist)
