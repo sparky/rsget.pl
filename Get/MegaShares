@@ -45,8 +45,7 @@ start:
 		my $left = $1;
 		m{Your download passport will renew in\s*<strong>0</strong>:<strong>(\d+)</strong>:<strong>(\d+)</strong>}s;
 		my $time = s2string( $1 * 60 + $2 );
-		my $if = $-{_outif} ? "[$-{_outif}]" : "";
-		p "${if}[MS] Passport: $left, $time";
+		LOG( "Passport: $left, $time" );
 
 		return $self->stage_download();
 	}
@@ -74,8 +73,8 @@ start:
 
 	GET( $ajax );
 
-	RESTART( 10, "Passport reactivated" ) if m{Thank you for reactivating your passport};
-	RESTART( 10, "Wrong captcha ?" );
+	RESTART( 2, "Passport reactivated" ) if m{Thank you for reactivating your passport};
+	RESTART( 2, "Wrong captcha ?" );
 
 	GET( "" );
 stage_download:
