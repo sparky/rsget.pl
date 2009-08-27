@@ -1,0 +1,33 @@
+#!/usr/bin/perl
+
+name: StorageTo
+short: ST
+uri: qr{storage\.to/}
+status: OK 2009-08-24
+
+start:
+	GET( $-{_uri} );
+
+	! m{<span class="orange">.*?:</span> (.*?) <span class="light">\(([\d\.]+ [KM]B)\)</span>};
+	INFO( name => $1, size => $2 );
+
+	! /onclick='javascript:startcountdown\("(.*?)", "(.*?)"\);'/;
+	GET( "/getlink/$2/" );
+
+	! s/^.*?{\s+//;
+	! s/\s+}.*?$//;
+
+	! /'countdown'\s*:\s*(\d+)/;
+	my $wait = $1;
+	RESTART( $wait, "free limit reached" )
+		unless /'state'\s*:\s*'ok'/;
+
+	! /'link'\s*:\s*'(.*?)'/ and $1;
+	$-{file_uri} = $1;
+
+	WAIT( $wait, "starting download" );
+
+	delete $-{_referer}; # started from ajax, there must be no referer
+	DOWNLOAD( $-{file_uri} );
+
+# vim:ts=4:sw=4

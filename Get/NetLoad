@@ -1,0 +1,231 @@
+#!/usr/bin/perl
+
+name: NetLoad
+short: NL
+uri: qr{netload\.in/datei}
+cookie: nl
+status: OK 2009-08-24
+
+pre:
+	use IPC::Open2;
+	use GD;
+
+	die "Both ocrad and gocr are required\n" unless
+		require_prog( "ocrad" ) and require_prog( "gocr" );
+	die "pngtopnm is required\n" unless require_prog( "pngtopnm" );
+
+start:
+	GET( $-{_uri} );
+
+	ERROR( "file not found" )
+		if /(Sorry, we don't host the requested file|unknown_file_data)/;
+	! m#<div class="dl_first_filename">\s*(.+?)<span.*?>, (\d+\.\d+ MB)</span></div>#s;
+	INFO( name => $1, size => $2 );
+
+	RESTART( 60 )
+		if /We will prepare your download/;
+
+	! /href="(.*?captcha=1)"/;
+	GET( de_ml( $1 ) );
+	$-{dl_page} = $-{_referer};
+
+	RESTART( 1 ) if /"(.*?captcha=1)"/;
+
+	SEARCH(
+		action => qr#<form method="post" action="(.*?)">#,
+		captcha_img => qr#"(share/includes/captcha\.php\?t=[0-9]+)"#,
+		file_id => qr#input name="file_id" .*value="(.*?)"#,
+		s3wait => qr#please wait .*countdown\(([0-9]+),#,
+	);
+
+	GET( $-{captcha_img} );
+
+	$-{captcha} = Get::NetLoad::Captcha::resolve( \$_ );
+	RESTART( 1 ) unless defined $-{captcha};
+
+	WAIT( $-{s3wait} / 100, "checking" );
+
+	$-{_referer} = $-{dl_page};
+	GET( $-{action}, post => {
+		file_id => $-{file_id},
+		captcha_check => $-{captcha},
+		start => ''
+	} );
+
+	RESTART( 1 )
+		if /You may forgot the security code or it might be wrong/;
+	ERROR( "file not found" )
+		if /This file is currently unavailable/;
+	RESTART( $1 / 100, "free limit reached" )
+		if /You could download your next file in.*countdown\(([0-9]+)/;
+
+	! /<a class="Orange_Link" href="(.*?)"/;
+	$-{file_uri} = $1;
+
+	! /please wait .*countdown\(([0-9]+),/;
+	WAIT( $1 / 100, "starting download" );
+
+	DOWNLOAD( $-{file_uri} );
+
+perl:
+package Get::NetLoad::Captcha;
+
+sub blankline
+{
+	my $img = shift;
+	my $x = shift;
+	my $n = 0;
+	my $white = $img->colorClosest( 255, 255, 255 );
+	foreach my $y ( 0..28 ) {
+		my $ci = $img->getPixel( $x, $y );
+		next if $ci == $white;
+		$n++;
+		return 0 if $n > 1;
+	}
+	return 1;
+}
+
+sub blanklinev
+{
+	my $img = shift;
+	my $y = shift;
+	my $y2 = $y + shift;
+	my $xmin = shift;
+	my $xmax = shift;
+	my $n = 0;
+	my $white = $img->colorClosest( 255, 255, 255 );
+	foreach my $x ( $xmin..$xmax ) {
+		my $ci = $img->getPixel( $x, $y );
+		$n++ if $ci != $white;
+		$ci = $img->getPixel( $x, $y2 );
+		$n++ if $ci != $white;
+		return 0 if $n > 2;
+	}
+	return 1;
+}
+
+sub charat
+{
+	my $img = shift;
+	my $trimg = shift;
+	my $sx = shift;
+
+	my $xmin = $sx;
+	until( blankline( $img, $xmin ) ) {
+		$xmin--;
+	}
+	my $xmax = $sx+1;
+	until( blankline( $img, $xmax ) ) {
+		$xmax++;
+	}
+	my $ymin = 14;
+	until( blanklinev( $img, $ymin, -1, $xmin, $xmax ) ) {
+		$ymin--;
+	}
+	my $ymax = 15;
+	until( blanklinev( $img, $ymax, +1, $xmin, $xmax ) ) {
+		$ymax++;
+	}
+
+	my $w = $xmax - $xmin;
+	my $h = $ymax - $ymin;
+	my $nimg = new GD::Image( $w * 4 + 16, ($h > 12 ? $h : 12 ) + 4 );
+	my $nw = $nimg->colorAllocate( 255, 255, 255);
+	$nimg->copy( $trimg, 1, 1, $xmin, $ymin, $w, $h );
+	$nimg->copy( $trimg, 3 + 1*$w, 1, $xmin, $ymin, $w, $h );
+	$nimg->copy( $trimg, 13 + 2*$w, 1, $xmin, $ymin, $w, $h );
+	$nimg->copy( $trimg, 15 + 3*$w, 1, $xmin, $ymin, $w, $h );
+
+	IPC::Open2::open2( *READ, *WRITE, "pngtopnm | gocr -f ASCII -a 5 -m 56 -C 0123456789 - 2>/dev/null" );
+	print WRITE $nimg->png;
+	close WRITE;
+	my $num = <READ> || "";
+	close READ;
+
+	my ($gocr) = ($num =~ /^([0-9])/);
+
+	IPC::Open2::open2( *READ, *WRITE, "pngtopnm | ocrad --filter=numbers_only - 2>/dev/null" );
+	print WRITE $nimg->png;
+	close WRITE;
+	$num = <READ> || "";
+	close READ;
+
+	my ($ocrad) = ($num =~ /^([0-9])/);
+
+	#print "G: $gocr, O: $ocrad\n";
+	if ( defined $gocr ) {
+		return 7 if ( defined $ocrad and $ocrad == 7 and $gocr == 1 );
+		return $gocr;
+	} elsif ( defined $ocrad ) {
+		return $ocrad;
+	}
+	return undef;
+}
+
+sub resolve
+{
+	my $capdata = shift;
+
+	my $img = GD::Image->new( $$capdata );
+	my $white = $img->colorClosest( 255, 255, 255 );
+
+	foreach my $y ( 0..28 ) {
+		$img->setPixel( 0, $y, $white );
+		$img->setPixel( 73, $y, $white );
+	}
+	foreach my $x ( 0..73 ) {
+		$img->setPixel( $x, 0, $white );
+		$img->setPixel( $x, 28, $white );
+	}
+
+	foreach my $y ( 1..27 ) {
+		FORX: foreach my $x ( 1..72 ) {
+			my $ci = $img->getPixel( $x, $y );
+			next if $ci == $white;
+			my @xy = ( [0, 1], [0, -1], [1, 0], [-1, 0] );
+	
+			my $wrong = 0;
+			foreach my $xy ( @xy ) {
+				my $c = $img->getPixel( $x + $xy->[0], $y + $xy->[1] );
+				if ( $c != $white ) {
+					$wrong++;
+					next FORX if $wrong > 1;
+				}
+			}
+	
+			$img->setPixel( $x, $y, $white );
+		}
+	}
+
+
+	my $trimg = GD::Image->newTrueColor( 74, 29 );
+	my $trwhite = $trimg->colorAllocate( 255, 255, 255 );
+	$trimg->fill( 0, 0, $trwhite );
+	foreach my $y ( 0..28 ) {
+		foreach my $x ( 0..73 ) {
+			my $ci = $img->getPixel( $x, $y );
+			my ($r, $g, $b ) = $img->rgb( $ci );
+			$r = (256 - $r) / 256;
+			$g = (256 - $g) / 256;
+			$b = (256 - $b) / 256;
+			my $c = 256 - 256 * (($r * $g * $b) ** (1/3));
+
+			my $gray = $trimg->colorResolve( $c, $c, $c );
+	
+			$trimg->setPixel( $x, $y, $gray );
+		}
+	}
+	
+	my @n;
+	push @n, charat( $img, $trimg, 9 );
+	push @n, charat( $img, $trimg, 28 );
+	push @n, charat( $img, $trimg, 42 );
+	push @n, charat( $img, $trimg, 58 );
+	foreach (@n) {
+		return undef unless defined $_;
+	}
+
+	return join "", @n;
+}
+
+# vim:ts=4:sw=4

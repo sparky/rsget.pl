@@ -1,0 +1,115 @@
+#!/usr/bin/perl
+
+name: MegaShares
+short: MS
+uri: qr{d01\.megashares\.com/\?d01=}
+cookie: ms
+status: OK ?
+
+pre:
+	use IPC::Open2;
+	my @ocr;
+	push @ocr, "gocr -f ASCII -a 5 -m 56 -C 0-9 -l 31" if require_prog( "gocr" );
+	push @ocr, "ocrad --filter=numbers_only" if require_prog( "ocrad" );
+	die "ocrad or gocr is required" unless @ocr;
+	die "pngtopnm is required" unless require_prog( "pngtopnm" );
+
+start:
+	my $stime = time() - 600;
+	my @line = (qw(.megashares.com TRUE / FALSE), $stime + 43200, 'freest', $stime . "%3A" );
+
+	open my $c, ">", $-{_cookie};
+	print $c join( "\t", @line ), "\n";
+	close $c;
+
+	GET( $-{_uri} );
+
+	ERROR( "temporarily unavailable" )
+		if m{<dd class="red">([^<]|<br>)*(link is currently offline)([^<]|<br>)*</dd>};
+	ERROR( "file not found" )
+		if m{<dd class="red">([^<]|<br>)*(Link was removed|Invalid link)([^<]|<br>)*</dd>};
+	MULTI()
+		if m{You already have the maximum of 1 download running};
+
+	m{<dt>Filename:&nbsp;<strong>(.*?)</strong>&nbsp;&nbsp;&nbsp;size: (\d+\.\d+ [GMK]B)</dt>};
+	INFO( name => $1, size => $2 );
+
+	RESTART( $1 * 60 + $2, "free limit reached" )
+		if m{Your download passport will renew\s*in 00:<strong>(\d+)</strong>:<strong>(\d+)</strong>};
+
+	unless( m{<dt>Your Passport needs to be reactivated.</dt>} ) {
+		! m{<a href="(.*?)">Click here to download</a>};
+		$-{file_uri} = $1;
+
+		m{You have ([\d\.]+ .*?) left that you can download with this passport.};
+		my $left = $1;
+		m{Your download passport will renew in\s*<strong>0</strong>:<strong>(\d+)</strong>:<strong>(\d+)</strong>}s;
+		my $time = s2string( $1 * 60 + $2 );
+		my $if = $-{_outif} ? "[$-{_outif}]" : "";
+		p "${if}[MS] Passport: $left, $time";
+
+		return $self->stage_download();
+	}
+
+	! m{var request_uri = "(.*?)";};
+	$-{ajax} = $1 . "&rs=check_passport_renewal";
+
+	! m{<input type="hidden" name="random_num" id="random_num" value="(\d+)" />};
+	$-{random_num} = $1;
+
+	! m{<input type="hidden" name="passport_num" id="passport_num" value="([0-9a-f]+)" />};
+	$-{passport_num} = $1;
+
+	! m{<img src="(index.*?)" alt="Security Code"};
+	GET( $1 );
+
+	my $captcha = captcha( \$_ );
+	RESTART( 5, "Can't read captcha" ) unless $captcha;
+
+	my $rand = 1000 * time() + int rand 1000;
+	my $ajax = $-{ajax}
+		. (join "", map { '&rsargs[]=' . $_ }
+			( $captcha, $-{random_num}, $-{passport_num}, "replace_sec_pprenewal" ) )
+		. "&rsrnd=$rand";
+
+	GET( $ajax );
+
+	RESTART( 10, "Passport reactivated" ) if m{Thank you for reactivating your passport};
+	RESTART( 10, "Wrong captcha ?" );
+
+	GET( "" );
+stage_download:
+
+	DOWNLOAD( $-{file_uri} );
+
+perl:
+
+sub run_ocr
+{
+	my $prog = shift;
+	my $png = shift;
+
+	IPC::Open2::open2( *READ, *WRITE, "pngtopnm | $prog - 2>/dev/null" );
+	print WRITE $$png;
+	close WRITE;
+	my $num = <READ> || "";
+	close READ;
+
+	my ($ret) = ($num =~ /([0-9]{4})/);
+	return $ret;
+}
+
+
+sub captcha
+{
+	my $png = shift;
+
+	foreach ( @ocr ) {
+		my $ret = run_ocr( $_, $png );
+		return $ret if $ret;
+	}
+
+	return undef;
+}
+
+# vim:ts=4:sw=4

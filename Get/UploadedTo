@@ -1,0 +1,33 @@
+#!/usr/bin/perl
+
+name: UploadedTo
+short: UT
+uri: qr{(uploaded|ul)\.to/}
+status: OK 2009-08-24
+
+start:
+	GET( $-{_uri} );
+
+	RESTART( $1 * 60, "free limit reached" )
+		if /Or wait (\d+) minutes/;
+
+	if ( $-{_referer} =~ m#/\?view=# ) {
+		ERROR( "file not found" ) if $-{_referer} =~ /fileremoved/;
+		ERROR( "unknown error" );
+	}
+
+	! m{<title>(.*?) \.\.\. at uploaded\.to - };
+	my $name = $1;
+	! m{<tr><td style="padding-left:4px;">Filesize: &nbsp;</td><td>\s*(\d+\.\d+ [KM]B)\s*</td></tr>};
+	INFO( name => $name, size => $1 );
+
+
+	! m#<form name="download_form" method="post" action="(.*)">#;
+	$-{file_uri} = $1;
+
+	! m#var secs = (\d+); // Wartezeit#;
+	WAIT( $1, "starting download" );
+
+	DOWNLOAD( $-{file_uri}, post => { download_submit => "Download" } );
+
+# vim:ts=4:sw=4

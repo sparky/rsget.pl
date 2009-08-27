@@ -1,0 +1,66 @@
+#!/usr/bin/perl
+
+name: RapidShark
+short: RK
+uri: qr{rapidshark\.pl/}
+status: OK 2009-08-26
+
+start:
+	GET( $-{_uri} );
+
+	ERROR( "file not found" )
+		if m{<b>(Plik nie został odnaleziony|File Not Found|Datei nicht gefunden)</b>};
+	ERROR( "file not found" )
+		if m{<font class="err">No such file};
+
+	m{<font style="font-size:12px;">Chcesz pobrac plik <font color="red">.*/(.*?)</font> \(([\d\.]+ ([MK])?b)\)</font>};
+	INFO( name => $1, size => $2 );
+
+	! s/^.*?<Form method="POST" action=''>//s;
+	! s/(.*?)<\/Form>.*$/$1/s;
+
+	my %opts;
+	$opts{$1} = $2 while s/<input type="hidden" name="(.*?)" value="(.*?)">//;
+
+	! m{<input type="submit" name="method_free" value="(.*?)">};
+	$opts{method_free} = $1;
+
+	GET( "", post => \%opts );
+
+	if ( /You have to wait (.*) till next download/ ) {
+		$_ = $1;
+		my $wait = 0;
+		$wait += 60 * 60 * $1 if /(\d+) hour/;
+		$wait += 60 * $1 if /(\d+) minute/;
+		$wait += $1 if /(\d+) second/;
+		RESTART( $wait, "free limit reached" );
+	}
+
+	! s/^.*?<Form name="F1" method="POST" action=""//s;
+	! s/(.*?)<\/Form>.*$/$1/s;
+
+	! m{<div .*?>(.*)</div>\s+</td><td align=left valign=middle><input type="text" name="code" class="captcha_code"></td></tr>}s;
+	my %opts = ( code => captcha( $1 ) );
+
+
+	$opts{$1} = $2 while s/<input type="hidden" name="(.*?)" value="(.*?)">//s;
+
+	! m{<input type="submit" id="btn_download" value="(.*?)">};
+	$opts{btn_download} = $1;
+
+	$-{post} = \%opts;
+
+	! m{<span id="countdown">(\d+)</span>};
+	WAIT( $1, "starting download" );
+	
+	DOWNLOAD( $-{_referer}, post => $-{post} );
+
+perl:
+	sub captcha
+	{
+		my %c = map /<span.*?padding-left:\s*?(\d+)px;.*?>(\d)</g, shift;
+		my @c = map { $c{$_} } sort { $a <=> $b } keys %c;
+		return join "", @c;
+	}
+
+# vim:ts=4:sw=4

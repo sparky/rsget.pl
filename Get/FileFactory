@@ -1,0 +1,40 @@
+#!/usr/bin/perl
+
+name: FileFactory
+short: FF
+uri: qr{filefactory\.com/}
+status: OK 2009-08-24
+
+start:
+	GET( $-{_uri} );
+
+	ERROR( "file not found" ) if /File Not Found/;
+	! m{<h1>(<a.*?</a>|<img .*?/>)&nbsp;(.*?)(<span.*?</span>)?</h1>\s*<div id="info" class="metadata">\s*<span>([\d\.]+ [KM]B) file uploaded}s;
+	my ( $name, $size ) = ( $2, $4 );
+	$name =~ s/&#8203;//g;
+	INFO( name => $name, size => $size );
+	
+	MULTI() if /You are currently downloading/;
+	if ( /starthtimer[\s\S]*timerend=d\.getTime\(\)\+(\d+);/m ) {
+		RESTART( $1 / 1000, "free limit reached" ) if $1 > 0;
+	}
+
+	! m#<form action="(.*)" method="post">\s*<input type="submit" value="Free#m;
+	GET( $1, post => { freeBtn => "Free Download" } );
+
+	! m#<a href="(.*?)">Click here to begin your download</a>#;
+	$-{file_uri} = $1;
+	
+	! m#<p id="countdown">(\d+)</p>#;
+	WAIT( $1, "starting soon" );
+
+	DOWNLOAD( $-{file_uri} );
+
+	# file turned out to be html, meens we need to wait
+	MULTI() if /You are currently downloading too many files at once/;
+	RESTART( $1 * 60 - 30, "free limit reached" )
+		if /Please wait (\d+) minutes to download more files/;
+	RESTART( $1, "free limit reached" )
+		if /Please wait (\d+) seconds to download more files/;
+
+# vim:ts=4:sw=4

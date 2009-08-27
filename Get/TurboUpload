@@ -1,0 +1,56 @@
+#!/usr/bin/perl
+
+name: TurboUpload
+short: TU
+uri: qr{turboupload\.com/}
+status: OK 2009-08-24
+
+start:
+	GET( $-{_uri} );
+
+	ERROR( "file not found" ) if /File Not Found/;
+	! m{<h2>\S* \S* (.*?)</h2>\s*<font .*?</font> \((\d+\.\d+ [MK]b)\)</font>}s;
+	INFO( name => $1, size => $2 );
+
+	! s/^.*?<Form method="POST" action=''>//s;
+	! s/(.*?)<\/Form>.*$/$1/s;
+
+	my %opts;
+	$opts{$1} = $2 while s/<input type="hidden" name="(.*?)" value="(.*?)">//;
+	$opts{method_free} = "Free Download";
+
+	GET( "", post => \%opts );
+
+	if ( /You have to wait (.*) till next download/ ) {
+		$_ = $1;
+		my $wait = 0;
+		$wait += 60 * 60 * $1 if /(\d+) hour/;
+		$wait += 60 * $1 if /(\d+) minute/;
+		$wait += $1 if /(\d+) second/;
+		RESTART( $wait, "free limit reached" );
+	}
+
+	! m#Enter code below:[\S\s]*?<div.*?>(.*?)</div>#;
+	my %opts = ( code => captcha( $1 ) );
+
+	! s/^.*?<Form name="F1" method="POST" action=""//s;
+	! s/(.*?)<\/Form>.*$/$1/s;
+
+	$opts{$1} = $2 while s/<input type="hidden" name="(.*?)" value="(.*?)">//s;
+	$opts{btn_download} = "Download File";
+
+	$-{post} = \%opts;
+
+	WAIT( 60, "starting download" );
+	
+	DOWNLOAD( $-{_referer}, post => $-{post} );
+
+perl:
+	sub captcha
+	{
+		my %c = map /<span.*?padding-left:\s*?(\d+)px;.*?>(\d)</g, shift;
+		my @c = map { $c{$_} } sort { $a <=> $b } keys %c;
+		return join "", @c;
+	}
+
+# vim:ts=4:sw=4

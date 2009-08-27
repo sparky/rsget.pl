@@ -1,0 +1,25 @@
+#!/usr/bin/perl
+
+name: OdSiebie
+short: OS
+uri: qr{odsiebie\.com/pokaz/}
+cookie: os
+slots: 8
+status: OK 2009-08-25
+
+start:
+	GET( $-{_uri} );
+
+	ERROR( "some problem, file not found ?" )
+		if $-{_referer} =~ m{/(upload|error)\.html};
+
+	m{<dl class="file-info">.*?<dd>(.*?)</dd>.*?<dd>\s*(\d+\.\d+ MB)</dd>}s;
+	INFO( name => $1, size => $2 );
+
+	! m{href="(/pobierz/\d+---.*?\.html)"};
+	GET( $1 );
+
+	! m{href="(/download/\d+---.*?.html)"};
+	DOWNLOAD( $1 );
+
+# vim:ts=4:sw=4

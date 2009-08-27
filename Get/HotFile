@@ -1,0 +1,33 @@
+#!/usr/bin/perl
+
+name: HotFile
+short: HF
+uri: qr{hotfile\.com/}
+status: BROKEN
+
+start:
+	GET( $-{uri} );
+
+	ERROR( "file not found" ) unless length $_;
+	ERROR( "file not found" ) if /This file is either removed/;
+	MULTI() if /You are currently downloading/;
+	! /starthtimer[\s\S]*?timerend=d\.getTime\(\)\+(\d+);/;
+	RESTART( $1 / 1000, "free limit reached" ) if $1 > 0;
+	! /starttimer[\s\S]*?timerend=d\.getTime\(\)\+(\d+);/;
+	my $wait = $1 / 1000;
+
+	! s/^.*?<form style=".*?" action="(.*?)" method=post name=f>//s;
+	$-{action} = $1;
+	! s#^(.*?)</form>.*#$1#;
+	my %post;
+	$post{$1} = $2 while s/<input type=hidden name=(.*?) value=(.*?)>//;
+	$-{post} = \%post;
+
+	WAIT( $wait,  "starting download" );
+
+	GET( $-{action}, post => $-{post} );
+
+	! m#<a href="(.*?)">Click here to download</a>#;
+	DOWNLOAD( $1 );
+
+# vim:ts=4:sw=4
