@@ -33,6 +33,7 @@ start:
 
 	GET( $-{action}, post => $-{post} );
 
+	ERROR( "captcha not supported" ) if m/<input type=text name=captcha/;
 	! m#<a href="(.*?)">Click here to download</a>#;
 	DOWNLOAD( $1 );
 
