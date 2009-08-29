@@ -3,27 +3,33 @@
 name: HotFile
 short: HF
 uri: qr{hotfile\.com/}
-status: BROKEN
+status: OK 2009-08-29
 
 start:
-	GET( $-{uri} );
+	GET( $-{_uri} );
 
 	ERROR( "file not found" ) unless length $_;
 	ERROR( "file not found" ) if /This file is either removed/;
+
+	! m{<table class="downloading"><tr><td>.*?<b>(.*?)</b> <span class="size">\| ([\d\.]+[KM]b)</span></td></tr></table>};
+	INFO( name => $1, size => $2 );
+
 	MULTI() if /You are currently downloading/;
-	! /starthtimer[\s\S]*?timerend=d\.getTime\(\)\+(\d+);/;
+
+	! /starthtimer.*?timerend=d\.getTime\(\)\+(\d+);/s;
 	RESTART( $1 / 1000, "free limit reached" ) if $1 > 0;
-	! /starttimer[\s\S]*?timerend=d\.getTime\(\)\+(\d+);/;
+
+	! /starttimer.*?timerend=d\.getTime\(\)\+(\d+);/s;
 	my $wait = $1 / 1000;
 
 	! s/^.*?<form style=".*?" action="(.*?)" method=post name=f>//s;
 	$-{action} = $1;
-	! s#^(.*?)</form>.*#$1#;
+	! s#^(.*?)</form>.*#$1#s;
 	my %post;
 	$post{$1} = $2 while s/<input type=hidden name=(.*?) value=(.*?)>//;
 	$-{post} = \%post;
 
-	WAIT( $wait,  "starting download" );
+	WAIT( $wait, "starting download" );
 
 	GET( $-{action}, post => $-{post} );
 
