@@ -3,7 +3,7 @@
 name: MegaShares
 short: MS
 uri: qr{d01\.megashares\.com/\?d01=}
-cookie: ms
+cookie: !ms
 status: OK 2009-08-28
 
 pre:
@@ -15,12 +15,15 @@ pre:
 	die "pngtopnm is required" unless require_prog( "pngtopnm" );
 
 start:
-	my $stime = time() - 600;
+	# create fake cookie to skip first page
+	my $stime = time() - 10000;
 	my @line = (qw(.megashares.com TRUE / FALSE), $stime + 43200, 'freest', $stime . "%3A" );
 
-	open my $c, ">", $-{_cookie};
-	print $c join( "\t", @line ), "\n";
-	close $c;
+	unless ( -r $-{_cookie} ) {
+		open my $c, ">", $-{_cookie};
+		print $c join( "\t", @line ), "\n";
+		close $c;
+	}
 
 	GET( $-{_uri} );
 
@@ -31,8 +34,13 @@ start:
 	MULTI()
 		if m{You already have the maximum of 1 download running};
 
+	RESTART( 600, "servers overloaded" )
+		if m{All download slots for this link are currently filled};
+
 	m{<dt>Filename:&nbsp;<strong>(.*?)</strong>&nbsp;&nbsp;&nbsp;size: (\d+\.\d+ [GMK]B)</dt>};
-	INFO( name => $1, size => $2 );
+	my ( $name, $size ) = ( $1, $2 );
+	$name =~ s/\.\.\.$/\0/;
+	INFO( iname => $name, asize => $size );
 
 	RESTART( $1 * 60 + $2, "free limit reached" )
 		if m{Your download passport will renew\s*in 00:<strong>(\d+)</strong>:<strong>(\d+)</strong>};
