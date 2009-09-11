@@ -1,0 +1,33 @@
+#!/usr/bin/perl
+
+name: zSHARE
+short: zS
+uri: qr{zshare\.net}
+#cookie: zs
+slots: 8
+status: OK ?
+
+start:
+	GET( $-{_uri} );
+
+	ERROR( "file not found" ) if $-{_referer} =~ /file-404.html$/;
+
+	! m{>File Name:\s*<font.*?>(.*?)</font></td>}s;
+	my $name = $1;
+	! m{>File Size:\s*<font.*?>([\d\.]+MB)</font></td>}s;
+	INFO( name => $name, asize => $1 );
+
+	my $x = 10 + int rand 180;
+	my $y = 10 + int rand 37;
+	my $post = "referer2=&download=1&imageField.x=$x&imageField.y=$y&imageField=";
+
+	GET( "", post => $post );
+
+	! m{var link_enc=new Array\('(.*?)'\);};
+	( $-{uri} = $1 ) =~ s/','//g;
+
+	WAIT( 50, "starting download" );
+
+	DOWNLOAD( $-{uri} );
+
+# vim:ts=4:sw=4
