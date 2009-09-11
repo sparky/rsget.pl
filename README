@@ -17,6 +17,6 @@ Bugs:
 
 
 Command-line options:
- -s <PORT>      - starts MicroHTTP server at specified port
+ -p <PORT>      - starts MicroHTTP server at specified port
  -i <IF1>,<IF2> - list of network interfaces or IP numbers
  <FILENAME>     - file to use as link list file (must exist)
