@@ -2,7 +2,7 @@
 
 name: MegaUpload
 short: MU
-uri: qr{mega(upload|porn|rotic)\.com/\?d=}
+uri: qr{mega(upload|porn|rotic)\.com/(../)?\?d=}
 status: OK 2009-08-24
 
 pre:
@@ -12,8 +12,8 @@ pre:
 	die "Font DB '$mu_font_db' does not exist\n" unless -r $mu_font_db;
 
 start:
-	( $-{uri} = $-{_uri} ) =~ s/megarotic/megaporn/;
-	GET( $-{uri} );
+	( my $uri = $-{_uri} ) =~ s/megarotic/megaporn/;
+	GET( $uri );
 stage_first:
 	$-{first_page} = $-{_referer};
 
@@ -22,13 +22,15 @@ stage_first:
 			or /Unfortunately, the link you have clicked is not available/
 			or /This file has expired due to inactivity/;
 	m{<TD valign="middle" align="left" .*?width="500">(.*?)</TD>}s;
-	my @f = map m#<font.*?>(.*?)</font>#g, $1;
-	INFO( name => de_ml( $f[1] ), size => $f[5] );
+	my @f = map m#<font.*?>\s*(.*?)\s*</font>#g, $1;
+	my $name = $f[1];
+	$name =~ s/(.*)\.(\..{1,5})$/$1\0$2/; # mark truncated name
+	INFO( iname => $name, asize => $f[5] );
 
 	if ( /The file you're trying to download is password protected/ ) {
 		ERROR( "password required" ) unless exists $-{_opts}->{mu_pass};
 
-		GET_NEXT( stage_last, $-{uri},
+		GET_NEXT( stage_last, "",
 			post => { filepassword => $-{_opts}->{mu_pass} } );
 	}
 
@@ -44,7 +46,7 @@ stage_first:
 	RESTART( 10, "Can't read captcha" ) unless defined $captcha;
 
 	$-{_referer} = $-{first_page};
-	GET( $-{uri}, post => {
+	GET( "", post => {
 		captchacode => $-{s2icode},
 		megavar => $-{s2mevagar},
 		captcha => $captcha
