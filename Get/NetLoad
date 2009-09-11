@@ -10,26 +10,32 @@ pre:
 	use IPC::Open2;
 	use GD;
 
-	die "Both ocrad and gocr are required\n" unless
-		require_prog( "ocrad" ) and require_prog( "gocr" );
-	die "pngtopnm is required\n" unless require_prog( "pngtopnm" );
+	my @missing;
+	foreach my $prog ( qw(ocrad gocr pngtopnm) ) {
+		push @missing, $prog unless require_prog( $prog );
+	}
+	if ( @missing ) {
+		my $m = join ", ", @missing;
+		die "Missing applications: $m\n";
+	}
 
 start:
 	GET( $-{_uri} );
+stage_first:
 
 	ERROR( "file not found" )
 		if /(Sorry, we don't host the requested file|unknown_file_data)/;
-	! m#<div class="dl_first_filename">\s*(.+?)<span.*?>, (\d+\.\d+ MB)</span></div>#s;
-	INFO( name => $1, size => $2 );
+	m#<div class="dl_first_filename">\s*(.+?)<span.*?>, ([\d\.]+ MB)</span></div>#s;
+	INFO( name => $1, asize => $2 );
 
-	RESTART( 60 )
+	RESTART( 60, "Not prepared" )
 		if /We will prepare your download/;
 
 	! /href="(.*?captcha=1)"/;
 	GET( de_ml( $1 ) );
 	$-{dl_page} = $-{_referer};
 
-	RESTART( 1 ) if /"(.*?captcha=1)"/;
+	RESTART( 1, "Still on the same page ?" ) if /"(.*?captcha=1)"/;
 
 	SEARCH(
 		action => qr#<form method="post" action="(.*?)">#,
@@ -41,7 +47,7 @@ start:
 	GET( $-{captcha_img} );
 
 	$-{captcha} = Get::NetLoad::Captcha::resolve( \$_ );
-	RESTART( 1 ) unless defined $-{captcha};
+	RESTART( 1, "Can't read captcha" ) unless defined $-{captcha};
 
 	WAIT( $-{s3wait} / 100, "checking" );
 
@@ -52,7 +58,7 @@ start:
 		start => ''
 	} );
 
-	RESTART( 1 )
+	RESTART( 1, "Wrong captcha" )
 		if /You may forgot the security code or it might be wrong/;
 	ERROR( "file not found" )
 		if /This file is currently unavailable/;
