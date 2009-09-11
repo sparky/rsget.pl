@@ -14,7 +14,7 @@ start:
 		if m{<font class="err">No such file};
 
 	m{<font style="font-size:12px;">Chcesz pobrac plik <font color="red">.*/(.*?)</font> \(([\d\.]+ ([MK])?b)\)</font>};
-	INFO( name => $1, size => $2 );
+	INFO( name => $1, asize => $2 );
 
 	! s/^.*?<Form method="POST" action=''>//s;
 	! s/(.*?)<\/Form>.*$/$1/s;

@@ -12,7 +12,7 @@ start:
 	ERROR( "file not found" ) if /This file is either removed/;
 
 	! m{<table class="downloading"><tr><td>.*?<b>(.*?)</b> <span class="size">\| ([\d\.]+[KM]b)</span></td></tr></table>};
-	INFO( name => $1, size => $2 );
+	INFO( name => $1, asize => $2 );
 
 	MULTI() if /You are currently downloading/;
 

@@ -8,8 +8,9 @@ status: OK 2009-08-28
 start:
 	GET( $-{_uri} );
 
+	ERROR( "file not found" ) if /File not found\./;
 	! m{<span class="orange">.*?:</span> (.*?) <span class="light">\(([\d\.]+ [KM]B)\)</span>};
-	INFO( name => $1, size => $2 );
+	INFO( name => $1, asize => $2 );
 
 	! /onclick='javascript:startcountdown\("(.*?)", "(.*?)"\);'/;
 	GET( "/getlink/$2/" );

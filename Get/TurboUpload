@@ -10,7 +10,7 @@ start:
 
 	ERROR( "file not found" ) if /File Not Found/;
 	! m{<h2>\S* \S* (.*?)</h2>\s*<font .*?</font> \((\d+\.\d+ [MK]b)\)</font>}s;
-	INFO( name => $1, size => $2 );
+	INFO( name => $1, asize => $2 );
 
 	! s/^.*?<Form method="POST" action=''>//s;
 	! s/(.*?)<\/Form>.*$/$1/s;

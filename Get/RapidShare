@@ -11,9 +11,10 @@ start:
 	ERROR( "file not found" )
 		if /The file could not be found\.  Please check the download link/;
 	ERROR( "file removed" ) if /file has been removed from the server/;
+	ERROR( "file removed" ) if /download of this file is currently not possible|This limit is reached/;
 
 	m#<p class="downloadlink">.*/(.+?) <font style=".*?">\| (\d+ KB)</font></p>#;
-	INFO( name => $1, size => $2, kilo => 1000 );
+	INFO( name => $1, asize => $2, kilo => 1000 );
 
 	RESTART( $1 * 60, "servers overloaded" )
 		if /Unfortunately you will have to wait ([0-9]+) minutes,/;
