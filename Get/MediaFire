@@ -1,0 +1,46 @@
+#!/usr/bin/perl
+
+name: MediaFire
+short: MF
+uri: qr{mediafire\.com/}
+cookie: mf
+slots: 8
+status: OK 2009-08-31
+
+start:
+	GET( $-{_uri} );
+	$-{first_page} = $-{_referer};
+
+	if ( $-{_referer} =~ /error\.php/ ) {
+		ERROR( "file not found" ) if /Invalid File/;
+		ERROR( "some error" );
+	}
+
+	! m{You requested: (.*?) \(([\d\.]+ MB)\)</div>};
+	INFO( name => $1, asize => $2 );
+
+	! /cu\('(.*?)','(.*?)','(.*?)'\);/;
+	GET( "/dynamic/download.php?qk=$1&pk=$2&r=$3" );
+
+	! /var sServer = '(.*?)';/;
+	my $server = $1;
+
+	! /var sQk = '(.*?)';/;
+	my $sqk = $1;
+
+	! /var sFile = '(.*?)';/;
+	my $file = $1;
+
+	! /^(var.*var.*var.*)$/m;
+	my $vars = $1;
+	my %vars = map { /var (.*?)='(.*?)'/ } split /;/, $vars;
+
+	! m{href=\\"http://"\s*\+\s*sServer\s*\+'/'\s*\+(.*?)\+\s*'g/' \+ sQk \+ '/' \+ sFile \+ '"> Click here to start download..</a>';};
+	my $order = $1;
+	my $code = join "", map { $vars{ $_ } } split /\+/, $order;
+	my $uri = "http://$server/${code}g/$sqk/$file";
+
+	$-{_referer} = $-{first_page};
+	DOWNLOAD( $uri );
+
+# vim:ts=4:sw=4
