@@ -18,8 +18,14 @@ start:
 
 	! m{<title>(.*?) \.\.\. at uploaded\.to - };
 	my $name = $1;
+	if ( length $name >= 60 ) {
+		! m{<tr><td style="padding-left:4px;">Filename: &nbsp;</td><td><b>\s+(.*?)\s+</b></td></tr>}s;
+		$name = $1;
+		! m{<tr><td style="padding-left:4px;">Filetype: &nbsp;</td><td>(.*?)</td></tr>};
+		$name .= $1;
+	}
 	! m{<tr><td style="padding-left:4px;">Filesize: &nbsp;</td><td>\s*(\d+\.\d+ [KM]B)\s*</td></tr>};
-	INFO( name => $name, size => $1 );
+	INFO( name => $name, asize => $1 );
 
 
 	! m#<form name="download_form" method="post" action="(.*)">#;
