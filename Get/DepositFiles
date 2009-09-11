@@ -10,7 +10,10 @@ start:
 
 	ERROR( "file not found" ) if /Such file does not exist /;
 	! m{<div class="info">.*?<b .*?>(.*?)</b>\s*<span .*?>.*?<b>(\d+(\.\d+)?)&nbsp;([KM]B)</b></span>}s;
-	INFO( name => $1, size => "$2 $4" );
+	my $name = $1;
+	my $size = "$2 $4";
+	$name =~ s/\.\.\. (\..{1,5})$/\0$1/;
+	INFO( iname => $name, asize => $size );
 	RESTART( 5 * 60, "servers overloaded" )
 		if /We are sorry, but all downloading slots for your country are busy/;
 	

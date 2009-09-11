@@ -12,7 +12,9 @@ start:
 	! m{<h1>(<a.*?</a>|<img .*?/>)&nbsp;(.*?)(<span.*?</span>)?</h1>\s*<div id="info" class="metadata">\s*<span>([\d\.]+ [KM]B) file uploaded}s;
 	my ( $name, $size ) = ( $2, $4 );
 	$name =~ s/&#8203;//g;
-	INFO( name => $name, size => $size );
+	$name =~ s/\.\.\.$/\0/;
+	$-{_referer} =~ m{.*/(.*?)$};
+	INFO( iname => $name, aname => $1, asize => $size );
 	
 	MULTI() if /You are currently downloading/;
 	if ( /starthtimer[\s\S]*timerend=d\.getTime\(\)\+(\d+);/m ) {
@@ -30,7 +32,7 @@ start:
 
 	DOWNLOAD( $-{file_uri} );
 
-	# file turned out to be html, meens we need to wait
+	# file turned out to be html, means we have to wait
 	MULTI() if /You are currently downloading too many files at once/;
 	RESTART( $1 * 60 - 30, "free limit reached" )
 		if /Please wait (\d+) minutes to download more files/;
