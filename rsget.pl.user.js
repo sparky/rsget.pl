@@ -89,52 +89,27 @@
 					add_links( links, fake_text( end.nodeValue.substr( 0, range.endOffset ) ) );
 			}
 		}
-		send( "links=" + escape( links.join( "\n" ) ) );
+		window.setTimeout( send, 0, links.join( "\n" ) );
 	}
-	GM_registerMenuCommand("Add links to rsget.pl", extract_links);
+	GM_registerMenuCommand("Add links to rsget.pl", extract_links, null, null, "r");
 
-	function add_comment()
+	function send( text )
 	{
-		var range;
-		var sel;
-		try {
-			sel = window.getSelection();
-			range = sel.getRangeAt( 0 );
-		} catch ( e ) {}
-		var links = new Array;
-
-		if ( !range || range.collapsed ) {
-			alert( "Can create comments only from selection" );
-			return;
-		}
-		send( "comment=" + escape( sel ) );
-	}
-	GM_registerMenuCommand("Add comments to rsget.pl", add_comment);
-
-
-	function onload( req )
-	{
-		GM_log( req.responseText );
-	}
-
-	function onerror( req )
-	{
-	}
-
-	function send( post )
-	{
-		var server = GM_getValue( "server", "http://localhost:8080/" );
+		var server = GM_getValue( "server", "http://localhost:5666/" );
 		GM_setValue( "server", server );
 		var uri = server + "add";
 
-		GM_xmlhttpRequest( {
-			method: "POST",
-			url: uri,
-			headers: { 'Content-type': 'application/x-www-form-urlencoded' },
-			data: post,
-			onload: onload,
-			onerror: onerror
-		} );
+		var form = document.createElement( 'form' );
+		form.setAttribute( 'action', uri );
+		form.setAttribute( 'method', 'POST' );
+		form.setAttribute( 'target', '_blank' );
+
+		var ar = document.createElement( 'textarea' );
+		ar.setAttribute( 'name', 'links' );
+		ar.value = text;
+		form.appendChild( ar );
+		document.body.appendChild( form );
+		form.submit();
 	}
 }());
 
