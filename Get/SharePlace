@@ -1,0 +1,28 @@
+#!/usr/bin/perl
+
+name: SharePlace
+short: SP
+uri: qr{shareplace\.com/}
+slots: 8
+status: OK 2009-09-12
+
+start:
+	GET( $-{_uri} );
+
+	ERROR( "file not found" )
+		if /Your requested file is not found/;
+
+	! m#<b>File name: </b>(.*)<b><br>\s*File size: </b>([\d\.]+ [MkK]B)<b><br>#s;
+	INFO( name => $1, asize => $2 );
+
+	RESTART( - ( 60 + int rand 300 ), "limit reached" ) if /You have got max allowed download sessions from the same IP/;
+
+	! m#input type=button.*document.location="(.*?)"'>#;
+	$-{file_uri} = $1;
+
+	! /var timeout='(\d+)';/;
+	WAIT( $1, "starting download" );
+
+	DOWNLOAD( $-{file_uri} );
+
+# vim:ts=4:sw=4
