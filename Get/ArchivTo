@@ -1,0 +1,23 @@
+#!/usr/bin/perl
+
+name: ArchivTo
+short: AT
+uri: qr{archiv\.to/}
+slots: 8
+status: OK 2009-09-12
+
+start:
+	GET( $-{_uri} );
+
+	ERROR( "file not found" )
+		if /Datei wurde entfernt/;
+
+	! m#<td width="23%">Originaldatei</td>\s*<td width="77%">: <a href="(.*?)" .*?>(.*?)</a></td></tr>#s;
+	my ( $file_uri, $name ) = ( $1, $2 );
+
+	m#<td width="23%">Dateigröße</td>\s*<td width="77%">: (\d+) Bytes#s;
+	INFO( name => $name, size => $1 );
+
+	DOWNLOAD( de_ml( $file_uri ) );
+
+# vim:ts=4:sw=4
