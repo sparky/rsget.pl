@@ -1,0 +1,32 @@
+#!/usr/bin/perl
+
+name: SendSpacePL
+short: SS.pl
+uri: qr{sendspace\.pl/}
+cookie: ss.pl
+status: OK 2009-09-12
+
+start:
+	GET( $-{_uri} );
+
+	ERROR( "file not found" )
+		if /Podany plik nie istnieje lub został usunięty./;
+
+	! m#<div class="text"><span class="black3">Nazwa pliku:</span></div>\s*<div class="info"><span class="black"><b>(.*?)</b></span></div>#s;
+	my $name = $1;
+	$name =~ s/\.\.\.$/\0/;
+
+	! m#<div class="text"><span class="black3">Rozmiar pliku:</span></div>\s*<div class="info"><span class="blue4">([\d,]+ MB)</span></div>#s;
+	my $size = $1;
+	$size =~ s/,/\./;
+
+	INFO( name => $name, asize => $size );
+
+	! m#<span class="grey3">pobierz plik:</span>.*?<a href="(.*?)"#;
+	my $file_uri = $1;
+
+	DOWNLOAD( $file_uri );
+
+	RESTART( $1, "free limit reached" ) if /setDownloadTimeOut\('(\d+)'\);/;
+
+# vim:ts=4:sw=4
