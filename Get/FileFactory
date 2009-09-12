@@ -3,12 +3,12 @@
 name: FileFactory
 short: FF
 uri: qr{filefactory\.com/}
-status: OK 2009-08-24
+status: OK 2009-09-12
 
 start:
 	GET( $-{_uri} );
 
-	ERROR( "file not found" ) if /File Not Found/;
+	ERROR( "file not found" ) if /File Not Found|This file has been deleted/;
 	! m{<h1>(<a.*?</a>|<img .*?/>)&nbsp;(.*?)(<span.*?</span>)?</h1>\s*<div id="info" class="metadata">\s*<span>([\d\.]+ [KM]B) file uploaded}s;
 	my ( $name, $size ) = ( $2, $4 );
 	$name =~ s/&#8203;//g;

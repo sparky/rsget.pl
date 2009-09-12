@@ -3,16 +3,16 @@
 name: DepositFiles
 short: DF
 uri: qr{depositfiles\.com/}
-status: OK 2009-08-24
+status: OK 2009-09-12
 
 start:
 	GET( $-{_uri} );
 
 	ERROR( "file not found" ) if /Such file does not exist /;
-	! m{<div class="info">.*?<b .*?>(.*?)</b>\s*<span .*?>.*?<b>(\d+(\.\d+)?)&nbsp;([KM]B)</b></span>}s;
+
+	! m{<div class="info">.*?<b title="(.*?)">.*?</b>\s*<span .*?>.*?<b>(\d+(\.\d+)?)&nbsp;([KM]B)</b></span>}s;
 	my $name = $1;
-	my $size = "$2 $4";
-	$name =~ s/\.\.\. (\..{1,5})$/\0$1/;
+	my $size = "$2$4";
 	INFO( iname => $name, asize => $size );
 	RESTART( 5 * 60, "servers overloaded" )
 		if /We are sorry, but all downloading slots for your country are busy/;
