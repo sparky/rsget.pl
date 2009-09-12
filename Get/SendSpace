@@ -1,0 +1,25 @@
+#!/usr/bin/perl
+
+name: SendSpace
+short: SS
+uri: qr{sendspace\.com/}
+cookie: ss
+status: OK 2009-09-12
+
+start:
+	GET( $-{_uri} );
+
+	ERROR( "file not found" )
+		if /Sorry, the file you requested is not available/;
+
+	! m#<b>Name:</b>\s*(.*?)\s*<br><b>Size:</b>\s*(\d+MB)\s*<br>#;
+	INFO( name => $1, asize => $2 );
+
+	! m#<a id="downlink" class="mango" href="(.*?)"#;
+	my $file_uri = $1;
+
+	DOWNLOAD( $file_uri );
+
+	MULTI() if /You cannot download more than one file at a time/;
+
+# vim:ts=4:sw=4
