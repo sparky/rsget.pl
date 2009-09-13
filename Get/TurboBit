@@ -1,0 +1,59 @@
+#!/usr/bin/perl
+
+name: TurboBit
+short: TB
+uri: qr{turbobit\.net/}
+cookie: tb
+slots: 8
+status: OK 2009-09-13
+
+start:
+	GET( $-{_uri} );
+
+	ERROR( "file not found" ) if m#<div class="code-404">404</div>#;
+	ERROR( "file not found" ) if m#Файл не найден. Возможно он был удален|File was not found. It could possibly be deleted#;
+
+	! m#<h1 class="download-file">.*?<span.*?>&nbsp;</span><b>(.*?)</b></h1>#;
+	my $name = $1;
+	! m#<div class="download-file">\s*<div><b>.*?</b> ([\d,\.]+ .)#;
+	my $size = $1. "B";
+	$size =~ tr/Мк,/Mk./;
+	INFO( name => $name, asize => $size );
+
+	! m#<td><a class="free" href="(.*?)" onclick#;
+	GET( $1 );
+stage_captcha:
+	$-{c_page} = $-{_referer};
+
+	unless ( m#<img alt="Captcha" src="(.*?)"# ) {
+		! m#var Timeout = {\s*limit: (\d+),#s;
+		RESTART( $1, "free limit reached" );
+	}
+	GET( $1 );
+
+	CAPTCHA( "image/png" );
+	$-{_referer} = $-{c_page};
+	
+	GET( "#", post => { captcha_response => $_ } );
+	$-{dl_page} = $-{_referer};
+
+	unless ( /updateTime: function/ ) {
+		PRINT( "Invalid captcha" );
+		return $self->stage_captcha();
+	}
+
+	! m{\$\("#timeout"\)\.load\("(/download/timeout/.*?)"\);};
+	$-{dl_link} = $1;
+
+	! m#var Timeout = {\s*limit: (\d+),#;
+	WAIT( -$1, "starting download" );
+
+	GET( $-{dl_link} );
+
+	$-{_referer} = $-{dl_page};
+
+	! m#<a href='(.*?)'>#;
+
+	DOWNLOAD( $1 );
+
+# vim:ts=4:sw=4
