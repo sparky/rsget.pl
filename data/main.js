@@ -70,9 +70,39 @@ function update_page( body )
 		if ( !old )
 			continue;
 
-		old.parentNode.replaceChild( ne, old );
+		if ( id == "f_notify" )
+			update_notify( ne, old );
+		else
+			old.parentNode.replaceChild( ne, old );
 		if ( id == "f_dllist" || id == "f_addlist" || id == "f_listask" )
 			add_DL_commands( ne );
+	}
+}
+
+function update_notify( n_f, o_f )
+{
+	var nid = {};
+	var n = n_f.lastChild;
+	var o = o_f.lastChild;
+	
+	var node;
+	while ( node = n.firstChild ) {
+		var id = node.getAttribute( 'id' );
+		nid[ id ] = node;
+		node.parentNode.removeChild( node );
+	}
+	for ( var i = o.childNodes.length - 1; i >= 0; i-- ) {
+		node = o.childNodes[ i ];
+		var id = node.getAttribute( 'id' );
+		if ( nid[ id ] ) {
+			delete nid[ id ];
+		} else {
+			node.parentNode.removeChild( node );
+		}
+	}
+	for ( var id in nid ) {
+		node = nid[ id ];
+		o.appendChild( node );
 	}
 }
 

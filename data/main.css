@@ -188,3 +188,22 @@ div.progress span {
 .tools span:hover {
 	text-decoration: underline;
 }
+
+
+li.captcha {
+	height: 60px;
+}
+li.captcha iframe {
+	float: left;
+	height: 50px;
+	width: 20px;
+}
+li.captcha img {
+	display: block;
+	float: left;
+}
+
+li.captcha input {
+	width: auto;
+	margin-left: 20px;
+}
