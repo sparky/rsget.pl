@@ -32,9 +32,40 @@ start:
 	WAIT( $wait, "starting download" );
 
 	GET( $-{action}, post => $-{post} );
+	$-{dl_page} = $-{_referer};
 
-	ERROR( "captcha not supported" ) if m/<input type=text name=captcha/;
+	if ( m#<a href="(.*?)">Click here to download</a># ) {
+		return $self->stage_download();
+	}
+
+	! s#^.*<form action="(.*?)" method="post">##s;
+	$-{form_uri} = $1;
+
+	my %post = ( action => "checkcaptcha" );
+	! m#<input type=hidden name=captchaid value=(\d+)>#;
+	$post{captchaid} = $1;
+	! m#<input type=hidden name=hash1 value=(\S+?)>#;
+	$post{hash1} = $1;
+	! m#<input type=hidden name=hash2 value=(\S+?)>#;
+	$post{hash2} = $1;
+
+	$-{post} = \%post;
+
+	! m#<img src="(/captcha\.php.*?)">#;
+	my $img = $1;
+
+	GET( $img );
+	$-{_referer} = $-{dl_page};
+
+	CAPTCHA( "image/jpeg" );
+
+	$-{post}->{captcha} = $_;
+
+	GET( $-{form_uri}, post => $-{post} );
+stage_download:
+
 	! m#<a href="(.*?)">Click here to download</a>#;
+
 	DOWNLOAD( $1 );
 
 # vim:ts=4:sw=4
