@@ -2,7 +2,7 @@
 
 name: TurboBit
 short: TB
-uri: qr{turbobit\.net/}
+uri: qr{turbobit\.(net|ru)/}
 cookie: tb
 slots: 8
 status: OK 2009-09-13
