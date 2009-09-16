@@ -1,0 +1,14 @@
+#!/usr/bin/perl
+
+name: LinkProtector
+short: link-protector
+uri: qr{link-protector\.com/}
+status: OK 2009-09-12
+
+start:
+	GET( $-{_uri} );
+	! m#<INPUT type="button" value="CONTINUE ..." name="Continue" onClick="window.location='(.*?)'"#;
+
+	LINK( $1 );
+
+# vim:ts=4:sw=4

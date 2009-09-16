@@ -6,6 +6,7 @@ uri: qr{anonym\.to/}
 status: OK 2009-08-25
 
 start:
+	GET( $-{_uri} );
 	$_ = $-{_uri};
 	s{^http://anonym.to/\?}{};
 	LINK( $_ );

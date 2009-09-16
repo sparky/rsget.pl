@@ -1,0 +1,30 @@
+#!/usr/bin/perl
+
+name: Simple
+short: simple.link
+uri: qr{4gk\.com/|xurl\.jp/|tinyurl\.com/|linkhider\.com/}
+status: OK 2009-09-12
+
+start:
+	my $uri = $-{_uri};
+	$uri =~ s#(xurl.*)\.html#$1#;
+	GET( $uri );
+	$-{_uri} =~ m#^(http://.*?/)#;
+	my $serv = quotemeta $1;
+
+	my $link;
+	if ( $-{_referer} =~ m#^$serv# ) {
+		if ( m#<meta http-equiv="refresh" content="\d+;url='(.*?)'">#i ) {
+			$link = $1;
+		} elsif ( m#<i?frame\s+.*?src="(http://.*?)">#i ) {
+			$link = $1;
+		} else {
+			ERROR( "can't find link" );
+		}
+	} else {
+		$link = $-{_referer};
+	}
+
+	LINK( $link );
+
+# vim:ts=4:sw=4
