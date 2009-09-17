@@ -1,0 +1,76 @@
+#!/usr/bin/perl
+
+name: SharingMatrix
+short: SM
+uri: qr{sharingmatrix\.com/}
+cookie: sm
+status: OK 2009-09-17
+
+start:
+	GET( $-{_uri} );
+	$-{page} = $-{_referer};
+
+	ERROR( "file not found" ) if m#File has been deleted#;
+
+	if ( /You are already downloading file/ ) {
+		! m#link_name = '(.*?)';#;
+		my $name = $1;
+		! m#fsize = '(.*?)';#;
+		my $size = $1;
+		$size =~ s/&nbsp;//;
+		INFO( name => $name, asize => $size );
+
+		MULTI();
+	}
+
+	! m#link_id = '(\d+)';#;
+	$-{link_id} = $1;
+
+	! m#case 'free':.*?sUrl2 = '(.*?)' \+ link_id;#s;
+	my $link = $1 . $-{link_id};
+
+	GET( $link );
+	$-{_referer} = $-{page};
+
+	! m#link_name = '(.*?)';#;
+	$-{link_name} = $1;
+	! m#file_size = '(\d+)';#;
+	INFO( name => $-{link_name}, size => $1 );
+
+	! m#sid='(.*?)';#;
+	$-{sid} = $1;
+
+	! m#<img alt=.*? id='cryptogram' src='(.*?)'>#;
+	my $img = $1;
+
+	GET( $img );
+	$-{_referer} = $-{page};
+
+	CAPTCHA( "image/jpeg" );
+
+	GET( '/ajax_scripts/verifier.php', post => "?$-{sid}&code=$_" );
+	$-{_referer} = $-{page};
+
+	RESTART( 0, "invalid captcha" ) unless /^\s*1\s*$/s;
+
+	GET( '/ajax_scripts/dl.php' );
+	$-{_referer} = $-{page};
+
+	s/\s+//sg;
+	$-{dl_id} = $_;
+
+	GET( '/ajax_scripts/update_dl.php?id=' . $-{dl_id} );
+	$-{_referer} = $-{page};
+
+	GET( "/ajax_scripts/_get.php?link_id=$-{link_id}&link_name=$-{link_name}&dl_id=$-{dl_id}&password=" );
+	$-{_referer} = $-{page};
+
+	s/^{//; s/}$//;
+	my %js = map { /^(.*?)\s*:\s*"(.*?)"/ } split /\s*,\s*/, $_;
+
+	DOWNLOAD( "$js{serv}/download/$js{hash}/$-{dl_id}/" );
+
+	# most likely multi-download
+	RESTART( 0, "download error" ) if /Download Error/;
+
+# vim:ts=4:sw=4
