@@ -1,0 +1,59 @@
+#!/usr/bin/perl
+
+name: EasyShare
+short: ES
+uri: qr{(?:w\d+\.)?easy-share\.com/(../)?(\d+)}
+cookie: !es
+status: OK 2009-09-17
+
+start:
+	COOKIE( [ (qw(.easy-share.com TRUE / FALSE), time + 80000, 'language', 'en' ) ] );
+
+	GET( $-{_uri} );
+	$-{page} = $-{_referer};
+
+	ERROR( "file not found" ) if /File not found/;
+
+	! m{<p class="pt15 pb0 px18 txtgray family2 c">You are requesting\s+(.*?) \(([\d\.]+ [MkKH]B)\)</p>};
+	INFO( name => $1, asize => $2 );
+
+	RESTART( - ( 60 + int rand 300 ), "free limit reached" )
+		if m#You have downloaded over.*?during last hour#;
+
+	unless ( m#<script type="text/javascript">\s*u='(.*?)';\s*w='(\d+)';# ) {
+		return $self->stage_captcha();
+	}
+	$-{uri} = $1;
+	my $wait = $2;
+
+	WAIT( $wait, "expecting captcha" );
+stage_cappage:
+
+	GET( $-{uri} );
+stage_captcha:
+
+	if ( m#<script type="text/javascript">\s*u='(.*?)';\s*w='(\d+)';# ) {
+		$-{uri} = $1;
+		WAIT_NEXT( stage_cappage, $2, "still expecting captcha" );
+	}
+
+	! s#.*<form class="captcha1" method="post" action="(.*?)">##;
+	$-{file_uri} = $1;
+
+	! m#<input type="hidden" name="id" value="(\d+)">#;
+	$-{id} = $1;
+
+	! m#<p class="pb0"><img src="(.*?)" width="220" height="50" alt="" border="1"></p>#;
+	my $img = $1;
+
+	GET( $img );
+
+	CAPTCHA( "image/jpeg" );
+	my $captcha = $_;
+
+	DOWNLOAD( $-{file_uri}, post => { captcha => $captcha, id => $-{id} } );
+
+	RESTART( 1, "invalid captcha" ) if /Invalid characters/;
+	RESTART( 1, "to slow ?" ) if m#<script type="text/javascript">\s*u='(.*?)';\s*w='(\d+)';#;
+
+# vim:ts=4:sw=4
