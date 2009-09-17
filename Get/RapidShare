@@ -38,4 +38,6 @@ start:
 
 	DOWNLOAD( $-{file_uri}, post => { mirror => "on" } );
 
+	MULTI() if /Please wait until the download is completed/;
+
 # vim:ts=4:sw=4

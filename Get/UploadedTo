@@ -2,7 +2,8 @@
 
 name: UploadedTo
 short: UT
-uri: qr{(uploaded|ul)\.to/}
+uri: qr{uploaded\.to/}
+uri: qr{ul\.to/}
 status: OK 2009-08-24
 
 start:

@@ -2,7 +2,10 @@
 
 name: MegaUpload
 short: MU
-uri: qr{mega(upload|porn|rotic)\.com/(../)?\?d=}
+uri: qw{megaupload\.com/(../)?\?d=}
+uri: qw{megaporn\.com/(../)?\?d=}
+uri: qw{megarotic\.com/(../)?\?d=}
+uri: qw{sexuploader\.com/(../)?\?d=}
 status: OK 2009-08-24
 
 pre:
@@ -12,7 +15,7 @@ pre:
 	die "Font DB '$mu_font_db' does not exist\n" unless -r $mu_font_db;
 
 start:
-	( my $uri = $-{_uri} ) =~ s/megarotic/megaporn/;
+	( my $uri = $-{_uri} ) =~ s#^(http://(?:www\.)?)(?:megarotic|sexuploader)#$1megaporn#;
 	GET( $uri );
 stage_first:
 	$-{first_page} = $-{_referer};
@@ -28,10 +31,10 @@ stage_first:
 	INFO( iname => $name, asize => $f[5] );
 
 	if ( /The file you're trying to download is password protected/ ) {
-		ERROR( "password required" ) unless exists $-{_opts}->{mu_pass};
+		ERROR( "password required" ) unless exists $-{_opts}->{pass};
 
 		GET_NEXT( stage_last, "",
-			post => { filepassword => $-{_opts}->{mu_pass} } );
+			post => { filepassword => $-{_opts}->{pass} } );
 	}
 
 	SEARCH(

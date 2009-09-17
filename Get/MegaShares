@@ -17,13 +17,7 @@ pre:
 start:
 	# create fake cookie to skip first page
 	my $stime = time() - 10000;
-	my @line = (qw(.megashares.com TRUE / FALSE), $stime + 43200, 'freest', $stime . "%3A" );
-
-	unless ( -r $-{_cookie} ) {
-		open my $c, ">", $-{_cookie};
-		print $c join( "\t", @line ), "\n";
-		close $c;
-	}
+	COOKIE( [ (qw(.megashares.com TRUE / FALSE), $stime + 43200, 'freest', $stime . "%3A" ) ] );
 
 	GET( $-{_uri} );
 

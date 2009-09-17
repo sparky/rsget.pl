@@ -64,7 +64,7 @@ start:
 	GET( $-{form_uri}, post => $-{post} );
 stage_download:
 
-	! m#<a href="(.*?)">Click here to download</a>#;
+	RESTART( 0, "invalid captcha ?" ) unless m#<a href="(.*?)">Click here to download</a>#;
 
 	DOWNLOAD( $1 );
 
