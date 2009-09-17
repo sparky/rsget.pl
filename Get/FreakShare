@@ -1,0 +1,39 @@
+#!/usr/bin/perl
+
+name: FreakShare
+short: FS
+uri: qr{freakshare\.net/}
+cookie: fs
+status: OK 2009-09-17
+
+start:
+	GET( $-{_uri} );
+
+	ERROR( "file not found" ) if /Sorry, this Download doesnt exist anymore/;
+
+	! m#<h1 class="box_heading" style="text-align:center;">(.*)</h1>#;
+	INFO( name => $1, size => -1 );
+
+	! m#var time = (\d+)(?:\.\d+);\s*var intervall;#;
+	my $wait = $1;
+
+	! m#<form action="(.*?)" method="post" style="display:inline;">#;
+	$-{dl_page} = $1;
+
+	WAIT( $wait, "starting" );
+
+	GET( $-{dl_page}, post => { section => "benefit", did => "0" } );
+	
+	! m#var time = (\d+)(?:\.\d+);\s*var intervall;#;
+	my $wait = $1;
+
+	! m#<form action="(.*?)" method="post" style="display:inline;"#;
+	$-{file_uri} = $1;
+
+	WAIT( $wait, "starting download" );
+
+	DOWNLOAD( $-{file_uri}, post => { section => "waitingtime", did => 0, submit => "Download" } );
+
+	MULTI() if /Sorry, you cant  download more then 1 at time/;
+
+# vim:ts=4:sw=4
