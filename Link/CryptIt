@@ -1,0 +1,54 @@
+#!/usr/bin/perl
+
+name: CryptIt
+short: cryptit
+uri: qr{crypt-it\.com/}
+status: OK 2009-09-19
+
+pre:
+	use MIME::Base64;
+
+	# from jdownloader
+	my $key = join "", map chr, (
+		0x73, 0x6f, 0x35, 0x73,  0x78, 0x4e, 0x73, 0x50,
+		0x4b, 0x66, 0x4e, 0x53,  0x44, 0x44, 0x5a, 0x48,
+		0x61, 0x79, 0x72, 0x33,  0x32, 0x35, 0x32, 0x30	);
+	my $post_header = join "", map chr, (
+		0x00, 0x00, 0x00, 0x00,  0x00, 0x01, 0x00, 0x11,
+		0x63, 0x72, 0x79, 0x70,  0x74, 0x69, 0x74, 0x32,
+		0x2e, 0x67, 0x65, 0x74,  0x46, 0x69, 0x6c, 0x65,
+		0x73, 0x00, 0x02, 0x2f,  0x31, 0x00, 0x00, 0x00,
+		0x11, 0x0a, 0x00, 0x00,  0x00, 0x02, 0x02, 0x00,
+		0x06);
+	my $post_separator = join "", map chr, ( 0x02, 0x00 );
+
+	use Crypt::Rijndael;
+	my $cipher = new Crypt::Rijndael $key;
+
+start:
+	! $-{_uri} =~ m{^http://crypt-it\.com/(.*?)/(.*?)(/.*)?$};
+	my $mode = $1;
+	$-{dir} = $2;
+	GET( "http://crypt-it.com/$mode/$-{dir}/" );
+
+	my $pass = $-{_opts}->{pass} || "";
+	my $post = $post_header . $-{dir} . $post_separator . ( chr length $pass ) . $pass;
+
+	GET( "http://crypt-it.com/engine/",
+		post => $post,
+		headers => [ "Content-Type: application/x-amf" ],
+	);
+
+	my @links;
+	my @cr = /url.*?([0-9a-fA-F]+).*?size/g;
+	foreach ( @cr ) {
+		my $cr = join "", map chr hex, /(..)/g;
+
+		my $l = $cipher->decrypt( $cr );
+		$l =~ s/\0+//g;
+		push @links, $l;
+	}
+
+	LINK( @links );
+
+# vim:ts=4:sw=4
