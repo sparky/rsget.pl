@@ -2,7 +2,10 @@
 
 name: Simple
 short: simple.link
-uri: qr{4gk\.com/|xurl\.jp/|tinyurl\.com/|linkhider\.com/}
+uri: qr{4gk\.com/}
+uri: qr{xurl\.jp/}
+uri: qr{tinyurl\.com/}
+uri: qr{linkhider\.com/}
 status: OK 2009-09-12
 
 start:

@@ -100,10 +100,14 @@ function update_notify( n_f, o_f )
 			node.parentNode.removeChild( node );
 		}
 	}
+	var al = 0;
 	for ( var id in nid ) {
 		node = nid[ id ];
 		o.appendChild( node );
+		al = 1;
 	}
+	if ( al )
+		alert( "Assist needed" );
 }
 
 function add_DL_commands( list )

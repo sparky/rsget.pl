@@ -73,6 +73,12 @@ a, a:visited {
 a:focus, a:hover {
 	text-decoration: underline;
 }
+h2 a, h2 a:visited {
+	border-bottom: 2px dashed black;
+}
+h2 a:focus, h2 a:hover {
+	border-bottom: none;
+}
 
 li.active, li.file, li.uri, li.comment {
 	display: block;
