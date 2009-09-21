@@ -1,8 +1,10 @@
 // ==UserScript==
 // @name		rsget.pl helper
-// @namespace	http://rsget.pl/
+// @namespace	http://rsget.pl
 // @description	quickly add links to rsget.pl
-// @include		http://*.*/*
+// @include		http://*/*
+// @include		https://*/*
+// @include		file://*
 // ==/UserScript==
 
 (function(){
@@ -93,10 +95,14 @@
 	}
 	GM_registerMenuCommand("Add links to rsget.pl", extract_links, null, null, "r");
 
+	var server = GM_getValue( "server" );
+	if ( server == null ) {
+		server = prompt( "Specify rsget.pl location", "http://localhost:5666/" );
+		GM_setValue( "server", server );
+	}
+
 	function send( text )
 	{
-		var server = GM_getValue( "server", "http://localhost:5666/" );
-		GM_setValue( "server", server );
 		var uri = server + "add";
 
 		var form = document.createElement( 'form' );
