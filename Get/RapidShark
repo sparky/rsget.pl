@@ -3,7 +3,7 @@
 name: RapidShark
 short: RK
 uri: qr{rapidshark\.pl/}
-status: OK 2009-08-28
+status: OK 2009-09-22
 
 start:
 	GET( $-{_uri} );
@@ -20,14 +20,15 @@ start:
 	! s/(.*?)<\/Form>.*$/$1/s;
 
 	my %opts;
-	$opts{$1} = $2 while s/<input type="hidden" name="(.*?)" value="(.*?)">//;
+	$opts{$1} = $2 while s/<input\s+type="hidden"\s+name="(.*?)"\s+value="(.*?)">//;
 
 	! m{<input type="submit" name="method_free" value="(.*?)">};
 	$opts{method_free} = $1;
 
 	GET( "", post => \%opts );
+	$-{dl_page} = $-{_referer};
 
-	if ( /You have to wait (.*) till next download/ ) {
+	if ( /(?:You have to wait|Proszę czekać) (.*) (?:till next download|aby ściągnąć kolejny plik)/ ) {
 		$_ = $1;
 		my $wait = 0;
 		$wait += 60 * 60 * $1 if /(\d+) hour/;
@@ -36,31 +37,36 @@ start:
 		RESTART( $wait, "free limit reached" );
 	}
 
-	! s/^.*?<Form name="F1" method="POST" action=""//s;
-	! s/(.*?)<\/Form>.*$/$1/s;
+	! s/^.*?<form name="F1" method="post" action=""//si;
+	! s/(.*?)<\/form>.*$/$1/si;
 
-	! m{<div .*?>(.*)</div>\s+</td><td align=left valign=middle><input type="text" name="code" class="captcha_code"></td></tr>}s;
-	my %opts = ( code => captcha( $1 ) );
-
-
+	my %opts;
+	$opts{$1} = $2 while s/<input name="(.*?)" value="(.*?)" type="hidden">//s;
 	$opts{$1} = $2 while s/<input type="hidden" name="(.*?)" value="(.*?)">//s;
 
-	! m{<input type="submit" id="btn_download" value="(.*?)">};
-	$opts{btn_download} = $1;
+	#! m{<input.*?id="btn_download" value="(.*?)">};
+	#$opts{btn_download} = $1;
 
 	$-{post} = \%opts;
 
 	! m{<span id="countdown">(\d+)</span>};
-	WAIT( $1, "starting download" );
-	
-	DOWNLOAD( $-{_referer}, post => $-{post} );
+	$-{wait} = $1;
 
-perl:
-	sub captcha
-	{
-		my %c = map /<span.*?padding-left:\s*?(\d+)px;.*?>(\d)</g, shift;
-		my @c = map { $c{$_} } sort { $a <=> $b } keys %c;
-		return join "", @c;
-	}
+	! m{<img src="(http://www\.rapidshark\.pl/captchas/.*?jpg)">};
+	my $img = $1;
+
+	GET( $img );
+	$-{_referer} = $-{dl_page};
+	$-{cap_start} = time;
+
+	CAPTCHA( "image/jpeg" );
+	$-{post}->{code} = $_;
+
+	my $wait = $-{wait} - (time - $-{cap_start});
+	$wait = 1 if $wait < 1;
+
+	WAIT( $wait, "starting download" );
+	
+	DOWNLOAD( "", post => $-{post} );
 
 # vim:ts=4:sw=4
