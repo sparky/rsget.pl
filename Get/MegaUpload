@@ -11,8 +11,8 @@ status: OK 2009-08-24
 pre:
 	use Image::Magick;
 
-	my $mu_font_db = $main::data_path . "/data/mu_font_db.png";
-	die "Font DB '$mu_font_db' does not exist\n" unless -r $mu_font_db;
+	my $mu_font_db = data_file( "mu_font_db.png" );
+	die "Font DB '$mu_font_db' does not exist\n" unless $mu_font_db;
 
 start:
 	( my $uri = $-{_uri} ) =~ s#^(http://(?:www\.)?)(?:megarotic|sexuploader)#$1megaporn#;
