@@ -20,6 +20,9 @@ start:
 stage_first:
 	$-{first_page} = $-{_referer};
 
+	RESTART( 10 * 60, "temporarily blocked" )
+		if m{document\.location='http://www\.megaupload\.com/\?c=msg'};
+
 	ERROR( "file not found" ) if
 		/The file you are trying to access is temporarily unavailable/
 			or /Unfortunately, the link you have clicked is not available/
@@ -33,33 +36,28 @@ stage_first:
 	if ( /The file you're trying to download is password protected/ ) {
 		ERROR( "password required" ) unless exists $-{_opts}->{pass};
 
-		GET_NEXT( stage_last, "",
-			post => { filepassword => $-{_opts}->{pass} } );
+		my $form = $self->form( id => "passwordform" );
+		$form->set( filepassword => $-{_opts}->{pass} );
+		GET_NEXT( stage_last, $form->post() );
 	}
 
-	SEARCH(
-		captcha_img => qr#<img src="(http://.*/gencap\.php\?[0-9a-f]+\.gif)"#,
-		s2icode => qr#<INPUT type="hidden" name="captchacode" value="(.*?)"#,
-		s2mevagar => qr#<INPUT type="hidden" name="megavar" value="(.*?)"#,
-	);
+	$-{form} = $self->form( id => "captchaform" );
 
-	GET( $-{captcha_img} );
+	! m{<img src="(http://.*?megaupload\.com/gencap\.php\?[0-9a-f]+\.gif)"};
+
+	GET( $1 );
 
 	my $captcha = captcha( \$_ );
 	RESTART( 10, "Can't read captcha" ) unless defined $captcha;
 
+	$-{form}->set( captcha => $captcha );
+
 	$-{_referer} = $-{first_page};
-	GET( "", post => {
-		captchacode => $-{s2icode},
-		megavar => $-{s2mevagar},
-		captcha => $captcha
-	} );
+	GET( $-{form}->post() );
 
 stage_last:
-	if ( /id="captchaform"/ ) {
-		$self->print( "invalid captcha" );
-		return $self->stage_first();
-	}
+	RESTART( 10, "invalid captcha" )
+		if /id="captchaform"/;
 	ERROR( "invalid password" )
 		if /The file you're trying to download is password protected/;
 
@@ -117,17 +115,23 @@ sub get_char
 	$img->Crop( width => $width, height => 32, x => $x, y => 0 );
 	$img->Extent( width => $width, height => 32, x => 0, y => 0 );
 
-	my $min = 1;
-	my $min_char = undef;
+	my $min_me = 1;
+	my $best_char = undef;
+	my @metric = ( metric => 'MEPP' );
 	foreach my $n ( keys %$db ) {
-		my $x = $img->Compare( image => $db->{$n} );
-		my ($e, $em) = $img->Get( 'error', 'mean-error' );
-		if ( $em < $min ) {
-			$min = $em;
-			$min_char = $n;
+		my $diff = $img->Compare( image => $db->{$n}, @metric );
+		if ( $diff and $diff =~ /Exception 410:.*metric/ ) {
+			@metric = ();
+			redo;
+		}
+		$diff = $img unless $diff;
+		my $me = $diff->Get( 'mean-error' );
+		if ( $me < $min_me ) {
+			$min_me = $me;
+			$best_char = $n;
 		}
 	}
-	return $min_char;
+	return $best_char;
 }
 
 sub captcha
