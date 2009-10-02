@@ -1,6 +1,6 @@
 
 TODO:
-- Write documentation
+- Write more documentation
 
 
 Features:
@@ -11,12 +11,8 @@ Features:
 - Continues partially downloaded files (if download service allows it)
 - Incorporates small HTTP server allowing to check the status of downloads,
   and add new links.
+- Automatically updates itself from SVN.
 
-Bugs:
-- MicroHTTP freezes whole program if there is an open connection.
-
-
-Command-line options:
- -p <PORT>      - starts MicroHTTP server at specified port
- -i <IF1>,<IF2> - list of network interfaces or IP numbers
- <FILENAME>     - file to use as link list file (must exist)
+For full list of command-line options check: rsget.pl --help. All those options
+may also be set in config file ( $HOME/.rsget.pl/config ). Check 'README.config'
+file for example config.
