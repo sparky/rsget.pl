@@ -3,32 +3,34 @@
 name: FileFactory
 short: FF
 uri: qr{filefactory\.com/}
-status: OK 2009-09-12
+status: OK 2009-10-03
 
 start:
 	GET( $-{_uri} );
 
 	ERROR( "file not found" ) if /File Not Found|This file has been deleted/;
-	! m{<h1>(<a.*?</a>|<img .*?/>)&nbsp;(.*?)(<span.*?</span>)?</h1>\s*<div id="info" class="metadata">\s*<span>([\d\.]+ [KM]B) file uploaded}s;
-	my ( $name, $size ) = ( $2, $4 );
-	$name =~ s/&#8203;//g;
-	$name =~ s/\.\.\.$/\0/;
-	$-{_referer} =~ m{.*/(.*?)$};
-	INFO( iname => $name, aname => $1, asize => $size );
+	! m{<title>(.*?) - download now for free};
+	my $name = $1;
+	! m{<div id="info" class="metadata">\s*<span>([\d\.]+ [kKMG]B) file uploaded}s;
+	my $size = $1;
+	INFO( name => $name, asize => $size );
 	
 	MULTI() if /You are currently downloading/;
 	if ( /starthtimer[\s\S]*timerend=d\.getTime\(\)\+(\d+);/m ) {
 		RESTART( $1 / 1000, "free limit reached" ) if $1 > 0;
 	}
 
-	! m#<form action="(.*)" method="post">\s*<input type="submit" value="Free#m;
-	GET( $1, post => { freeBtn => "Free Download" } );
+	! m#<a href="(/dlf.*?)"><img.*?alt="Download Now" /></a>#;
+	GET( $1 );
 
-	! m#<a href="(.*?)">Click here to begin your download</a>#;
+	! m#<a href="(http.*?)"><img.*?alt="Download Now" /></a>#;
 	$-{file_uri} = $1;
-	
-	! m#<p id="countdown">(\d+)</p>#;
-	WAIT( $1, "starting soon" );
+
+	! m#<span id="countdown".*?>(\d+)</span>#;
+	my $wait = $1;
+	RESTART( $wait, "free limit reached" ) if $wait > 30;
+
+	WAIT( $wait, "starting soon" );
 
 	DOWNLOAD( $-{file_uri} );
 
