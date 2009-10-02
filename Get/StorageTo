@@ -18,6 +18,8 @@ start:
 	! s/^.*?{\s+//;
 	! s/\s+}.*?$//;
 
+	ERROR( "download failed" ) if /'state'\s*:\s*'failed'/;
+
 	! /'countdown'\s*:\s*(\d+)/;
 	my $wait = $1;
 	RESTART( $wait, "free limit reached" )

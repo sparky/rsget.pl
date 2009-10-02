@@ -28,7 +28,8 @@ start:
 		if /Instant download access! Or try again in about ([0-9]+) minutes\./;
 
 	RESTART( $1 * 60, "servers overloaded" )
-		if /Unfortunately you will have to wait ([0-9]+) minutes,/;
+		if /Unfortunately you will have to wait (\d+) minutes,/
+			or /Please try again in (\d+) minutes/;
 
 	! /form name="dlf" action="(.*?)"/;
 	$-{file_uri} = $1;
