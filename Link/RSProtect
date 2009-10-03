@@ -1,0 +1,17 @@
+#!/usr/bin/perl
+
+name: RSProtect
+short: rsprotect.com
+uri: qr{rsprotect\.com/rc-.*?/}
+status: OK 2009-10-04
+
+start:
+	GET( $-{_uri} );
+
+	! m{<form method="post" onsubmit="return ch.*?" action="(.*?)"};
+	$_ = $1;
+	s/&#x(..);/chr hex $1/eg;
+
+	LINK( $_ );
+
+# vim:ts=4:sw=4
