@@ -1,0 +1,40 @@
+#!/usr/bin/perl
+
+name: YouTube
+short: V:YT
+uri: qr{youtube\.com/watch\?v=.*}
+slots: 8
+status: OK 2009-10-03
+
+pre:
+	use URI::Escape;
+
+start:
+	! $-{_uri} =~ m{[\?&]v=([-_a-zA-Z0-9]+)(?:&.*)?$};
+	$-{v} = $1;
+
+	GET( "http://www.youtube.com/watch?v=$-{v}" );
+
+	! m{<meta name="title" content="(.*?)">};
+	my $name = $1;
+
+	! /"fmt_map"\s*:\s*"(.*?)"/;
+	my %fmts = map { m{(\d+)/}; $1 => $_ } split ",", uri_unescape( $1 );
+
+	my $fmt = "18";
+	$fmt = "35" if $fmts{35};
+	$fmt = "22" if $fmts{22};
+
+	my $ext = "mp4";
+	$ext = "flv" if $fmt eq "35";
+
+	! /"t"\s*:\s*"(.*?)"/;
+	my $t = $1;
+
+	my $fname = $name . "." . $ext;
+	INFO( name => $fname, size => -1 );
+
+	DOWNLOAD( "http://youtube.com/get_video?video_id=$-{v}&t=$t&fmt=$fmt",
+		fname => $fname );
+
+# vim:ts=4:sw=4
