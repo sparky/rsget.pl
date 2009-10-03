@@ -1,0 +1,57 @@
+#!/usr/bin/perl
+
+name: UploadingCom
+short: UC
+uri: qr{uploading\.com/(../)?files/(get/)?[A-Za-z0-9]{8}/}
+cookie: uc
+status: OK 2009-10-03
+
+start:
+	GET( $-{_uri} );
+
+	RESTART( 60 + int rand 180, "temporarily unavailable" )
+		if m{<h1>Service Not Available</h1>};
+	ERROR( "file not found" ) if /Requested file not found/;
+
+	! m{<h2 style=".*?">File download</h2><br/>\s*<h2>(.*?)</h2><br/>\s*File size: <b>($STDSIZE)</b>};
+	my $name = $1; my $size = $2;
+	if ( $name =~ /\.\..{1,5}$/ ) {
+		! m{<title>Download (.*?) for free on uploading\.com</title>};
+		$name = $1;
+	}
+	INFO( name => $name, asize => $size );
+
+	my $form = $self->form( id => "downloadform" );
+	$-{file_id} = $form->get( "file_id" );
+
+	GET( $form->post() );
+	$-{dl_page} = $-{_referer};
+
+	if ( m{var file_link = '.+?'} ) {
+		$-{file_uri} = $1;
+		return $self->stage_download();
+	}
+	! /CONF\s*=\s*{\s*host:\s*'(.*?)'\s*}/;
+	$-{host} = $1;
+
+	! m{start_timer\((\d+)\);};
+	WAIT( -$1, "expecting download link" );
+
+	GET( $-{host} . "files/get/?JsHttpRequest=" . jstime() . "-xml",
+		post => "file_id=$-{file_id}&action=get_link&pass",
+		headers => [ "Content-Type: application/octet-stream" ],
+	);
+stage_download:
+	$-{_referer} = $-{dl_page};
+
+	unless ( $-{file_uri} ) {
+		! m{"link"\s*:\s*"(.*?)"};
+		$-{file_uri} = $1;
+		$-{file_uri} =~ s/\\(.)/$1/g;
+	}
+
+	DOWNLOAD( $-{file_uri} );
+
+	MULTI() if /Your IP address is currently downloading a file/;
+
+# vim:ts=4:sw=4
