@@ -12,6 +12,7 @@ pkg:
 else
 pkg:
 	rm -f {RSGet,Get,Link,data}/*~
+	rm -rf $(PKGDIR)
 	install -d $(PKGDIR)/{RSGet,Get,Link,data}
 	install rsget.pl $(PKGDIR)
 	cp Makefile README README.config $(PKGDIR)
@@ -25,7 +26,7 @@ endif
 install:
 	rm -f {RSGet,Get,Link,data}/*~
 	install -d $(DESTDIR)$(DATADIR)/{RSGet,Get,Link,data} $(DESTDIR)$(BINDIR)
-	sed 's#\($$data_path\) =.*;#\1 = "$(DATADIR)";#' < rsget.pl > rsget.pl.datadir
+	sed 's#\($$install_path\) =.*;#\1 = "$(DATADIR)";#' < rsget.pl > rsget.pl.datadir
 	install rsget.pl.datadir $(DESTDIR)$(BINDIR)/rsget.pl
 	cp RSGet/*.pm $(DESTDIR)$(DATADIR)/RSGet
 	cp data/* $(DESTDIR)$(DATADIR)/data
