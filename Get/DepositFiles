@@ -3,7 +3,7 @@
 name: DepositFiles
 short: DF
 uri: qr{depositfiles\.com/}
-status: OK 2009-09-12
+status: OK 2009-10-04
 
 start:
 	GET( $-{_uri} );
@@ -18,24 +18,23 @@ start:
 		if /We are sorry, but all downloading slots for your country are busy/;
 	
 	if ( m{<form action="(.*)" method="get" onSubmit="download_started} ) {
-		$-{file_uri} = $1;
+		$-{dl_form} = $self->form( match => { onsubmit => qr/^download_started/ } );
 		return $self->stage_download();
 	}
 
-	! /<form action="(.*?)" method="post">/;
-	GET( $1, post => { gateway_result => 1 } );
+	my $form = $self->form( match => { body => qr/name="gateway_result"/ } );
+	GET( $form->post() );
 
 	RESTART( $1, "free limit reached" )
 		if m#<span class="html_download_api-limit_interval">(\d+)</span>#;
 	
 	MULTI() if m#<span class="html_download_api-limit_parallel">#;
-	! /<form action="(.*?)" method="get" onSubmit="download_started/;
-	$-{file_uri} = $1;
+	$-{dl_form} = $self->form( match => { onsubmit => qr/^download_started/ } );
 	
 	WAIT( 60, "starting download" );
 stage_download:
 
-	DOWNLOAD( $-{file_uri} );
+	DOWNLOAD( $-{dl_form}->post() );
 	RESTART( $1, "traffic limit" ) if /Wait (\d+) seconds/;
 
 # vim:ts=4:sw=4
