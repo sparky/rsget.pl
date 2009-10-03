@@ -16,3 +16,10 @@ Features:
 For full list of command-line options check: rsget.pl --help. All those options
 may also be set in config file ( $HOME/.rsget.pl/config ). Check 'README.config'
 file for example config.
+Each option requires a value, which may be specified inmediately after '=' sign,
+or as next argument. Underscores may be replaced with dashes.
+Following command-line declarations are equivalent:
+ --use_svn=update
+ --use-svn=update
+ --use_svn update
+ --use-svn update
