@@ -4,7 +4,7 @@ name: MegaShares
 short: MS
 uri: qr{d01\.megashares\.com/\?d01=}
 cookie: !ms
-status: OK 2009-08-28
+status: OK 2009-10-03
 
 pre:
 	use IPC::Open2;
@@ -23,15 +23,17 @@ start:
 
 	ERROR( "temporarily unavailable" )
 		if m{<dd class="red">([^<]|<br>)*(link is currently offline)([^<]|<br>)*</dd>};
+	my $fnf = join "|",
+		"Link was removed", "Invalid link", "Could not download file";
 	ERROR( "file not found" )
-		if m{<dd class="red">([^<]|<br>)*(Link was removed|Invalid link)([^<]|<br>)*</dd>};
+		if m{<dd class="red">([^<]|<br>)*($fnf)([^<]|<br>)*</dd>};
 	MULTI()
 		if m{You already have the maximum of 1 download running};
 
 	RESTART( 600, "servers overloaded" )
 		if m{All download slots for this link are currently filled};
 
-	m{<dt>Filename:&nbsp;<strong>(.*?)</strong>&nbsp;&nbsp;&nbsp;size: (\d+\.\d+ [GMK]B)</dt>};
+	m{<dt>Filename:&nbsp;<strong>(.*?)</strong>&nbsp;&nbsp;&nbsp;size: ($STDSIZE)(?:ytes)?</dt>};
 	my ( $name, $size ) = ( $1, $2 );
 	$name =~ s/\.\.\.$/\0/;
 	INFO( iname => $name, asize => $size );

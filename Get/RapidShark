@@ -13,7 +13,7 @@ start:
 	ERROR( "file not found" )
 		if m{<font class="err">No such file};
 
-	m{<font style="font-size:12px;">Chcesz pobrac plik <font color="red">.*/(.*?)</font> \(([\d\.]+ ([MK])?b)\)</font>};
+	m{<font style="font-size:12px;">Chcesz pobrac plik <font color="red">.*/(.*?)</font> \(($STDSIZE)\)</font>};
 	INFO( name => $1, asize => $2 );
 
 	! s/^.*?<Form method="POST" action=''>//s;

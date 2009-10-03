@@ -25,7 +25,7 @@ stage_first:
 
 	ERROR( "file not found" )
 		if /(Sorry, we don't host the requested file|unknown_file_data)/;
-	m#<div class="dl_first_filename">\s*(.+?)<span.*?>, ([\d\.]+ MB)</span></div>#s;
+	m#<div class="dl_first_filename">\s*(.+?)<span.*?>, ($STDSIZE)</span></div>#s;
 	INFO( name => $1, asize => $2 );
 
 	RESTART( 60, "Not prepared" )

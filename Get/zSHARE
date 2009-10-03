@@ -14,7 +14,7 @@ start:
 
 	! m{>File Name:\s*<font.*?>(.*?)</font></td>}s;
 	my $name = $1;
-	! m{>File Size:\s*<font.*?>([\d\.]+MB)</font></td>}s;
+	! m{>File Size:\s*<font.*?>($STDSIZE)</font></td>}s;
 	INFO( name => $name, asize => $1 );
 
 	my $x = 10 + int rand 180;

@@ -15,7 +15,7 @@ start:
 	ERROR( "file not found" ) if /File not found/;
 	ERROR( "file removed" ) if /Requested file is deleted/;
 
-	! m{<p class="pt15 pb0 px18 txtgray family2 c">You are requesting\s+(.*?) \(([\d\.]+ [MkKH]B)\)</p>};
+	! m{<p class="pt15 pb0 px18 txtgray family2 c">You are requesting\s+(.*?) \(($STDSIZE)\)</p>};
 	INFO( name => $1, asize => $2 );
 
 	RESTART( - ( 60 + int rand 300 ), "free limit reached" )

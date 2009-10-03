@@ -16,7 +16,7 @@ start:
 		ERROR( "some error" );
 	}
 
-	! m{You requested: (.*?) \(([\d\.]+ MB)\)</div>};
+	! m{You requested: (.*?) \(($STDSIZE)\)</div>};
 	INFO( name => $1, asize => $2 );
 
 	! /cu\('(.*?)','(.*?)','(.*?)'\);/;

@@ -10,9 +10,9 @@ start:
 
 	ERROR( "file not found" ) if /Such file does not exist /;
 
-	! m{<div class="info">.*?<b title="(.*?)">.*?</b>\s*<span .*?>.*?<b>(\d+(\.\d+)?)&nbsp;([KMG]B)</b></span>}s;
+	! m{<div class="info">.*?<b title="(.*?)">.*?</b>\s*<span .*?>.*?<b>(\d+(?:\.\d+)?)&nbsp;([KMG]B)</b></span>}s;
 	my $name = $1;
-	my $size = "$2$4";
+	my $size = "$2$3";
 	INFO( iname => $name, asize => $size );
 	RESTART( 5 * 60, "servers overloaded" )
 		if /We are sorry, but all downloading slots for your country are busy/;

@@ -9,7 +9,7 @@ start:
 	GET( $-{_uri} );
 
 	ERROR( "file not found" ) if /File Not Found/;
-	! m{<h2>\S* \S* (.*?)</h2>\s*<font .*?</font> \((\d+\.\d+ [MK]b)\)</font>}s;
+	! m{<h2>\S* \S* (.*?)</h2>\s*<font .*?</font> \(($STDSIZE)\)</font>}s;
 	INFO( name => $1, asize => $2 );
 
 	! s/^.*?<Form method="POST" action=''>//s;

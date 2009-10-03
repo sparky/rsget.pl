@@ -12,7 +12,7 @@ start:
 	ERROR( "file not found" )
 		if /Your requested file is not found/;
 
-	! m#<b>File name: </b>(.*)<b><br>\s*File size: </b>([\d\.]+ [MkK]B)<b><br>#s;
+	! m#<b>File name: </b>(.*)<b><br>\s*File size: </b>($STDSIZE)<b><br>#s;
 	INFO( name => $1, asize => $2 );
 
 	RESTART( - ( 60 + int rand 300 ), "limit reached" ) if /You have got max allowed download sessions from the same IP/;

@@ -11,7 +11,7 @@ start:
 	ERROR( "file not found" )
 		if /The requested file is not found/;
 
-	m#<div class="content_text"><h1>(.*?)\s*\[ ([\d\.]+ Mb) \]</h1>#;
+	m#<div class="content_text"><h1>(.*?)\s*\[ ($STDSIZE) \]</h1>#;
 	INFO( name => $1, asize => $2 );
 
 	RESTART( -(60 + int rand 300), "free limit reached" )

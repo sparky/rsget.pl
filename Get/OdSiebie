@@ -13,7 +13,10 @@ start:
 	ERROR( "some problem, file not found ?" )
 		if $-{_referer} =~ m{/(upload|error)\.html};
 
-	m{<dl class="file-info">.*?<dd.*?>(?:\s*<!--.*?-->\s*<!--.*?-->\s*)?(.*?)</dd>.*?<dd>\s*(\d+\.\d+ MB)</dd>}s;
+	m{<dl\s+class="file-info">.*?<dd.*?>
+		(?:\s*<!--.*?-->\s*<!--.*?-->\s*)?
+		(.*?)
+		</dd>.*?<dd>\s*($STDSIZE)</dd>}sx;
 	INFO( name => $1, asize => $2 );
 
 	! m{href="(/pobierz/\d+---.*?(\.html)?)"};
