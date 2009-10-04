@@ -1,0 +1,28 @@
+#!/usr/bin/perl
+
+name: MetaCafe
+short: V:MetaCafe
+uri: qr{metacafe\.com/watch/}
+slots: 8
+status: OK 2009-10-04
+
+pre:
+	use URI::Escape;
+	
+start:
+	GET( $-{_uri} );
+
+	LINK( "http://youtube.com/watch?v=$1" )
+		if $-{_referer} =~ m{/watch/yt-(.*?)/};
+
+	! m{mediaURL=(.*?)&};
+	my $file_uri = uri_unescape( $1 );
+	! m{<title>(.*?) - Video</title>};
+	my $fname = de_ml( $1 );
+	$fname =~ s{/}{_}g;
+	$fname .= ".flv";
+	INFO( name => $fname, quality => "flv" );
+
+	DOWNLOAD( $file_uri, fname => $fname );
+
+# vim:ts=4:sw=4
