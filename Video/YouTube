@@ -16,7 +16,8 @@ start:
 	GET( "http://www.youtube.com/watch?v=$-{v}" );
 
 	! m{<meta name="title" content="(.*?)">};
-	my $name = $1;
+	my $name = de_ml( $1 );
+	$name =~ s{/}{_}g;
 
 	! /"fmt_map"\s*:\s*"(.*?)"/;
 	my %fmts = map { m{(\d+)/}; $1 => $_ } split ",", uri_unescape( $1 );
