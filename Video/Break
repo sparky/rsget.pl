@@ -1,0 +1,25 @@
+#!/usr/bin/perl
+
+name: Break
+short: V:Break
+uri: qr{break\.com}
+slots: 8
+status: OK 2009-10-05
+
+start:
+	GET( $-{_uri} );
+
+	! m{sGlobalFileName='(.*?)'};
+	my $name = $1;
+	$name .= ".flv";
+	# there are .mp4 files as well, but seem to have lower quality
+	INFO( name => $name, quality => "flv" );
+
+	! m{sGlobalContentFilePath='(.*?)'};
+	my $fp = $1;
+	! m{\s+videoPath\s*=\s*"(.*?)"};
+	my $vp = $1;
+
+	DOWNLOAD( "$vp/$fp/$name" );
+
+# vim:ts=4:sw=4
