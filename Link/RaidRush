@@ -3,27 +3,25 @@
 name: RaidRush
 short: save.raidrush.ws
 uri: qr{save\.raidrush\.ws/}
-status: OK 2009-08-25
+status: OK 2009-10-04
 
 start:
 	GET( $-{_uri} );
-	$-{referer} = $-{_referer};
 
 	my @list;
 	push @list, "/404.php.php?id=$1&key=$2"
 		while s/onclick="get\('(.*?)','FREE','(.*?)'\)//;
+
 	ERROR("no links") unless @list;
+
 	$-{list} = \@list;
 	$-{outlist} = [];
 
+stage_get_link:
 	GET( shift @{$-{list}} );
-stage_next_uri:
 	push @{$-{outlist}}, "http://" . $_;
 
-	if ( @{$-{list}} ) {
-		$-{_referer} = $-{referer};
-		GET_NEXT( stage_next_uri, shift @{$-{list}} );
-	}
+	GOTO stage_get_link if @{$-{list}};
 
 	LINK( @{$-{outlist}} );
 
