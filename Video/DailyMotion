@@ -1,0 +1,37 @@
+#!/usr/bin/perl
+
+name: DailyMotion
+short: V:DailyMotion
+uri: qr{dailymotion\.com/(.*?/)?video/[a-z0-9]+}
+slots: 8
+status: OK 2009-10-04
+
+pre:
+	use URI::Escape;
+
+start:
+	GET( $-{_uri} );
+
+	! m{<title>(.*?)</title>};
+	! m{<h1 class="dmco_title">(.*?)</h1>};
+	my $name = de_ml( $1 );
+	$name =~ s{/}{_}g;
+
+	! m{"video", "(.*?)"};
+	my @uris = map { /(.*)@@.*/; $1 } split /\|\|/, uri_unescape( $1 );
+	my $best_uri = undef;
+	my $best_size = 0;
+	foreach my $uri ( @uris ) {
+		$uri =~ m{/cdn/.*?-(\d+)x};
+		next unless $1 > $best_size;
+		$best_size = $1;
+		$best_uri = $uri;
+	}
+	my $ext = "mp4";
+	$ext = "flv" if $best_uri =~ m{/cdn/FLV-};
+	my $fname = $name . "." . $ext;
+	INFO( name => $fname, size => -1 );
+
+	DOWNLOAD( $best_uri, fname => $fname );
+
+# vim:ts=4:sw=4
