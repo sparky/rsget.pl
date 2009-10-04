@@ -1,0 +1,74 @@
+#!/usr/bin/perl
+
+name: SecuredIn
+short: secured.in
+uri: qr{secured\.in/download-\d+-[0-9a-f]+\.html$}
+status: OK 2009-10-04
+
+pre:
+	use MIME::Base64;
+	use Crypt::Blowfish;
+
+	my $cipher = new Crypt::Blowfish "\0\0\0\0\0\0\0\0";
+	sub cipher
+	{
+		my $cipher_string = shift;
+		my $cipher_text = decode_base64( $cipher_string );
+		my $iv = substr $cipher_text, 0, 8;
+
+		my $decrypted = '';
+		for ( my $pos = 8; $pos < length $cipher_text; $pos += 8 ) {
+			my $part = substr $cipher_text, $pos, 8;
+			my $d = $cipher->decrypt( $part );
+			$decrypted .= $d ^ $iv;
+			$iv = $part;
+		}
+		return $decrypted;
+	}
+
+start:
+	GET( $-{_uri} );
+stage_captcha:
+	$-{referer} = $-{_referer};
+
+	unless ( m#<form action="" id="frm_captcha" method="post"># ) {
+		return $self->stage_getlinks();
+	}
+	$-{form} = $self->form( id => "frm_captcha" );
+	my $h = $-{form}->get( "captcha_hash" );
+	my $img = "captcha-$h.jpg";
+
+	GET( $img );
+	$-{_referer} = $-{referer};
+
+	CAPTCHA( "image/jpeg" );
+
+	$-{form}->set( captcha_key => $_ );
+	GET( $-{form}->post() );
+stage_getlinks:
+	$-{referer} = $-{_referer};
+	if ( m#<form action="" id="frm_captcha" method="post"># ) {
+		return $self->stage_captcha();
+	}
+
+	my @list;
+	push @list, $1 while s/accessDownload\(\d+, \d+, '(\d+-[0-9a-f]+)', \d+\);//;
+	ERROR("no links") unless @list;
+	$-{list} = \@list;
+	$-{outlist} = [];
+
+	GET( "/ajax-handler.php", post => { cmd => "download", download_id => shift @{$-{list}} } );
+stage_next_uri:
+	$_ = cipher( $_ );
+	s/\s+$//;
+	push @{$-{outlist}}, $_;
+
+	if ( @{$-{list}} ) {
+		$-{_referer} = $-{referer};
+		GET_NEXT( stage_next_uri, "/ajax-handler.php",
+			post => { cmd => "download", download_id => shift @{$-{list}} } );
+	}
+
+	LINK( @{$-{outlist}} );
+
+# vim:ts=4:sw=4
