@@ -1,0 +1,25 @@
+#!/usr/bin/perl
+
+name: Delfi
+short: V:Delfi
+uri: qr{tv\.delfi\.ee/video/.*/}
+slots: 8
+status: OK 2009-10-04
+
+pre:
+	use URI::Escape;
+
+start:
+	GET( $-{_uri} );
+
+	! m{<title>DELFI TV &#62; Video &#62; (.*?)</title>};
+	my $fname = de_ml( $1 );
+	$fname =~ s{/}{_}g;
+	$fname .= ".flv";
+	INFO( name => $fname, quality => "flv" );
+
+	! m{addVariable\('file','(.*?)'};
+
+	DOWNLOAD( uri_unescape( $1 ), fname => $fname );
+
+# vim:ts=4:sw=4
