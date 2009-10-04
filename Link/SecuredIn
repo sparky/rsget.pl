@@ -28,46 +28,45 @@ pre:
 
 start:
 	GET( $-{_uri} );
-stage_captcha:
-	$-{referer} = $-{_referer};
 
-	unless ( m#<form action="" id="frm_captcha" method="post"># ) {
-		return $self->stage_getlinks();
-	}
-	$-{form} = $self->form( id => "frm_captcha" );
-	my $h = $-{form}->get( "captcha_hash" );
+	$-{cap_form} = $self->form( id => "frm_captcha" );
+	GOTO stage_find_links unless $-{cap_form};
+
+stage_captcha:
+	my $h = $-{cap_form}->get( "captcha_hash" );
 	my $img = "captcha-$h.jpg";
 
-	GET( $img );
-	$-{_referer} = $-{referer};
+	GET( $img, keep_referer => 1 );
 
 	CAPTCHA( "image/jpeg" );
+	$-{cap_form}->set( captcha_key => $_ );
 
-	$-{form}->set( captcha_key => $_ );
-	GET( $-{form}->post() );
-stage_getlinks:
-	$-{referer} = $-{_referer};
-	if ( m#<form action="" id="frm_captcha" method="post"># ) {
-		return $self->stage_captcha();
-	}
+	GET( $-{cap_form}->post() );
+
+	$-{cap_form} = $self->form( id => "frm_captcha" );
+	GOTO stage_captcha if $-{cap_form};
+
+stage_find_links:
 
 	my @list;
 	push @list, $1 while s/accessDownload\(\d+, \d+, '(\d+-[0-9a-f]+)', \d+\);//;
+
 	ERROR("no links") unless @list;
+
 	$-{list} = \@list;
 	$-{outlist} = [];
 
-	GET( "/ajax-handler.php", post => { cmd => "download", download_id => shift @{$-{list}} } );
-stage_next_uri:
-	$_ = cipher( $_ );
-	s/\s+$//;
-	push @{$-{outlist}}, $_;
+stage_get_link:
+	GET( "/ajax-handler.php",
+		post => { cmd => "download", download_id => shift @{$-{list}} },
+		keep_referer => 1 );
 
-	if ( @{$-{list}} ) {
-		$-{_referer} = $-{referer};
-		GET_NEXT( stage_next_uri, "/ajax-handler.php",
-			post => { cmd => "download", download_id => shift @{$-{list}} } );
-	}
+	my $uri = cipher( $_ );
+	$uri =~ s/\s+$//;
+	$uri =~ s/ /%20/g;
+	push @{$-{outlist}}, $uri;
+
+	GOTO stage_get_link if @{$-{list}};
 
 	LINK( @{$-{outlist}} );
 
