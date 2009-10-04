@@ -1,6 +1,7 @@
 
 TODO:
 - Write more documentation
+- Add hooks to allow unifying URIs before adding them to the list
 
 
 Features:

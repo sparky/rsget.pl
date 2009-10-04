@@ -6,9 +6,6 @@ uri: qr{youtube\.com/watch\?v=.*}
 slots: 8
 status: OK 2009-10-03
 
-pre:
-	use URI::Escape;
-
 start:
 	! $-{_uri} =~ m{[\?&]v=([-_a-zA-Z0-9]+)(?:&.*)?$};
 	$-{v} = $1;
