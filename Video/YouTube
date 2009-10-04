@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 
 name: YouTube
-short: V:YT
+short: V:YouTube
 uri: qr{youtube\.com/watch\?v=.*}
 slots: 8
 status: OK 2009-10-03
@@ -33,7 +33,7 @@ start:
 	my $t = $1;
 
 	my $fname = $name . "." . $ext;
-	INFO( name => $fname, size => -1 );
+	INFO( name => $fname, quality => "fmt$fmt" );
 
 	DOWNLOAD( "http://youtube.com/get_video?video_id=$-{v}&t=$t&fmt=$fmt",
 		fname => $fname );

@@ -2,7 +2,7 @@
 
 name: DailyMotion
 short: V:DailyMotion
-uri: qr{dailymotion\.com/(.*?/)?video/[a-z0-9]+}
+uri: qr{dailymotion\.(com|pl)/(.*?/)?video/[a-z0-9]+}
 slots: 8
 status: OK 2009-10-04
 
@@ -27,10 +27,12 @@ start:
 		$best_size = $1;
 		$best_uri = $uri;
 	}
+
 	my $ext = "mp4";
-	$ext = "flv" if $best_uri =~ m{/cdn/FLV-};
+	! $best_uri =~ m{/cdn/((.*?)-\d+x\d+)};
+	$ext = "flv" if $2 eq "FLV";
 	my $fname = $name . "." . $ext;
-	INFO( name => $fname, size => -1 );
+	INFO( name => $fname, quality => $1 );
 
 	DOWNLOAD( $best_uri, fname => $fname );
 

@@ -15,15 +15,16 @@ start:
 	! m{<title>(.*?)</title>};
 	my $name = de_ml( $1 );
 	$name =~ s{/}{_}g;
-	INFO( name => $name, size => -1 );
 
 	my @file_uri;
 	if ( /<a href=(http.*?ck1)>/ ) {
 		@file_uri = ( $1 );
+		INFO( ainame => $name, quality => "mp4" );
 	} else {
 		! m{videoUrl\\x3d(.*?)\\x26};
 		@file_uri = (uri_unescape( $1 ),
 			fname => "$name.flv" );
+		INFO( name => "$name.flv", quality => "flv" );
 	}
 
 	DOWNLOAD( @file_uri );
