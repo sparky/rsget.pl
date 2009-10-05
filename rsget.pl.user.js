@@ -8,6 +8,53 @@
 // ==/UserScript==
 
 (function(){
+	function add_src( links, el_name )
+	{
+		try {
+			var els = w.document.getElementsByTagName( el_name );
+			for ( var i = 0; i < els.length; i++ ) {
+				var el = els[ i ];
+				if ( el.src )
+					links.push( el.src );
+			}
+		} catch (e) {};
+	}
+	function add_window( links, w )
+	{
+		try {
+			links.push( w.document.location.href );
+		} catch ( e ) {};
+		try {
+			links.push( w.location.href );
+		} catch ( e ) {};
+		add_src( links, 'iframe' );
+		add_src( links, 'frame' );
+		try {
+			var fel = w.frameElement;
+			if ( fel )
+				links.push( fel.src );
+		} catch ( e ) {};
+
+		var frames = w.frames;
+		if ( frames ) {
+			for ( var i = 0; i < frames.length; i++ ) {
+				add_window( links, frames[ i ] );
+			}
+		}
+	}
+	function add_location()
+	{
+		var links = [];
+		var w = unsafeWindow;
+		add_window( links, w );
+		while ( w != w.parent ) {
+			w = w.parent;
+			add_window( links, w );
+		}
+
+		window.setTimeout( send, 0, links.join( "\n" ) );
+	}
+	GM_registerMenuCommand("Add location to rsget.pl", add_location, null, null, "l");
 
 	var hostname = document.location.hostname;
 	function add_links( links, node )
