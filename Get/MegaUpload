@@ -6,6 +6,7 @@ uri: qw{megaupload\.com/(../)?\?d=}
 uri: qw{megaporn\.com/(../)?\?d=}
 uri: qw{megarotic\.com/(../)?\?d=}
 uri: qw{sexuploader\.com/(../)?\?d=}
+uri: qw{megavideo\.com/\?d=}
 status: OK 2009-08-24
 
 pre:
@@ -16,6 +17,8 @@ pre:
 
 start:
 	( my $uri = $-{_uri} ) =~ s#^(http://(?:www\.)?)(?:megarotic|sexuploader)#$1megaporn#;
+	$uri =~ s#^(http://(?:www\.)?)megavideo#megaupload#;
+
 	GET( $uri );
 stage_first:
 	$-{first_page} = $-{_referer};
