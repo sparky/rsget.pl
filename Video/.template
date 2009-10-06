@@ -1,0 +1,23 @@
+#!/usr/bin/perl
+
+name: [NAME]
+short: V:[NAME]
+uri: qr{vsite\.com/}
+slots: 8
+status: OK [DATE]
+
+start:
+	GET( $-{_uri} );
+
+	! m{<title>(.*?)</title>};
+	my $fname = de_ml( $1 );
+	$fname =~ s{/}{_}g;
+	$fname .= ".flv";
+
+	INFO( name => $fname, quality => "flv" );
+
+	! m{file_uri_here:'(.*?)'};
+	my $file_uri = uri_unescape( $1 );
+	DOWNLOAD( $file_uri, fname => $fname );
+
+# vim:ts=4:sw=4
