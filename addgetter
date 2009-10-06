@@ -1,0 +1,19 @@
+#!/usr/bin/perl
+
+my $fname = shift @ARGV;
+die "$fname exists" if -r $fname;
+$fname =~ m{^(Get|Video|Link)/([A-Z][a-zA-Z0-9_]*)$} or die "invalid";
+my ( $dir, $name ) = ($1, $2);
+
+open F_IN, '<', "$dir/.template" or die "no template";
+open F_OUT, '>', $fname or die "can't create";
+
+my @l = localtime;
+my $date = sprintf "%d-%.2d-%.2d", $l[5] + 1900, $l[4] + 1, $l[3];
+while ( <F_IN> ) {
+	s/\[NAME\]/$name/g;
+	s/\[DATE\]/$date/g;
+	print F_OUT $_;
+}
+close F_IN;
+close F_OUT;
