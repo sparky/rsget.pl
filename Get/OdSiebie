@@ -13,7 +13,26 @@ start:
 	ERROR( "some problem, file not found ?" )
 		if $-{_referer} =~ m{/(upload|error)\.html};
 
-	m{<dl\s+class="file-info">.*?<dd.*?>
+	if ( m{<img id="thepic" .* src="(.*?)"} ) { # picture
+		$-{file_uri} = $1;
+		! m{<dl class="file-info">.*?<dd> ($STDSIZE)</dd>}s;
+		my $size = $1;
+		$-{file_uri} =~ m{.*/(.*?)$};
+		INFO( name => $1, asize => $size );
+
+		GOTO stage_download;
+	} elsif ( m{var VideoID = "video=(http://.*?)::url=.*?";} ) { # video
+		$-{file_uri} = $1;
+
+		! m{Oryginalna nazwa pliku: (.*?)<br />.*<br />Rozmiar pliku:\s+($STDSIZE)<!--};
+		$-{fname} = $1;
+		INFO( name => $1, asize => $2 );
+
+		GOTO stage_download;
+	}
+
+	# mp3 or binary file
+	! m{<dl\s+class="file-info">.*?<dd.*?>
 		(?:\s*<!--.*?-->\s*<!--.*?-->\s*)?
 		(.*?)
 		</dd>.*?<dd>\s*($STDSIZE)</dd>}sx;
@@ -23,6 +42,11 @@ start:
 	GET( $1 );
 
 	! m{href="(/download/\d+---.*?.html)"};
-	DOWNLOAD( $1 );
+	$-{file_uri} = $1;
+
+stage_download:
+	my @fname;
+	@fname = ( fname => $-{fname} ) if $-{fname};
+	DOWNLOAD( $-{file_uri}, @fname );
 
 # vim:ts=4:sw=4
