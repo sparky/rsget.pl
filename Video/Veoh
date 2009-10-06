@@ -1,0 +1,36 @@
+#!/usr/bin/perl
+
+name: Veoh
+short: V:Veoh
+uri: qr{veoh\.com/}
+slots: 8
+status: OK 2009-10-06
+
+start:
+	my $uri = $-{_uri};
+
+	my $id;
+	$id = $1 if $-{_uri} =~ m{.*/(?:watch|videos)/(v.*?)(#.*)?$};
+	$id = $1 if $-{_uri} =~ m{#watch%3D(v.*)$};
+	$uri = "http://www.veoh.com/browse/videos/watch/" . $id if $id;
+
+	GET( $uri );
+
+	! m/"videoId":"(.*?)",/;
+	my $id = $1;
+	my $ex_uri = "http://www.veoh.com/rest/v2/execute.xml?"
+		. "apiKey=5697781E-1C60-663B-FFD8-9B49D2B56D36&method=veoh.search.search"
+		. "&type=video&maxResults=1&permalink=$id&contentRatingId=1&";
+	GET( $ex_uri );
+
+	! m/title="(.*?)"/;
+	my $fname = de_ml( $1 );
+	$fname =~ tr{/}{_};
+	$fname .= ".flv";
+
+	INFO( name => $fname, quality => "flv" );
+
+	! m/fullPreviewHashPath="(.*?)"/;
+	DOWNLOAD( de_ml( $1 ), fname => $fname );
+
+# vim:ts=4:sw=4
