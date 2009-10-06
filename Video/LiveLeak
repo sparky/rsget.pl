@@ -1,0 +1,28 @@
+#!/usr/bin/perl
+
+name: LiveLeak
+short: V:LiveLeak
+uri: qr{liveleak\.com/view\?i=}
+slots: 8
+status: OK 2009-10-06
+
+start:
+	GET( $-{_uri} );
+
+	! m{<h4 id="s_hd">(.*?)</h4>};
+	$-{fname} = de_ml( $1 );
+	$-{fname} =~ s{/}{_}g;
+	$-{fname} .= ".flv";
+
+	INFO( name => $-{fname}, quality => "flv" );
+
+	! m{'config','(.*?)'};
+	GET( uri_unescape( $1 ), keep_referer => 1 );
+
+	! m{<file>(.*?)</file>};
+	GET( $1, keep_referer => 1 );
+
+	! m{<location>(.*?)</location>};
+	DOWNLOAD( $1, fname => $-{fname} );
+
+# vim:ts=4:sw=4
