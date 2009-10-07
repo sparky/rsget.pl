@@ -1,0 +1,45 @@
+#!/usr/bin/perl
+
+name: PornHub
+short: V:PornHub
+uri: qr{pornhub\.com/view_video.php\?viewkey=}
+slots: 8
+status: OK 2009-10-07
+
+pre:
+	my $amf_pre = pack "C*", (
+		0x00, 0x03, 0x00, 0x00,  0x00, 0x01, 0x00, 0x0c,
+		0x70, 0x6c, 0x61, 0x79,  0x65, 0x72, 0x43, 0x6f,
+		0x6e, 0x66, 0x69, 0x67,  0x00, 0x02, 0x2f, 0x31,
+		0x00, 0x00, 0x00, 0x44,  0x0a, 0x00, 0x00, 0x00,
+		0x03, 0x02, 0x00 );
+	my $amf_post = ( pack "C*", (
+		0x02, 0x00, 0x02, 0x2d,  0x31, 0x02, 0x00, 0x20 ) )
+		. "add299463d4410c6d1b1c418868225f7";
+
+start:
+	GET( $-{_uri} );
+
+	! m{<h1>\s*(.*?)\s*</h1>}s;
+	$-{fname} = de_ml( $1 );
+	$-{fname} =~ s{/}{_}g;
+	$-{fname} .= ".flv";
+
+	INFO( name => $-{fname}, quality => "flv"  );
+
+	! m{addVariable\("quality","-1"\);};
+	! m{addVariable\("vkey","(.*?)"\);};
+	my $key = $1;
+	my $post = $amf_pre . ( chr length $key ) . $key . $amf_post;
+
+	GET( "/gateway.php",
+		post => $post,
+		headers => [ "Content-Type: application/x-amf" ],
+	);
+
+	my $f = index $_, "flv_url";
+	my $len = ord substr $_, $f + 9, 1;
+	my $file_uri = substr $_, $f + 10, $len;
+	DOWNLOAD( $file_uri, fname => $-{fname} );
+
+# vim:ts=4:sw=4
