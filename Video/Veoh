@@ -6,15 +6,14 @@ uri: qr{veoh\.com/}
 slots: 8
 status: OK 2009-10-06
 
-start:
-	my $uri = $-{_uri};
-
+unify:
 	my $id;
-	$id = $1 if $-{_uri} =~ m{.*/(?:watch|videos)/(v.*?)(#.*)?$};
-	$id = $1 if $-{_uri} =~ m{#watch%3D(v.*)$};
-	$uri = "http://www.veoh.com/browse/videos/watch/" . $id if $id;
+	$id = $1 if m{.*/(?:watch|videos)/(v.*?)(#.*)?$};
+	$id = $1 if m{#watch%3D(v.*)$};
+	return "http://www.veoh.com/browse/videos/watch/" . $id if $id;
 
-	GET( $uri );
+start:
+	GET( unify( $-{_uri} ) );
 
 	! m/"videoId":"(.*?)",/;
 	my $id = $1;
