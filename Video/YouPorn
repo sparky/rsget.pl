@@ -1,0 +1,28 @@
+#!/usr/bin/perl
+
+name: YouPorn
+short: V:YouPorn
+uri: qr{youporn\.com/watch/\d+(/.*)?$}
+slots: 8
+cookie: !v_yp
+status: OK 2009-10-07
+
+start:
+	COOKIE( [ (qw(.youporn.com TRUE / FALSE), time + 86400, 'age_check', '1' ) ] );
+
+	GET( $-{_uri} );
+
+	! m{<div id="videoArea" class="yui-g">\s*<h1>\s*(?:<img[^<>]*?>\s*)?(.*?)\s*</h1>}s;
+	my $fname = de_ml( $1 );
+	$fname =~ s{/}{_}g;
+	$fname .= ".flv";
+
+	! m{<p><a href="(http://download.*?)">FLV - Flash Video format</a> \((\d+(?:,\d+)?\s+KB)\)</p>};
+	my $file_uri = $1;
+	my $size = $2;
+	$size =~ tr/,/./;
+	INFO( name => $fname, size => $size );
+
+	DOWNLOAD( $file_uri, fname => $fname );
+
+# vim:ts=4:sw=4
