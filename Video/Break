@@ -3,7 +3,7 @@
 name: Break
 short: V:Break
 uri: qr{break\.com}
-slots: 8
+slots: max
 status: OK 2009-10-05
 
 start:

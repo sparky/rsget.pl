@@ -3,7 +3,7 @@
 name: Delfi
 short: V:Delfi
 uri: qr{tv\.delfi\.ee/video/.*/}
-slots: 8
+slots: max
 status: OK 2009-10-04
 
 start:

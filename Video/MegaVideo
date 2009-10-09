@@ -3,8 +3,8 @@
 name: MegaVideo
 short: V:MegaVideo
 uri: qr{megavideo\.com/\?v=}
-uri: qr{megaporn\.com/video/\?v=}
-slots: 8
+uri: qr{megaporn\.com/(.*?/)?\?v=}
+slots: max
 status: OK 2009-10-06
 
 start:

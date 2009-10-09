@@ -3,7 +3,7 @@
 name: PornHub
 short: V:PornHub
 uri: qr{pornhub\.com/view_video.php\?viewkey=}
-slots: 8
+slots: max
 status: OK 2009-10-07
 
 pre:

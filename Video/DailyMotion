@@ -3,7 +3,7 @@
 name: DailyMotion
 short: V:DailyMotion
 uri: qr{dailymotion\.(com|pl)/(.*?/)?video/[a-z0-9]+}
-slots: 8
+slots: max
 status: OK 2009-10-04
 
 start:

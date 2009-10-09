@@ -3,7 +3,7 @@
 name: [NAME]
 short: V:[NAME]
 uri: qr{vsite\.com/}
-slots: 8
+slots: max
 status: OK [DATE]
 
 start:

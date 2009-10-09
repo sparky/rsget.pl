@@ -3,7 +3,7 @@
 name: YouPorn
 short: V:YouPorn
 uri: qr{youporn\.com/watch/\d+(/.*)?$}
-slots: 8
+slots: max
 cookie: !v_yp
 status: OK 2009-10-07
 

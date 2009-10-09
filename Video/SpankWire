@@ -2,8 +2,8 @@
 
 name: SpankWire
 short: V:SpankWire
-uri: qr{spankwire\.com/}
-slots: 8
+uri: qr{spankwire\.com/[^/]+/video\d+}
+slots: max
 status: OK 2009-10-05
 
 start:

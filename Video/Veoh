@@ -3,7 +3,7 @@
 name: Veoh
 short: V:Veoh
 uri: qr{veoh\.com/}
-slots: 8
+slots: max
 status: OK 2009-10-06
 
 unify:
