@@ -3,6 +3,7 @@
 name: LinkProtector
 short: link-protector
 uri: qr{link-protector\.com/}
+slots: max
 status: OK 2009-09-12
 
 start:

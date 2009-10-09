@@ -3,6 +3,7 @@
 name: AnonymTo
 short: anonym.to
 uri: qr{anonym\.to/}
+slots: max
 status: OK 2009-08-25
 
 start:

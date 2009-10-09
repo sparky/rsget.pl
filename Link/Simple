@@ -6,6 +6,7 @@ uri: qr{4gk\.com/}
 uri: qr{xurl\.jp/}
 uri: qr{tinyurl\.com/}
 uri: qr{linkhider\.com/}
+slots: max
 status: OK 2009-09-12
 
 start:

@@ -3,6 +3,7 @@
 name: RaidRush
 short: save.raidrush.ws
 uri: qr{save\.raidrush\.ws/}
+slots: max
 status: OK 2009-10-04
 
 start:

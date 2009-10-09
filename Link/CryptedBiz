@@ -3,6 +3,7 @@
 name: CryptedBiz
 short: crypted.biz
 uri: qr{crypted\.biz/}
+slots: max
 status: OK 2009-08-27
 
 pre:

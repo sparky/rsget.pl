@@ -3,6 +3,7 @@
 name: RSProtect
 short: rsprotect.com
 uri: qr{rsprotect\.com/rc-.*?/}
+slots: max
 status: OK 2009-10-04
 
 start:
