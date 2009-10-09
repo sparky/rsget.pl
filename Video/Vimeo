@@ -2,9 +2,13 @@
 
 name: Vimeo
 short: V:Vimeo
-uri: qr{vimeo\.com/}
-slots: 8
+uri: qr{vimeo\.com/\d+([/#].*)?$}
+slots: max
 status: OK 2009-10-05
+
+unify:
+	s/#.*//;
+	return "http://vimeo.com/$1" if m{/(\d+)(?:/.*)?$};
 
 start:
 	GET( $-{_uri} );

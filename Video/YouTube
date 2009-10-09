@@ -3,17 +3,22 @@
 name: YouTube
 short: V:YouTube
 uri: qr{youtube\.com/watch\?v=.*}
-slots: 8
+slots: max
 status: OK 2009-10-03
 
-start:
-	! $-{_uri} =~ m{[\?&]v=([-_a-zA-Z0-9]+)(?:&.*)?$};
-	$-{v} = $1;
+unify:
+	s/#.*//;
+	m{[\?&]v=([-_a-zA-Z0-9]+)(?:&.*?)?$};
+	return "http://www.youtube.com/watch?v=$1" if $1;
 
-	GET( "http://www.youtube.com/watch?v=$-{v}" );
+start:
+	GET( $-{_uri} );
+
+	! m{"video_id": "(.*?)"};
+	my $id = $1;
 
 	! m{<meta name="title" content="(.*?)">};
-	my $name = de_ml( $1 );
+	my $name = de_ml( de_ml( $1 ) );
 	$name =~ s{/}{_}g;
 
 	! /"fmt_map"\s*:\s*"(.*?)"/;
@@ -32,7 +37,7 @@ start:
 	my $fname = $name . "." . $ext;
 	INFO( name => $fname, quality => "fmt$fmt" );
 
-	DOWNLOAD( "http://youtube.com/get_video?video_id=$-{v}&t=$t&fmt=$fmt",
+	DOWNLOAD( "http://youtube.com/get_video?video_id=$id&t=$t&fmt=$fmt",
 		fname => $fname );
 
 # vim:ts=4:sw=4
