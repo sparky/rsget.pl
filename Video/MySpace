@@ -1,0 +1,30 @@
+#!/usr/bin/perl
+
+name: MySpace
+short: V:MySpace
+uri: qr{vids\.myspace\.com/index\.cfm\?fuseaction=vids\.individual&VideoID=\d+(?:#.*)?}i;
+slots: max
+status: OK 2009-10-09
+
+unify:
+	return "http://vids.myspace.com/index.cfm?fuseaction=vids.individual&videoid=$1"
+		if m{videoid=(\d+)}i;
+
+start:
+	GET( $-{_uri} );
+
+	! m{<h1 id="tv_tbar_title">(.*?)</h1>};
+	$-{fname} = de_ml( $1 );
+	$-{fname} =~ s{/}{_}g;
+	$-{fname} .= ".flv";
+
+	INFO( name => $-{fname}, quality => "flv" );
+
+	! m{var videoid = (\d+);};
+	GET( "http://mediaservices.myspace.com/services/rss.ashx?videoID=$1&type=video" );
+
+	! m{<media:content url="(.*?)"};
+	my $file_uri = $1;
+	DOWNLOAD( $file_uri, fname => $-{fname} );
+
+# vim:ts=4:sw=4
