@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 
 name: Simple
-short: simple.link
+short: L:Simple
 uri: qr{4gk\.com/}
 uri: qr{xurl\.jp/}
 uri: qr{tinyurl\.com/}

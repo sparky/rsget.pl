@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 
 name: CryptIt
-short: cryptit
+short: L:CryptIt
 uri: qr{crypt-it\.com/}
 slots: max
 status: OK 2009-09-19

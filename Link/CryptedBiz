@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 
 name: CryptedBiz
-short: crypted.biz
+short: L:CryptedBiz
 uri: qr{crypted\.biz/}
 slots: max
 status: OK 2009-08-27

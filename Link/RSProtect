@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 
 name: RSProtect
-short: rsprotect.com
+short: L:RSProtect
 uri: qr{rsprotect\.com/rc-.*?/}
 slots: max
 status: OK 2009-10-04

@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 
 name: LinkProtector
-short: link-protector
+short: L:LinkProtector
 uri: qr{link-protector\.com/}
 slots: max
 status: OK 2009-09-12

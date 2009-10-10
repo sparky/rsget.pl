@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 
 name: SecuredIn
-short: secured.in
+short: L:SecuredIn
 uri: qr{secured\.in/download-\d+-[0-9a-f]+\.html$}
 slots: max
 status: OK 2009-10-04

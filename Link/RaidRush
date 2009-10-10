@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 
 name: RaidRush
-short: save.raidrush.ws
+short: L:RaidRush
 uri: qr{save\.raidrush\.ws/}
 slots: max
 status: OK 2009-10-04

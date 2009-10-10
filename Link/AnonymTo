@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 
 name: AnonymTo
-short: anonym.to
+short: L:AnonymTo
 uri: qr{anonym\.to/}
 slots: max
 status: OK 2009-08-25
