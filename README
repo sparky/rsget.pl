@@ -1,7 +1,8 @@
 
 TODO:
 - Write more documentation
-
+- When continuing partially downloaded data start few kb before the end and
+  compare old with new.
 
 Features:
 - Perfect for screen session
