@@ -15,13 +15,14 @@ pre:
 	my $mu_font_db = data_file( "mu_font_db.png" );
 	die "Font DB '$mu_font_db' does not exist\n" unless $mu_font_db;
 
-start:
-	( my $uri = $-{_uri} ) =~ s#^(http://(?:www\.)?)(?:megarotic|sexuploader)#$1megaporn#;
-	$uri =~ s#^(http://(?:www\.)?)megavideo#megaupload#;
+unify:
+	my ($id) = /d=([A-Z0-9]*)/;
+	my $host = "megaupload";
+	$host = "megaporn" if m{^http://?:(www\.)?(?:megarotic|sexuploader)};
+	return "http://$host.com/?d=$id";
 
-	GET( $uri );
-stage_first:
-	$-{first_page} = $-{_referer};
+start:
+	GET( unify( $-{_uri} ) );
 
 	RESTART( 10 * 60, "temporarily blocked" )
 		if m{document\.location='http://www\.megaupload\.com/\?c=msg'};
@@ -39,28 +40,32 @@ stage_first:
 	if ( /The file you're trying to download is password protected/ ) {
 		ERROR( "password required" ) unless exists $-{_opts}->{pass};
 
-		my $form = $self->form( id => "passwordform" );
+		my $form;
+		! $form = $self->form( id => "passwordform" );
 		$form->set( filepassword => $-{_opts}->{pass} );
 		GET_NEXT( stage_last, $form->post() );
 	}
 
-	$-{form} = $self->form( id => "captchaform" );
+	! $-{form} = $self->form( id => "captchaform" );
 
+stage_captcha:
 	! m{<img src="(http://.*?megaupload\.com/gencap\.php\?[0-9a-f]+\.gif)"};
 
-	GET( $1 );
+	GET( $1, keep_referer => 1 );
 
 	my $captcha = captcha( \$_ );
-	RESTART( 10, "Can't read captcha" ) unless defined $captcha;
+	RESTART( -1, "can't read captcha" ) unless defined $captcha;
 
 	$-{form}->set( captcha => $captcha );
-
-	$-{_referer} = $-{first_page};
 	GET( $-{form}->post() );
 
+	$-{form} = $self->form( id => "captchaform" );
+	if ( $-{form} ) {
+		PRINT( "invalid captcha" );
+		GOTO stage_captcha;
+	}
+
 stage_last:
-	RESTART( 10, "invalid captcha" )
-		if /id="captchaform"/;
 	ERROR( "invalid password" )
 		if /The file you're trying to download is password protected/;
 
