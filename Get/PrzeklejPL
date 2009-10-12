@@ -1,0 +1,25 @@
+#!/usr/bin/perl
+
+name: PrzeklejPL
+short: P.pl
+uri: qr{przeklej\.pl/plik/}
+slots: max
+status: OK 2009-10-13
+
+start:
+	GET( $-{_uri} );
+
+	ERROR( "file not found" )
+		if /Plik nie istnieje/;
+
+	! m{<h1><a href="(/download/.*?)" title="Pobierz plik">(.*?)</a></h1><span class="size".*?> \(($STDSIZE)\)</span>};
+	my ( $file_uri, $name, $size ) = ( $1, $2, $3 );
+
+	$name =~ s/(.*) \./$1_www.przeklej.pl./
+		unless $name =~ s/\.\.\.$/\0/;
+
+	INFO( ainame => $name, asize => $size );
+
+	DOWNLOAD( de_ml( $file_uri ) );
+
+# vim:ts=4:sw=4
