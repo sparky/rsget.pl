@@ -1,0 +1,80 @@
+#!/usr/bin/perl
+
+name: GigaSize
+short: GS
+uri: qr{gigasize\.com/get\.php\?d=}
+cookie: gs
+status: OK 2009-10-11
+
+pre:
+	use IPC::Open2;
+	my @cap;
+	if ( require_prog( "djpeg" ) ) {
+		push @cap, 'djpeg -pnm -grey';
+	} elsif ( require_prog( "jpegtopnm" ) ) {
+		push @cap, 'jpegtopnm';
+		push @cap, 'ppmtopgm' if require_prog( "ppmtopgm" );
+		warn "Using jpegtopnm, but djpeg would give better results\n";
+	} else {
+		die "Required djpeg (preferred) or jpegtopnm\n";
+	}
+
+	push @cap, 'pamcut -left 15 -top 3 -right 42 -bottom 16'
+		if require_prog( "pamcut" );
+
+	if ( require_prog( "gocr" ) ) {
+		push @cap, 'gocr -f ASCII  -a 5 -m 56';
+	} elsif ( require_prog( "ocrad" ) ) {
+		push @cap, 'ocrad';
+		warn "Using ocrad, but gocr would give better results\n";
+	} else {
+		die "Required gocr (preferred) or ocrad\n";
+	}
+	my $cap_prog = join " | ", map "$_ 2>/dev/null", @cap;
+
+	sub captcha
+	{
+		my $data = shift;
+
+		IPC::Open2::open2( *READ, *WRITE, $cap_prog );
+		print WRITE $$data;
+		close WRITE;
+		my $out = <READ>;
+		close READ;
+
+		return $1 if $out =~ /([a-zA-Z]{3})/;
+		return undef;
+	}
+
+start:
+	GET( $-{_uri} );
+
+	ERROR( "file not found" ) if /The file has been deleted/;
+
+	! m{<strong>Name</strong>:\s*<b>(.*?)</b></p>\s*<p>Size:\s*<span>($STDSIZE)</span>};
+	INFO( name => $1, asize => $2 );
+
+stage_captcha:
+	PRINT( "solving captcha" );
+	! $-{form} = $self->form( match => { action => qr{^/formdownload\.php$} } );
+
+	GET( "/randomImage.php", keep_referer => 1 );
+
+	my $cap = captcha( \$_ );
+	RESTART( -1, "Can't decode captcha" ) unless $cap;
+	$-{form}->set( txtNumber => $cap );
+
+	GET( $-{form}->post() );
+
+	GOTO stage_captcha if $-{_referer} =~ /err=invalidchecksum$/;
+	RESTART( -180 - int rand 360, "free limit reached, waiting time unknown" )
+		if /YOU HAVE REACHED YOUR FREE DOWNLOAD LIMIT/;
+
+	! $-{form} = $self->form( id => "formDownload" );
+
+	! m{var seconds=(\d+)};
+	WAIT( $1, "starting download" );
+	
+	DOWNLOAD( $-{form}->post() );
+
+# vim:ts=4:sw=4
