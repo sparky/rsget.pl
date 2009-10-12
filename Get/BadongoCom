@@ -1,0 +1,101 @@
+#!/usr/bin/perl
+
+name: BadongoCom
+short: BC
+uri: qr{badongo\.com/}
+cookie: !badongo
+status: OK 2009-10-11
+
+unify:
+	s/#.*//; s{/$}{};
+	my $host = "http://www.badongo.com";
+	return "$host/file/$1" if m{/c?file/(\d+(/.*)?)};
+	return "$host/vid/$1/1" if m{/c?vid/(\d+)};
+	return "$host/pic/$1" if m{/pic/(\d+)};
+	return "$host/file/$1" if m{/audio/(\d+)};
+
+start:
+	COOKIE( [ (qw(.badongo.com TRUE / FALSE), time + 86400, 'badongoL', 'en' ) ] );
+
+	GET( $-{_uri} );
+
+	GOTO stage_getlink if $-{_referer} =~ m{/c(?:file|vid)/};
+
+	ERROR( "file not found" ) if /<div id="fileError">/;
+
+	if ( not /This file has been split/ or $-{_referer} =~ m{/\d+/(.+)$} ) {
+		my $part = $1;
+		! m{<div class="finfo">(.*?)</div>};
+		my $name = $1;
+		! m{<div class="ffileinfo">Views : \d+ \| Filesize : ($STDSIZE)</div>};
+		my $size = $1;
+		if ( $part ) {
+			INFO( name => "$name.$part", quality => "part of $1" );
+		} else {
+			INFO( name => $name, asize => $1 );
+		}
+	}
+
+	GOTO stage_getpic if $-{_referer} =~ m{/pic/};
+
+stage_getcaptcha:
+	my $rsrnd = jstime();
+	$-{_referer} =~ m{.*/(.*?)$};
+	GET( "$1?rs=displayCaptcha&rst=&rsrnd=$rsrnd&rsargs[]=yellow",
+		keep_referer => 1 );
+
+	! m{<img src=\\"(/ccaptcha.*?)\\"};
+	my $img = $1;
+
+	! s/^.*?<form/<form/s;
+	! s{</form>.*$}{</form>}s;
+	s/\\n/ /g;
+	s/\\"/"/g;
+
+	! $-{form} = $self->form( source => $_ );
+
+	GET( $img, keep_referer => 1 );
+
+	CAPTCHA( "image/jpeg" );
+
+	$-{form}->set( user_code => $_ );
+	GET( $-{form}->post() );
+
+	GOTO stage_getcaptcha unless $-{_referer} =~ m{/c(?:file|vid)/};
+
+	if ( my @links = m{<a href="(http://www\.badongo\.com/file/\d+/..)">}g ) {
+		LINK( @links );
+	}
+
+stage_getlink:
+	! /var check_n = (\d+);/;
+	WAIT( $1, "getting download link" );
+
+	my $linkType = "getFileLink";
+	$linkType = "getVidLink" if $-{_referer} =~ m{/cvid/};
+	my $rsrnd = jstime();
+	$-{_referer} =~ m{.*/(.*?)$};
+	GET( "$1?rs=$linkType&rst=&rsrnd=$rsrnd&rsargs[]=yellow" );
+
+	! m{doDownload\(\\'(.*?)\\'\)};
+	$-{dllink} = $1;
+
+	GET( $-{dllink} . "/ifr?pr=1&zenc=" );
+
+	$-{file_uri} = $-{dllink} . "/loc?pr=1";
+	GOTO stage_download;
+
+stage_getpic:
+	! m{/pic/(\d+)};
+	GET( "$1?size=original" );
+
+	! m{<img src="(http://mediacache.*)" border="0">};
+	$-{file_uri} = $1;
+ 
+stage_download:
+	DOWNLOAD( $-{file_uri} );
+
+	RESTART( -(60 + int rand 300), "free limit reached" )
+		if /You have exceeded your Download Quota/;
+
+# vim:ts=4:sw=4
