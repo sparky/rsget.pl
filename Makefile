@@ -4,6 +4,7 @@ BINDIR = /usr/bin
 VER =
 PKGDIR = rsget.pl-$(VER)
 
+PLUGIN_DIRS = Get Link Video
 DIRS = RSGet,Get,Link,Video,data
 
 all: rsget.pl
@@ -18,9 +19,10 @@ pkg: clean
 	install rsget.pl $(PKGDIR)
 	cp Makefile README README.config $(PKGDIR)
 	cp RSGet/*.pm $(PKGDIR)/RSGet
-	cp Get/* $(PKGDIR)/Get
-	cp Link/* $(PKGDIR)/Link
-	cp Video/* $(PKGDIR)/Video
+	for DIR in $(PLUGIN_DIRS); do \
+		cp $$DIR/* $(PKGDIR)/$$DIR || exit 1; \
+		cp $$DIR/.template $(PKGDIR)/$$DIR || exit 1; \
+	done
 	cp data/* $(PKGDIR)/data
 	tar -cjf $(PKGDIR).tar.bz2 $(PKGDIR)
 endif
@@ -31,9 +33,9 @@ install: clean
 	install rsget.pl.datadir $(DESTDIR)$(BINDIR)/rsget.pl
 	cp RSGet/*.pm $(DESTDIR)$(DATADIR)/RSGet
 	cp data/* $(DESTDIR)$(DATADIR)/data
-	cp Get/* $(DESTDIR)$(DATADIR)/Get
-	cp Link/* $(DESTDIR)$(DATADIR)/Link
-	cp Video/* $(DESTDIR)$(DATADIR)/Video
+	for DIR in $(PLUGIN_DIRS); do \
+		cp $$DIR/* $(DESTDIR)$(DATADIR)/$$DIR || exit 1; \
+	done
 	grep -l "status:\s*BROKEN" $(DESTDIR)$(DATADIR)/{Get,Link,Video}/* | xargs -r rm -v
 
 .PHONY: clean
