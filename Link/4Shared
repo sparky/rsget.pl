@@ -1,0 +1,39 @@
+#!/usr/bin/perl
+
+name: 4Shared
+short: L:4Shared
+uri: qr{4shared\.com/dir/}
+slots: max
+cookie: !4sh
+status: OK 2009-10-13
+
+unify:
+	return "http://www.4shared.com/dir/$1/$2"
+		if m{/dir/(\d+)/([0-9a-f]+)};
+
+start:
+	GET( $-{_uri} );
+
+	ERROR( "file not found" )
+		if m{^\s*<img alt="" src="/images/spacer\.gif" class="warn" hspace="3" align="left" />\s*$}m;
+	
+	$-{links} = [];
+	
+	my @dirs = m{href="javascript:changeDir\((\d+)\)"}g;
+	$-{dirs} = [ @dirs ];
+
+stage_morelinks:
+	my @links =m{<a id="ml_file_\d+"\s+href="/account(/file/\d+/[0-9a-f]+)(?:/.*?)?"}g;
+	push @{$-{links}}, @links;
+
+	if ( @{ $-{dirs} } ) {
+		my $form;
+		! $form = $self->form( name => "leftPanelForm" );
+		$form->set( changedir => shift @{ $-{dirs} } );
+		$form->set( refreshAfterUnzip => "false" );
+		GET_NEXT( stage_morelinks, $form->post() );
+	}
+
+	LINK( map "http://www.4shared.com$_", @{ $-{links} } );
+
+# vim:ts=4:sw=4
