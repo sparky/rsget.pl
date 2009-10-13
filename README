@@ -4,6 +4,10 @@ TODO:
 - When continuing partially downloaded data start few kb before the end and
   compare old with new.
 
+Planned features:
+- Multiuser support (may require major changes in the code).
+- XML-RPC (or similar) to allow writing GUIs.
+
 Features:
 - Perfect for screen session
 - Support for many download services
