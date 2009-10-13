@@ -1,0 +1,30 @@
+#!/usr/bin/perl
+
+name: [NAME]
+short: [NAME]
+uri: qr{gsite\.com/}
+status: OK [DATE]
+
+start:
+	GET( $-{_uri} );
+
+	ERROR( "file not found" )
+		if /404/;
+
+	! m#(.+?) \| ($STDSIZE)#;
+	INFO( name => $1, asize => $2 );
+
+	MULTI() if /You are downloading/;
+
+	RESTART( $1 * 60, "free limit reached" )
+		if /try again in (\d+) minutes/;
+
+	! /href="(.*?)"/;
+	$-{file_uri} = $1;
+
+	! /var wait = (\d+);/;
+	WAIT( $1, "starting download" );
+
+	DOWNLOAD( $-{file_uri} );
+
+# vim:ts=4:sw=4
