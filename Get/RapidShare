@@ -17,7 +17,7 @@ start:
 	INFO( name => $1, asize => $2, kilo => 1000 );
 
 	RESTART( $1 * 60, "servers overloaded" )
-		if /Unfortunately you will have to wait ([0-9]+) minutes,/;
+		if /Unfortunately you will have to wait (\d+) minutes,/;
 	
 	! /form id="ff" action="(.*?)"/;
 	GET( $1, post => 'dl.start=Free' );
@@ -25,7 +25,7 @@ start:
 	MULTI() if /Please wait until the download is completed/;
 
 	RESTART( $1 * 60 + 10, "free limit reached" )
-		if /Instant download access! Or try again in about ([0-9]+) minutes\./;
+		if /Instant download access! Or try again in about (\d+) minutes\./;
 
 	RESTART( $1 * 60, "servers overloaded" )
 		if /Unfortunately you will have to wait (\d+) minutes,/
@@ -34,7 +34,7 @@ start:
 	! /form name="dlf" action="(.*?)"/;
 	$-{file_uri} = $1;
 
-	! /var c=([0-9]+);/;
+	! /var c=(\d+);/;
 	WAIT( $1, "starting download" );
 
 	DOWNLOAD( $-{file_uri}, post => { mirror => "on" } );
