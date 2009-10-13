@@ -1,0 +1,24 @@
+#!/usr/bin/perl
+
+name: InteriaPL
+short: V:InteriaPL
+uri: qr{video\.interia\.pl/obejrzyj,film,\d+}
+slots: max
+status: OK 2009-10-13
+
+start:
+	GET( $-{_uri} );
+
+	! m{<h2>(.*?)</h2>};
+	my $fname = de_ml( $1 );
+	$fname =~ s{/}{_}g;
+	$fname .= ".flv";
+
+	INFO( name => $fname, quality => "flv" );
+
+	! m{so\.addVariable\("vid", "(\d+)"\);};
+	my $id = $1;
+
+	DOWNLOAD( "http://flv.interia.pl/l/$id.flv", fname => $fname );
+
+# vim:ts=4:sw=4
