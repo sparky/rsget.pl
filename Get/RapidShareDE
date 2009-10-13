@@ -1,0 +1,49 @@
+#!/usr/bin/perl
+
+name: RapidShareDE
+short: RS.de
+uri: qr{rapidshare\.de/}
+status: OK 2009-10-13
+
+start:
+	GET( $-{_uri} );
+
+	ERROR( "file not found" )
+		if m{<p><script>alert.*?</script>(File not found|This file has been deleted).*?</p>};
+
+	! $-{form} = $self->form( match => { action => qr{^http://rapidshare\.de$} } );
+	$-{form}->set( "dl.start" => "Free" );
+	GET( $-{form}->post() );
+
+	! m{<p><p>You have requested the file <b>(.*?)</b> \(($STDSIZE)\)\.</p>};
+	INFO( name => $1, asize => $2 );
+
+	RESTART( $1 * 60 + 10, "free limit reached" )
+		if /Instant download access! \(Or wait (\d+) minutes\)/;
+
+	MULTI() if /Your IP-address .+? is already downloading a file/;
+
+	! m{<script>var c = (\d+); fc\(\);};
+	$-{wait} = $1;
+
+	! m{getElementById\("dl"\).innerHTML = unescape\('(.*?)'\)};
+	my $form = uri_unescape( $1 );
+	$-{dlform} = $self->form( source => $form );
+
+	! $form =~ m{<img src="(.*?)">};
+	$-{img} = $1;
+
+	GET( $-{img}, keep_referer => 1 );
+
+	CAPTCHA( "image/png" );
+
+	$-{dlform}->set( captcha => $_ );
+
+	WAIT( $-{wait}, "starting download" );
+
+	DOWNLOAD( $-{dlform}->post() );
+
+	RESTART( -1, "invalid captcha" )
+		if /Access-code wrong/;
+
+# vim:ts=4:sw=4
