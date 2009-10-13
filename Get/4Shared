@@ -1,0 +1,38 @@
+#!/usr/bin/perl
+
+name: 4Shared
+short: 4S
+uri: qr{4shared\.com/(account/)?file/}
+slots: 8
+status: OK 2009-10-13
+
+unify:
+	return "http://www.4shared.com/file/$1/$2"
+		if m{/file/(\d+)/([0-9a-f]+)};
+
+start:
+	GET( $-{_uri} );
+
+	ERROR( "file not found" )
+		if m{^\s*<img alt="" src="/images/spacer\.gif" class="warn" hspace="3" align="left" />\s*$}m;
+
+	! m{window\.location = ".*/(.*?)\?tsid=.*";};
+	my $name = uri_unescape( $1 );
+
+	! m{<td class="finforight">(\d+(?:,\d+)? KB)</td>}s;
+	my $size = $1;
+	$size =~ tr/,/./;
+	INFO( name => $name, asize => $size );
+
+	! m{<a href="(.*?)" class="dbtn" tabindex="1">};
+	GET( $1 );
+
+	! m{id='divDLStart' >\s*<a href='(.*?)'>};
+	$-{file_uri} = $1;
+
+	! /var c = (\d+);/;
+	WAIT( $1, "starting download" );
+
+	DOWNLOAD( $-{file_uri} );
+
+# vim:ts=4:sw=4
