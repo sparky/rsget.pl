@@ -1,0 +1,25 @@
+#!/usr/bin/perl
+
+name: UpFile
+short: UF
+uri: qr{up-file\.com/download/}
+cookie: uf
+status: OK 2009-10-14
+
+start:
+	GET( $-{_uri} );
+
+	ERROR( "file not found" )
+		if m{<h1>The requested file is not found</h1>};
+
+	my $info = $self->form( match => { action => qr{^/sms/check2.php$} } );
+	INFO( name => $info->get( "realname" ), size => $info->get( "sssize" ) );
+	
+	MULTI() if /Downloading is in process from your IP-Address/;
+
+	my $form;
+	! $form = $self->form( id => "Premium" );
+
+	DOWNLOAD( $form->post() );
+
+# vim:ts=4:sw=4
