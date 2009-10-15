@@ -3,6 +3,8 @@ TODO:
 - Write more documentation
 - When continuing partially downloaded data start few kb before the end and
   compare old with new.
+- Add commands: pause downloads, allow/don't allow captcha, clean done
+  downloads, and more
 
 Planned features:
 - Multiuser support (may require major changes in the code).
