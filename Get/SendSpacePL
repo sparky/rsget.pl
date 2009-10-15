@@ -2,9 +2,9 @@
 
 name: SendSpacePL
 short: SS.pl
-uri: qr{sendspace\.pl/}
+uri: qr{sendspace\.pl/file/}
 cookie: ss.pl
-status: OK 2009-09-12
+status: OK 2009-10-15
 
 start:
 	GET( $-{_uri} );
@@ -12,7 +12,7 @@ start:
 	ERROR( "file not found" )
 		if /Podany plik nie istnieje lub został usunięty./;
 
-	! m#<div class="text"><span class="black3">Nazwa pliku:</span></div>\s*<div class="info"><span class="black"><b>(.*?)</b></span></div>#s;
+	! m#<div class="text"><span class="black3">Nazwa pliku:</span></div>\s*<div class="info"><span class="black3".*?><b>(.*?)</b></span></div>#s;
 	my $name = $1;
 	$name =~ s/\.\.\.$/\0/;
 
@@ -22,7 +22,7 @@ start:
 
 	INFO( name => $name, asize => $size );
 
-	! m#<span class="grey3">pobierz plik:</span>.*?<a href="(.*?)"#;
+	! m#<a href="(http://www.sendspace.pl/download/.*?)"><img src=".*?" alt="Pobierz plik" title="Pobierz plik" /></a>#;
 	my $file_uri = $1;
 
 	DOWNLOAD( $file_uri );
