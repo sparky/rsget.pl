@@ -40,11 +40,7 @@ stage_captcha:
 		WAIT_NEXT( stage_cappage, $2, "still expecting captcha" );
 	}
 
-	! s#.*<form class="captcha1" method="post" action="(.*?)">##;
-	$-{file_uri} = $1;
-
-	! m#<input type="hidden" name="id" value="(\d+)">#;
-	$-{id} = $1;
+	! $-{capform} = $self->form( match => { class => qr/^captcha1$/ } );
 
 	! m#<p class="pb0"><img src="(.*?)" width="220" height="50" alt="" border="1"></p>#;
 	my $img = $1;
@@ -57,8 +53,9 @@ stage_captcha:
 	);
 
 	GOTO stage_cappage unless $_;
+	$-{capform}->set( captcha => $_ );
 
-	DOWNLOAD( $-{file_uri}, post => { captcha => $_, id => $-{id} } );
+	DOWNLOAD( $-{capform}->post() );
 
 	if ( /Invalid characters/ ) {
 		CAPTCHA_RESULT( "FAIL" );
