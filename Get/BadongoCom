@@ -4,7 +4,7 @@ name: BadongoCom
 short: BC
 uri: qr{badongo\.com/}
 cookie: !badongo
-status: OK 2009-10-11
+status: OK 2009-10-22
 
 unify:
 	s/#.*//; s{/$}{};
@@ -56,12 +56,22 @@ stage_getcaptcha:
 
 	GET( $img, keep_referer => 1 );
 
-	CAPTCHA( "image/jpeg" );
+	CAPTCHA(
+		qr/[A-Z]{4}/,
+		process => \&bc_decaptcha
+	);
 
-	$-{form}->set( user_code => $_ );
+	GOTO stage_getcaptcha unless defined $_;
+
+	$-{form}->set( user_code => lc $_ );
 	GET( $-{form}->post() );
 
-	GOTO stage_getcaptcha unless $-{_referer} =~ m{/c(?:file|vid)/};
+	if ( $-{_referer} =~ m{/c(?:file|vid)/} ) {
+		CAPTCHA_RESULT( "OK" );
+	} else {
+		CAPTCHA_RESULT( "FAIL" );
+		GOTO stage_getcaptcha;
+	}
 
 	if ( my @links = m{<a href="(http://www\.badongo\.com/file/\d+/..)">}g ) {
 		LINK( @links );
@@ -80,7 +90,7 @@ stage_getlink:
 	! m{doDownload\(\\'(.*?)\\'\)};
 	$-{dllink} = $1;
 
-	GET( $-{dllink} . "/ifr?pr=1&zenc=" );
+	CLICK( $-{dllink} . "/ifr?pr=1&zenc=" );
 
 	$-{file_uri} = $-{dllink} . "/loc?pr=1";
 	GOTO stage_download;
@@ -95,7 +105,47 @@ stage_getpic:
 stage_download:
 	DOWNLOAD( $-{file_uri} );
 
+	MULTI() if m{<h3>FREE MEMBER WAITING PERIOD</h3>};
 	RESTART( -(60 + int rand 300), "free limit reached" )
 		if /You have exceeded your Download Quota/;
+
+
+perl:
+
+sub bc_color_select
+{
+	my @s = sort { $a <=> $b } @_;
+	my $diff = $s[2] - $s[0];
+	return $diff >= 64 ? 0xff : $s[2] + $diff * 2;
+}
+
+sub bc_decaptcha
+{
+	my $img = shift;
+
+	$img->color_filter( \&bc_color_select );
+	$img = $img->crop( y1 => 10, y2 => 49 );
+	my @text;
+	foreach my $limg ( $img->chop( 50, 100, 150 ) ) {
+		my %try;
+		for ( my $min = 0; $min <= 200; $min += 100 ) {
+			for ( my $max = $min + 200; $max <= 200; $max += 100 ) {
+				my $copy = $limg->crop;
+				$copy->luma_emphasize( $min, $max );
+
+				my $txt = $copy->ocr();
+				if ( $txt =~ /([A-Z])/ ) {
+					$try{ $1 } ||= 0;
+					$try{ $1 }++;
+				}
+			}
+		}
+		return "" unless keys %try;
+		my @s = sort { $try{ $b } <=> $try{ $a } } keys %try;
+		push @text, $s[ 0 ];
+	}
+	return join "", @text;
+}
+
 
 # vim:ts=4:sw=4
