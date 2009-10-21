@@ -4,7 +4,7 @@ name: EasyShare
 short: ES
 uri: qr{(?:w\d+\.)?easy-share\.com/(../)?(\d+)}
 cookie: !es
-status: OK 2009-09-17
+status: OK 2009-10-21
 
 start:
 	COOKIE( [ (qw(.easy-share.com TRUE / FALSE), time + 80000, 'language', 'en' ) ] );
@@ -52,7 +52,7 @@ stage_captcha:
 		process => \&es_decaptcha
 	);
 
-	GOTO stage_cappage unless $_;
+	GOTO stage_cappage unless defined $_;
 	$-{capform}->set( captcha => $_ );
 
 	DOWNLOAD( $-{capform}->post() );
@@ -101,7 +101,6 @@ sub es_histogram_get_min_max
 sub es_decaptcha
 {
 	my $img = shift;
-	my $name = shift;
 
 	$img->color_filter( \&es_color_get_luma );
 	my $h = $img->histogram();
