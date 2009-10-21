@@ -138,6 +138,10 @@ li.blue {
 	background: #AAF;
 	border-color: #22F;
 }
+li.bluegreen {
+	background: #AED;
+	border-color: #2EC;
+}
 li.orange {
 	background: #FCA;
 	border-color: #F82;
@@ -167,6 +171,9 @@ li.red div.progress {
 }
 li.blue div.progress {
 	background: #DDF;
+}
+li.bluegreen div.progress {
+	background: #DFE;
 }
 li.orange div.progress {
 	background: #FDC;
