@@ -10,10 +10,22 @@ uri: qw{megavideo\.com/\?d=}
 status: OK 2009-08-24
 
 pre:
-	use Image::Magick;
+	my @captcha_solver;
 
 	my $mu_font_db = data_file( "mu_font_db.png" );
-	die "Font DB '$mu_font_db' does not exist\n" unless $mu_font_db;
+	eval {
+		die "Font DB 'mu_font_db.png' does not exist\n" unless $mu_font_db;
+
+		require Image::Magick;
+		my $dbf = new Image::Magick;
+		$dbf->Read( $mu_font_db );
+		die "Cannot open image $mu_font_db\n" unless $dbf->Get( "width" );
+	};
+	if ( $@ ) {
+		warn "MegaUpload: Unable to use native captcha solver: $@\n";
+	} else {
+		@captcha_solver = ( solver => \&mu_captcha );
+	}
 
 unify:
 	my ($id) = /d=([A-Z0-9]*)/;
@@ -43,7 +55,7 @@ start:
 		my $form;
 		! $form = $self->form( id => "passwordform" );
 		$form->set( filepassword => $-{_opts}->{pass} );
-		GET_NEXT( stage_last, $form->post() );
+		CLICK_NEXT( stage_last, $form->post() );
 	}
 
 	! $-{form} = $self->form( id => "captchaform" );
@@ -53,16 +65,23 @@ stage_captcha:
 
 	GET( $1, keep_referer => 1 );
 
-	my $captcha = captcha( \$_ );
-	RESTART( -1, "can't read captcha" ) unless defined $captcha;
+	CAPTCHA( qr/[A-HKMNP-Z]{3}[1-9]{1}/,
+		@captcha_solver,
+		process => \&mu_decaptcha
+	);
 
-	$-{form}->set( captcha => $captcha );
+	RESTART( -1, "can't read captcha" ) unless defined $_;
+
+	$-{form}->set( captcha => $_ );
 	GET( $-{form}->post() );
 
 	$-{form} = $self->form( id => "captchaform" );
 	if ( $-{form} ) {
+		CAPTCHA_RESULT( "FAIL" );
 		PRINT( "invalid captcha" );
 		GOTO stage_captcha;
+	} else {
+		CAPTCHA_RESULT( "OK" );
 	}
 
 stage_last:
@@ -75,11 +94,18 @@ stage_last:
 	! /count=([0-9]+);/;
 	WAIT( $1, "starting download" );
 
-	DOWNLOAD( $-{file_uri} );
+	CLICK_DOWNLOAD( $-{file_uri} );
 
 
 perl:
 	
+sub mu_decaptcha
+{
+	my $img = shift;
+	$img->color_filter( sub { shift } );
+	return $img->doublesize->ocr();
+}
+
 my %size = (
 	A => 28, B => 22, C => 21, D => 27, E => 16,
 	F => 16, G => 26, H => 26, K => 20, M => 38,
@@ -90,7 +116,7 @@ my %size = (
 
 my @db;
 
-sub read_db()
+sub mu_captcha_read_db()
 {
 	my $dbf = new Image::Magick;
 	$dbf->Read( $mu_font_db );
@@ -115,7 +141,7 @@ sub read_db()
 	}
 }
 
-sub get_char
+sub mu_captcha_get_char
 {
 	my ($src, $db, $width, $x) = @_;
 
@@ -142,11 +168,11 @@ sub get_char
 	return $best_char;
 }
 
-sub captcha
+sub mu_captcha
 {
 	my $data_ref = shift;
 
-	read_db() unless @db;
+	mu_captcha_read_db() unless @db;
 
 	open IMAGE, '>', '.captcha.gif';
 	print IMAGE $$data_ref;
@@ -165,10 +191,10 @@ sub captcha
 	$bg->Composite( image => $img );
 
 	my @cap;
-	push @cap, get_char( $bg, $db[0], 40, 0 );
-	push @cap, get_char( $bg, $db[1], 40, $size{$cap[0]} - 6 );
-	push @cap, get_char( $bg, $db[2], 40, $width - 56 );
-	push @cap, get_char( $bg, $db[3], 22, $width - 22 );
+	push @cap, mu_captcha_get_char( $bg, $db[0], 40, 0 );
+	push @cap, mu_captcha_get_char( $bg, $db[1], 40, $size{$cap[0]} - 6 );
+	push @cap, mu_captcha_get_char( $bg, $db[2], 40, $width - 56 );
+	push @cap, mu_captcha_get_char( $bg, $db[3], 22, $width - 22 );
 
 	return join "", @cap;
 }
