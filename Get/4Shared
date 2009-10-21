@@ -25,7 +25,7 @@ start:
 	INFO( name => $name, asize => $size );
 
 	! m{<a href="(.*?)" class="dbtn" tabindex="1">};
-	GET( $1 );
+	CLICK( $1 );
 
 	! m{id='divDLStart' >\s*<a href='(.*?)'>};
 	$-{file_uri} = $1;
@@ -33,6 +33,6 @@ start:
 	! /var c = (\d+);/;
 	WAIT( $1, "starting download" );
 
-	DOWNLOAD( $-{file_uri} );
+	CLICK_DOWNLOAD( $-{file_uri} );
 
 # vim:ts=4:sw=4
