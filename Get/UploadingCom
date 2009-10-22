@@ -2,9 +2,13 @@
 
 name: UploadingCom
 short: UC
-uri: qr{uploading\.com/(../)?files/(get/)?[A-Za-z0-9]{8}/}
+uri: qr{uploading\.com/(../)?files/(get/)?[A-Za-z0-9]{8}}
 cookie: uc
-status: OK 2009-10-03
+status: OK 2009-10-22
+
+unify:
+	return "http://uploading.com/files/$1/"
+		if m{uploading\.com/(?:../)?files/(?:get/)?([A-Za-z0-9]{8})/?};
 
 start:
 	GET( $-{_uri} );
@@ -24,25 +28,24 @@ start:
 	my $form = $self->form( id => "downloadform" );
 	$-{file_id} = $form->get( "file_id" );
 
-	GET( $form->post() );
-	$-{dl_page} = $-{_referer};
+	CLICK( $form->post() );
 
-	if ( m{var file_link = '.+?'} ) {
+	if ( m{var file_link = '(.+?)'} ) {
 		$-{file_uri} = $1;
-		return $self->stage_download();
+		GOTO stage_download;
 	}
-	! /CONF\s*=\s*{\s*host:\s*'(.*?)'\s*}/;
+	! /CONF\s*=\s*{\s*host:\s*'(.*?)'/;
 	$-{host} = $1;
 
 	! m{start_timer\((\d+)\);};
 	WAIT( -$1, "expecting download link" );
 
 	GET( $-{host} . "files/get/?JsHttpRequest=" . jstime() . "-xml",
-		post => "file_id=$-{file_id}&action=get_link&pass",
+		post => "file_id=$-{file_id}&action=get_link&pass=",
 		headers => [ "Content-Type: application/octet-stream" ],
+		keep_referer => 1,
 	);
 stage_download:
-	$-{_referer} = $-{dl_page};
 
 	unless ( $-{file_uri} ) {
 		! m{"link"\s*:\s*"(.*?)"};
@@ -50,7 +53,7 @@ stage_download:
 		$-{file_uri} =~ s/\\(.)/$1/g;
 	}
 
-	DOWNLOAD( $-{file_uri} );
+	CLICK_DOWNLOAD( $-{file_uri} );
 
 	MULTI() if /Your IP address is currently downloading a file/;
 
