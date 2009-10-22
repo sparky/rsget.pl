@@ -4,8 +4,8 @@ name: OdSiebie
 short: OS
 uri: qr{odsiebie\.com/pokaz/}
 cookie: os
-slots: 8
-status: OK 2009-08-28
+slots: max
+status: OK 2009-10-22
 
 start:
 	GET( $-{_uri} );
@@ -39,7 +39,7 @@ start:
 	INFO( name => $1, asize => $2 );
 
 	! m{href="(/pobierz/\d+---.*?(\.html)?)"};
-	GET( $1 );
+	CLICK( $1 );
 
 	! m{href="(/download/\d+---.*?.html)"};
 	$-{file_uri} = $1;
@@ -47,6 +47,6 @@ start:
 stage_download:
 	my @fname;
 	@fname = ( fname => $-{fname} ) if $-{fname};
-	DOWNLOAD( $-{file_uri}, @fname );
+	CLICK_DOWNLOAD( $-{file_uri}, @fname );
 
 # vim:ts=4:sw=4
