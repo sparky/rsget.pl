@@ -4,8 +4,8 @@ name: zSHARE
 short: zS
 uri: qr{zshare\.net}
 #cookie: zs
-slots: 8
-status: OK ?
+slots: max
+status: OK 2009-10-22
 
 start:
 	GET( $-{_uri} );
@@ -17,11 +17,12 @@ start:
 	! m{>File Size:\s*<font.*?>($STDSIZE)</font></td>}s;
 	INFO( name => $name, asize => $1 );
 
-	my $x = 10 + int rand 180;
-	my $y = 10 + int rand 37;
-	my $post = "referer2=&download=1&imageField.x=$x&imageField.y=$y&imageField=";
+	! my $form = $self->form( name => "form1" );
+	$form->set( "imageField.x" => 10 + int rand 180 );
+	$form->set( "imageField.y" => 10 + int rand 37 );
+	$form->set( "imageField" => "" );
 
-	GET( "", post => $post );
+	GET( $form->post() );
 
 	! m{var link_enc=new Array\('(.*?)'\);};
 	( $-{uri} = $1 ) =~ s/','//g;
