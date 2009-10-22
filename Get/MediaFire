@@ -4,12 +4,11 @@ name: MediaFire
 short: MF
 uri: qr{mediafire\.com/}
 cookie: mf
-slots: 8
-status: OK 2009-08-31
+slots: max
+status: OK 2009-10-22
 
 start:
 	GET( $-{_uri} );
-	$-{first_page} = $-{_referer};
 
 	if ( $-{_referer} =~ /error\.php/ ) {
 		ERROR( "file not found" ) if /Invalid File/;
@@ -20,7 +19,7 @@ start:
 	INFO( name => $1, asize => $2 );
 
 	! /cu\('(.*?)','(.*?)','(.*?)'\);/;
-	GET( "/dynamic/download.php?qk=$1&pk=$2&r=$3" );
+	GET( "/dynamic/download.php?qk=$1&pk=$2&r=$3", keep_referer => 1 );
 
 	! /^(var.*var.*var.*)\s*function/m;
 	my $vars = $1;
@@ -31,7 +30,6 @@ start:
 	my $code = join "", map { /'(.*)'/ ? $1 : $vars{ $_ } } split /\s*\+\s*/, $order;
 	my $uri = "http://" . $code;
 
-	$-{_referer} = $-{first_page};
-	DOWNLOAD( $uri );
+	CLICK_DOWNLOAD( $uri );
 
 # vim:ts=4:sw=4
