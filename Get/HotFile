@@ -3,7 +3,7 @@
 name: HotFile
 short: HF
 uri: qr{hotfile\.com/}
-status: OK 2009-08-29
+status: OK 2009-10-22
 
 start:
 	GET( $-{_uri} );
@@ -22,50 +22,54 @@ start:
 	! /starttimer.*?timerend=d\.getTime\(\)\+(\d+);/s;
 	my $wait = $1 / 1000;
 
-	! s/^.*?<form style=".*?" action="(.*?)" method=post name=f>//s;
-	$-{action} = $1;
-	! s#^(.*?)</form>.*#$1#s;
-	my %post;
-	$post{$1} = $2 while s/<input type=hidden name=(.*?) value=(.*?)>//;
-	$-{post} = \%post;
+	! $-{form} = $self->form( name => "f" );
 
 	WAIT( $wait, "starting download" );
 
-	GET( $-{action}, post => $-{post} );
-	$-{dl_page} = $-{_referer};
+stage_getcaptcha:
+	CLICK( $-{form}->post() );
 
-	if ( m#<a href="(.*?)">Click here to download</a># ) {
-		return $self->stage_download();
-	}
+	GOTO stage_download if m#<a href="(.*?)">Click here to download</a>#;
 
-	! s#^.*<form action="(.*?)" method="post">##s;
-	$-{form_uri} = $1;
-
-	my %post = ( action => "checkcaptcha" );
-	! m#<input type=hidden name=captchaid value=(\d+)>#;
-	$post{captchaid} = $1;
-	! m#<input type=hidden name=hash1 value=(\S+?)>#;
-	$post{hash1} = $1;
-	! m#<input type=hidden name=hash2 value=(\S+?)>#;
-	$post{hash2} = $1;
-
-	$-{post} = \%post;
+	! $-{capform} = $self->form( match => { body => qr/Enter word above/ } );
 
 	! m#<img src="(/captcha\.php.*?)">#;
-	my $img = $1;
+	GET( $1, keep_referer => 1 );
 
-	GET( $img );
-	$-{_referer} = $-{dl_page};
+	CAPTCHA(
+		qr/[a-zA-Z]{5,6}/,
+		process => \&hf_decaptcha
+	);
 
-	CAPTCHA( "image/jpeg" );
+	GOTO stage_getcaptcha unless defined $_;
+	$-{capform}->set( captcha => $_ );
 
-	$-{post}->{captcha} = $_;
-
-	GET( $-{form_uri}, post => $-{post} );
+	GET( $-{capform}->post() );
 stage_download:
 
-	RESTART( 0, "invalid captcha ?" ) unless m#<a href="(.*?)">Click here to download</a>#;
+	if ( m#<a href="(.*?)">Click here to download</a># ) {
+		CAPTCHA_RESULT( "OK" );
+	} else {
+		CAPTCHA_RESULT( "FAIL" );
+		GOTO stage_getcaptcha;
+	}
 
-	DOWNLOAD( $1 );
+	CLICK_DOWNLOAD( $1 );
+
+perl:
+
+sub hf_color_select_lowest
+{
+	my @s = sort { $a <=> $b } @_;
+	return $s[0];
+}
+
+sub hf_decaptcha
+{
+	my $img = shift;
+	$img->color_filter( \&hf_color_select_lowest );
+	$img->luma_emphasize( 90, 130 );
+	return $img->ocr();
+}
 
 # vim:ts=4:sw=4
