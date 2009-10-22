@@ -3,7 +3,7 @@
 name: RapidShare
 short: RS
 uri: qr{rapidshare\.com/}
-status: OK 2009-08-28
+status: OK 2009-10-22
 
 start:
 	GET( $-{_uri} );
@@ -19,8 +19,8 @@ start:
 	RESTART( $1 * 60, "servers overloaded" )
 		if /Unfortunately you will have to wait (\d+) minutes,/;
 	
-	! /form id="ff" action="(.*?)"/;
-	GET( $1, post => 'dl.start=Free' );
+	! my $form = $self->form( id => "ff" );
+	CLICK( $form->post() );
 
 	MULTI() if /Please wait until the download is completed/;
 
@@ -31,13 +31,15 @@ start:
 		if /Unfortunately you will have to wait (\d+) minutes,/
 			or /Please try again in (\d+) minutes/;
 
-	! /form name="dlf" action="(.*?)"/;
-	$-{file_uri} = $1;
+	! $-{form} = $self->form( name => "dlf" );
+	$-{form}->set( mirror => "on" );
+	$-{form}->set( x => int rand 108 );
+	$-{form}->set( y => int rand 108 );
 
 	! /var c=(\d+);/;
 	WAIT( $1, "starting download" );
 
-	DOWNLOAD( $-{file_uri}, post => { mirror => "on" } );
+	CLICK_DOWNLOAD( $-{form}->post() );
 
 	MULTI() if /Please wait until the download is completed/;
 
