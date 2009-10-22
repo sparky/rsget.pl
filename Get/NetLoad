@@ -4,20 +4,7 @@ name: NetLoad
 short: NL
 uri: qr{netload\.in/datei}
 cookie: nl
-status: OK 2009-08-24
-
-pre:
-	use IPC::Open2;
-	use GD;
-
-	my @missing;
-	foreach my $prog ( qw(ocrad gocr pngtopnm) ) {
-		push @missing, $prog unless require_prog( $prog );
-	}
-	if ( @missing ) {
-		my $m = join ", ", @missing;
-		die "Missing applications: $m\n";
-	}
+status: OK 2009-10-22
 
 start:
 	GET( $-{_uri} );
@@ -32,34 +19,38 @@ stage_first:
 		if /We will prepare your download/;
 
 	! /href="(.*?captcha=1)"/;
-	GET( de_ml( $1 ) );
-	$-{dl_page} = $-{_referer};
+	CLICK( de_ml( $1 ) );
 
 	RESTART( 1, "Still on the same page ?" ) if /"(.*?captcha=1)"/;
 
-	SEARCH(
-		action => qr#<form method="post" action="(.*?)">#,
-		captcha_img => qr#"(share/includes/captcha\.php\?t=[0-9]+)"#,
-		file_id => qr#input name="file_id" .*value="(.*?)"#,
-		s3wait => qr#please wait .*countdown\(([0-9]+),#,
+	! m#please wait .*countdown\(([0-9]+),#;
+	$-{s3wait} = $1;
+
+	! $-{capform} = $self->form( match => { body => qr/Please enter the Securitycode/ } );
+
+	! m#"(share/includes/captcha\.php\?t=[0-9]+)"#;
+	$-{captcha_img} = $1;
+
+stage_getcaptcha:
+	GET( $-{captcha_img}, keep_referer => 1 );
+
+	CAPTCHA(
+		qr/[0-9]{4}/,
+		process => \&nl_decaptcha
 	);
 
-	GET( $-{captcha_img} );
-
-	$-{captcha} = Get::NetLoad::Captcha::resolve( \$_ );
-	RESTART( 1, "Can't read captcha" ) unless defined $-{captcha};
+	GOTO stage_getcaptcha unless defined $_;
+	$-{capform}->set( captcha_check => $_ );
 
 	WAIT( $-{s3wait} / 100, "checking" );
 
-	$-{_referer} = $-{dl_page};
-	GET( $-{action}, post => {
-		file_id => $-{file_id},
-		captcha_check => $-{captcha},
-		start => ''
-	} );
+	GET( $-{capform}->post() );
 
-	RESTART( 1, "Wrong captcha" )
-		if /You may forgot the security code or it might be wrong/;
+	if ( /You may forgot the security code or it might be wrong/ ) {
+		PRINT( "Captcha failed" );
+		CAPTCHA_RESULT( "FAIL" );
+		GOTO stage_first;
+	}
 	ERROR( "file not found" )
 		if /This file is currently unavailable/;
 	RESTART( $1 / 100, "free limit reached" )
@@ -68,170 +59,97 @@ stage_first:
 	! /<a class="Orange_Link" href="(.*?)"/;
 	$-{file_uri} = $1;
 
+	CAPTCHA_RESULT( "OK" );
+
 	! /please wait .*countdown\(([0-9]+),/;
 	WAIT( $1 / 100, "starting download" );
 
-	DOWNLOAD( $-{file_uri} );
+	CLICK_DOWNLOAD( $-{file_uri} );
 
 perl:
-package Get::NetLoad::Captcha;
 
-sub blankline
+sub nl_color_select_grey
 {
-	my $img = shift;
-	my $x = shift;
-	my $n = 0;
-	my $white = $img->colorClosest( 255, 255, 255 );
-	foreach my $y ( 0..28 ) {
-		my $ci = $img->getPixel( $x, $y );
-		next if $ci == $white;
-		$n++;
-		return 0 if $n > 1;
-	}
-	return 1;
+	my @s = sort { $a <=> $b } @_;
+	return ( $s[2] - $s[0] > 50 ) ? 0xff : $s[0];
 }
 
-sub blanklinev
+sub nl_filter_spots # remove dark pixels
 {
-	my $img = shift;
-	my $y = shift;
-	my $y2 = $y + shift;
-	my $xmin = shift;
-	my $xmax = shift;
-	my $n = 0;
-	my $white = $img->colorClosest( 255, 255, 255 );
-	foreach my $x ( $xmin..$xmax ) {
-		my $ci = $img->getPixel( $x, $y );
-		$n++ if $ci != $white;
-		$ci = $img->getPixel( $x, $y2 );
-		$n++ if $ci != $white;
-		return 0 if $n > 2;
-	}
-	return 1;
-}
+	my $pix = shift;
 
-sub charat
-{
-	my $img = shift;
-	my $trimg = shift;
-	my $sx = shift;
+	my $lim = 250;
+	return if $pix->isAbove( $lim );
 
-	my $xmin = $sx;
-	until( blankline( $img, $xmin ) ) {
-		$xmin--;
+	my $whites = 0;
+	my @sides = ( $pix->up, $pix->down, $pix->left, $pix->right );
+	foreach my $spix ( @sides ) {
+		return unless $spix; # borders are taken care of
+		$whites++ if $spix->isAbove( $lim );
 	}
-	my $xmax = $sx+1;
-	until( blankline( $img, $xmax ) ) {
-		$xmax++;
-	}
-	my $ymin = 14;
-	until( blanklinev( $img, $ymin, -1, $xmin, $xmax ) ) {
-		$ymin--;
-	}
-	my $ymax = 15;
-	until( blanklinev( $img, $ymax, +1, $xmin, $xmax ) ) {
-		$ymax++;
+	return if $whites <= 2;
+	if ( $whites == 4 ) {
+		$pix->set( 0xff );
+		return;
 	}
 
-	my $w = $xmax - $xmin;
-	my $h = $ymax - $ymin;
-	my $nimg = new GD::Image( $w * 4 + 16, ($h > 12 ? $h : 12 ) + 4 );
-	my $nw = $nimg->colorAllocate( 255, 255, 255);
-	$nimg->copy( $trimg, 1, 1, $xmin, $ymin, $w, $h );
-	$nimg->copy( $trimg, 3 + 1*$w, 1, $xmin, $ymin, $w, $h );
-	$nimg->copy( $trimg, 13 + 2*$w, 1, $xmin, $ymin, $w, $h );
-	$nimg->copy( $trimg, 15 + 3*$w, 1, $xmin, $ymin, $w, $h );
-
-	IPC::Open2::open2( *READ, *WRITE, "pngtopnm | gocr -f ASCII -a 5 -m 56 -C 0123456789 - 2>/dev/null" );
-	print WRITE $nimg->png;
-	close WRITE;
-	my $num = <READ> || "";
-	close READ;
-
-	my ($gocr) = ($num =~ /^([0-9])/);
-
-	IPC::Open2::open2( *READ, *WRITE, "pngtopnm | ocrad --filter=numbers_only - 2>/dev/null" );
-	print WRITE $nimg->png;
-	close WRITE;
-	$num = <READ> || "";
-	close READ;
-
-	my ($ocrad) = ($num =~ /^([0-9])/);
-
-	#print "G: $gocr, O: $ocrad\n";
-	if ( defined $gocr ) {
-		return 7 if ( defined $ocrad and $ocrad == 7 and $gocr == 1 );
-		return $gocr;
-	} elsif ( defined $ocrad ) {
-		return $ocrad;
-	}
-	return undef;
-}
-
-sub resolve
-{
-	my $capdata = shift;
-
-	my $img = GD::Image->new( $$capdata );
-	my $white = $img->colorClosest( 255, 255, 255 );
-
-	foreach my $y ( 0..28 ) {
-		$img->setPixel( 0, $y, $white );
-		$img->setPixel( 73, $y, $white );
-	}
-	foreach my $x ( 0..73 ) {
-		$img->setPixel( $x, 0, $white );
-		$img->setPixel( $x, 28, $white );
-	}
-
-	foreach my $y ( 1..27 ) {
-		FORX: foreach my $x ( 1..72 ) {
-			my $ci = $img->getPixel( $x, $y );
-			next if $ci == $white;
-			my @xy = ( [0, 1], [0, -1], [1, 0], [-1, 0] );
-	
-			my $wrong = 0;
-			foreach my $xy ( @xy ) {
-				my $c = $img->getPixel( $x + $xy->[0], $y + $xy->[1] );
-				if ( $c != $white ) {
-					$wrong++;
-					next FORX if $wrong > 1;
-				}
-			}
-	
-			$img->setPixel( $x, $y, $white );
+	# possible double spot
+	my $bpix;
+	foreach my $spix ( @sides ) {
+		unless ( $spix->isAbove( $lim ) ) {
+			$bpix = $spix;
+			last;
 		}
 	}
 
-
-	my $trimg = GD::Image->newTrueColor( 74, 29 );
-	my $trwhite = $trimg->colorAllocate( 255, 255, 255 );
-	$trimg->fill( 0, 0, $trwhite );
-	foreach my $y ( 0..28 ) {
-		foreach my $x ( 0..73 ) {
-			my $ci = $img->getPixel( $x, $y );
-			my ($r, $g, $b ) = $img->rgb( $ci );
-			$r = (256 - $r) / 256;
-			$g = (256 - $g) / 256;
-			$b = (256 - $b) / 256;
-			my $c = 256 - 256 * (($r * $g * $b) ** (1/3));
-
-			my $gray = $trimg->colorResolve( $c, $c, $c );
-	
-			$trimg->setPixel( $x, $y, $gray );
-		}
-	}
-	
-	my @n;
-	push @n, charat( $img, $trimg, 9 );
-	push @n, charat( $img, $trimg, 28 );
-	push @n, charat( $img, $trimg, 42 );
-	push @n, charat( $img, $trimg, 58 );
-	foreach (@n) {
-		return undef unless defined $_;
+	$whites = 0;
+	my $sides = 0;
+	@sides = ( $bpix->up, $bpix->down, $bpix->left, $bpix->right );
+	foreach my $spix ( @sides ) {
+		next unless $spix;
+		$sides++;
+		$whites++ if $spix->isAbove( $lim );
 	}
 
-	return join "", @n;
+	if ( $whites >= $sides - 1 ) {
+		# it is a double spot
+		$pix->set( 0xff );
+		$bpix->set( 0xff );
+	}
+}
+
+sub nl_filter_snow # remove light pixels
+{
+	my $pix = shift;
+
+	my $lim = 10;
+	return if $pix->isBelow( $lim );
+
+	my $black = 0;
+	my @sides = ( $pix->up, $pix->down, $pix->left, $pix->right );
+	foreach my $i ( (0..3) ) {
+		my $pix = $sides[ $i ];
+		next unless $pix;
+		$black |= 1 << $i if $pix->isBelow( $lim );
+	}
+	if ( ($black & 0x03) == 0x03
+			or ($black & 0x0c) == 0x0c ) {
+		$pix->set( 0 );
+	}
+}
+
+sub nl_decaptcha
+{
+	my $img = shift;
+	$img->color_filter( \&nl_color_select_grey );
+	$img->set_border( 0xff );
+	$img->luma_emphasize( 180, 256 );
+	$img->pix_filter( \&nl_filter_spots );
+	$img->pix_filter( \&nl_filter_snow );
+	# TODO: chop to pieces and scan each digit separately
+	local $_ = $img->doublesize->ocr();
+	s/\s+//;
+	return $_;
 }
 
 # vim:ts=4:sw=4
