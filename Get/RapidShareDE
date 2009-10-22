@@ -12,7 +12,7 @@ start:
 		if m{<p><script>alert.*?</script>(File not found|This file has been deleted).*?</p>};
 
 	! $-{form} = $self->form( match => { action => qr{^http://rapidshare\.de$} } );
-	$-{form}->set( "dl.start" => "Free" );
+	! $-{form}->select( "dl.start" => 1 );
 	CLICK( $-{form}->post() );
 
 	! m{<p><p>You have requested the file <b>(.*?)</b> \(($STDSIZE)\)\.</p>};

@@ -13,7 +13,7 @@ start:
 	$-{name} = $1;
 
 	! my $form = $self->form( match => { body => qr/"Free Download"/ } );
-	$form->set( method_free => "Free Download" );
+	! $form->select( method_free => 0 );
 	CLICK( $form->post() );
 
 	ERROR( "file removed" )
