@@ -22,13 +22,13 @@ start:
 	$form->set( "imageField.y" => 10 + int rand 37 );
 	$form->set( "imageField" => "" );
 
-	GET( $form->post() );
+	CLICK( $form->post() );
 
 	! m{var link_enc=new Array\('(.*?)'\);};
 	( $-{uri} = $1 ) =~ s/','//g;
 
 	WAIT( 50, "starting download" );
 
-	DOWNLOAD( $-{uri} );
+	CLICK_DOWNLOAD( $-{uri} );
 
 # vim:ts=4:sw=4
