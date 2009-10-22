@@ -3,7 +3,7 @@
 name: FileFactory
 short: FF
 uri: qr{filefactory\.com/}
-status: OK 2009-10-03
+status: OK 2009-10-22
 
 start:
 	GET( $-{_uri} );
@@ -21,7 +21,7 @@ start:
 	}
 
 	! m#<a href="(/dlf.*?)"><img.*?alt="Download Now" /></a>#;
-	GET( $1 );
+	CLICK( $1 );
 
 	! m#<a href="(http.*?)"><img.*?alt="Download Now" /></a>#;
 	$-{file_uri} = $1;
@@ -30,9 +30,9 @@ start:
 	my $wait = $1;
 	RESTART( $wait, "free limit reached" ) if $wait > 30;
 
-	WAIT( $wait, "starting soon" );
+	WAIT( $wait, "starting" );
 
-	DOWNLOAD( $-{file_uri} );
+	CLICK_DOWNLOAD( $-{file_uri} );
 
 	# file turned out to be html, means we have to wait
 	MULTI() if /You are currently downloading too many files at once/;
