@@ -3,7 +3,7 @@
 name: BitRoad
 short: BR
 uri: qr{bitroad\.net/}
-status: OK 2009-09-12
+status: OK 2009-10-22
 
 start:
 	GET( $-{_uri} );
@@ -17,8 +17,7 @@ start:
 	RESTART( -(60 + int rand 300), "free limit reached" )
 		if /Downloading is in process from your IP-Address/;
 
-	! s#^.*<form action="/download3\.php".*?>##s;
-	! m#<input type="hidden" name="uid" value="(.*?)" />#;
-	DOWNLOAD( "/download3.php", post => { uid => $1, free => "Download" } );
+	$-{form} = $self->form( match => { action => qr{^/download3\.php$} } );
+	CLICK_DOWNLOAD( $-{form}->post() );
 
 # vim:ts=4:sw=4
