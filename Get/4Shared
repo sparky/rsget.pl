@@ -3,7 +3,7 @@
 name: 4Shared
 short: 4S
 uri: qr{4shared\.com/(account/)?file/}
-slots: 8
+slots: max
 status: OK 2009-10-21
 
 unify:

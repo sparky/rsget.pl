@@ -4,7 +4,7 @@ name: MegaShares
 short: MS
 uri: qr{d01\.megashares\.com/\?d01=}
 cookie: !ms
-status: OK 2009-10-03
+status: OK 2009-10-22
 
 unify:
 	return "http://d01.megashares.com/?d01=$1" if /\?d01=([0-9a-f]{7})/;
@@ -61,7 +61,7 @@ start:
 	$-{passport_num} = $1;
 
 	! m{<img src="(index.*?)" alt="Security Code"};
-	GET( $1 );
+	GET( $1, keep_referer => 1 );
 
 	CAPTCHA(
 		qr/[0-9]{4}/,
@@ -77,7 +77,7 @@ start:
 			( $captcha, $-{random_num}, $-{passport_num}, "replace_sec_pprenewal" ) )
 		. "&rsrnd=$rand";
 
-	GET( $ajax );
+	GET( $ajax, keep_referer => 1 );
 
 	if ( /Thank you for reactivating your passport/ ) {
 		CAPTCHA_RESULT( "OK" );
@@ -89,7 +89,7 @@ start:
 
 stage_download:
 
-	DOWNLOAD( $-{file_uri} );
+	CLICK_DOWNLOAD( $-{file_uri} );
 
 perl:
 

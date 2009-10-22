@@ -7,7 +7,7 @@ uri: qw{megaporn\.com/(../)?\?d=}
 uri: qw{megarotic\.com/(../)?\?d=}
 uri: qw{sexuploader\.com/(../)?\?d=}
 uri: qw{megavideo\.com/\?d=}
-status: OK 2009-08-24
+status: OK 2009-10-22
 
 pre:
 	my @captcha_solver;
@@ -52,8 +52,7 @@ start:
 	if ( /The file you're trying to download is password protected/ ) {
 		ERROR( "password required" ) unless exists $-{_opts}->{pass};
 
-		my $form;
-		! $form = $self->form( id => "passwordform" );
+		! my $form = $self->form( id => "passwordform" );
 		$form->set( filepassword => $-{_opts}->{pass} );
 		CLICK_NEXT( stage_last, $form->post() );
 	}

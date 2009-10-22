@@ -3,7 +3,7 @@
 name: ArchivTo
 short: AT
 uri: qr{archiv\.to/}
-slots: 8
+slots: max
 status: OK 2009-10-21
 
 start:
