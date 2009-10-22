@@ -4,7 +4,7 @@ name: FreakShare
 short: FS
 uri: qr{freakshare\.net/}
 cookie: fs
-status: OK 2009-09-17
+status: OK 2009-10-22
 
 start:
 	GET( $-{_uri} );
@@ -14,25 +14,19 @@ start:
 	! m#<h1 class="box_heading" style="text-align:center;">(.*)</h1>#;
 	INFO( name => $1, size => -1 );
 
+	! $-{form} = $self->form( match => { body => qr/"Free Download"/ } );
+
 	! m#var time = (\d+)(?:\.\d+);\s*var intervall;#;
-	my $wait = $1;
+	WAIT( $1, "starting" );
 
-	! m#<form action="(.*?)" method="post" style="display:inline;">#;
-	$-{dl_page} = $1;
-
-	WAIT( $wait, "starting" );
-
-	GET( $-{dl_page}, post => { section => "benefit", did => "0" } );
+	CLICK( $-{form}->post() );
 	
+	! $-{dlform} = $self->form( match => { onsubmit => qr/^disableButton/ } );
+
 	! m#var time = (\d+)(?:\.\d+);\s*var intervall;#;
-	my $wait = $1;
+	WAIT( $1, "starting download" );
 
-	! m#<form action="(.*?)" method="post" style="display:inline;"#;
-	$-{file_uri} = $1;
-
-	WAIT( $wait, "starting download" );
-
-	DOWNLOAD( $-{file_uri}, post => { section => "waitingtime", did => 0, submit => "Download" } );
+	CLICK_DOWNLOAD( $-{dlform}->post() );
 
 	MULTI() if /Sorry, you cant  download more then 1 at time/;
 
