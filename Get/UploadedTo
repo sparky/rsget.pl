@@ -4,7 +4,7 @@ name: UploadedTo
 short: UT
 uri: qr{uploaded\.to/}
 uri: qr{ul\.to/}
-status: OK 2009-08-24
+status: OK 2009-10-22
 
 start:
 	GET( $-{_uri} );
@@ -28,13 +28,12 @@ start:
 	! m{<tr><td style="padding-left:4px;">Filesize: &nbsp;</td><td>\s*($STDSIZE)\s*</td></tr>};
 	INFO( name => $name, asize => $1 );
 
-
-	! m#<form name="download_form" method="post" action="(.*)">#;
-	$-{file_uri} = $1;
+	! $-{form} = $self->form( name => "download_form" );
+	! $-{form}->select( download_submit => 0 );
 
 	! m#var secs = (\d+); // Wartezeit#;
 	WAIT( $1, "starting download" );
 
-	DOWNLOAD( $-{file_uri}, post => { download_submit => "Download" } );
+	CLICK_DOWNLOAD( $-{form}->post() );
 
 # vim:ts=4:sw=4
