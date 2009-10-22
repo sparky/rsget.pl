@@ -3,22 +3,21 @@
 name: FlyfileUs
 short: FU
 uri: qr{flyfile\.us/}
-status: OK 2009-08-24
+status: OK 2009-10-22
 
 start:
 	GET( $-{_uri} );
 
 	ERROR( "file not found" ) if /(No such file|No such user)/;
-	m{<h2>Download File (.*?)</h2>}; #\s*<font .*?>You have requested .*? \((\d+\.\d+) Mb\)</font>}s;
+	m{<h2>Download File (.*?)</h2>};
 	$-{name} = $1;
 
-	! s/^.*?<Form method="POST" action=''>//s;
-	! s/(.*?)<\/Form>.*$/$1/s;
-	my %opts;
-	$opts{$1} = $2 while s/<input type="hidden" name="(.*?)" value="(.*?)">//;
-	$opts{method_free} = "Free Download";
+	! my $form = $self->form( match => { body => qr/"Free Download"/ } );
+	$form->set( method_free => "Free Download" );
+	CLICK( $form->post() );
 
-	GET( "", post => \%opts );
+	ERROR( "file removed" )
+		if m{<font class="err">File was deleted by administrator</font>};
 
 	m{<small>\((\d+) bytes\)</small>};
 	INFO( name => $-{name}, size => $1 );
@@ -26,15 +25,9 @@ start:
 	RESTART( 600, "download-limit reached" )
 		if /You have reached the download-limit/;
 
-	! s/^.*?<Form name="F1" method="POST" action=""//s;
-	! s/(.*?)<\/Form>.*$/$1/s;
-	my %opts;
-	$opts{$1} = $2 while s/<input type="hidden" name="(.*?)" value="(.*?)">//;
-	$opts{btn_download} = "Create Download Link";
+	! my $form = $self->form( name => "F1" );
+	CLICK_DOWNLOAD( $form->post() );
 
-	DOWNLOAD( $-{_referer}, post => \%opts );
-
-	# html
 	RESTART( 120, "temporarily unavailable" )
 		if /temporarily unavailable/;
 
