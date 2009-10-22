@@ -6,13 +6,8 @@ uri: qr{d01\.megashares\.com/\?d01=}
 cookie: !ms
 status: OK 2009-10-03
 
-pre:
-	use IPC::Open2;
-	my @ocr;
-	push @ocr, "gocr -f ASCII -a 5 -m 56 -C 0-9 -l 31" if require_prog( "gocr" );
-	push @ocr, "ocrad --filter=numbers_only" if require_prog( "ocrad" );
-	die "ocrad or gocr is required" unless @ocr;
-	die "pngtopnm is required" unless require_prog( "pngtopnm" );
+unify:
+	return "http://d01.megashares.com/?d01=$1" if /\?d01=([0-9a-f]{7})/;
 
 start:
 	# create fake cookie to skip first page
@@ -27,6 +22,8 @@ start:
 		"Link was removed", "Invalid link", "Could not download file";
 	ERROR( "file not found" )
 		if m{<dd class="red">([^<]|<br>)*($fnf)([^<]|<br>)*</dd>};
+	ERROR( "file not found" )
+		if m{<dd class="red">Link has been deleted};
 	MULTI()
 		if m{You already have the maximum of 1 download running};
 
@@ -51,7 +48,7 @@ start:
 		my $time = s2string( $1 * 60 + $2 );
 		LOG( "Passport: $left, $time" );
 
-		return $self->stage_download();
+		GOTO stage_download;
 	}
 
 	! m{var request_uri = "(.*?)";};
@@ -66,9 +63,14 @@ start:
 	! m{<img src="(index.*?)" alt="Security Code"};
 	GET( $1 );
 
-	my $captcha = captcha( \$_ );
-	RESTART( 5, "Can't read captcha" ) unless $captcha;
+	CAPTCHA(
+		qr/[0-9]{4}/,
+		process => \&ms_decaptcha
+	);
 
+	RESTART( 1, "Can't read captcha" ) unless defined $_;
+
+	my $captcha = $_;
 	my $rand = jstime();
 	my $ajax = $-{ajax}
 		. (join "", map { '&rsargs[]=' . $_ }
@@ -77,42 +79,28 @@ start:
 
 	GET( $ajax );
 
-	RESTART( 2, "Passport reactivated" ) if m{Thank you for reactivating your passport};
-	RESTART( 2, "Wrong captcha ?" );
+	if ( /Thank you for reactivating your passport/ ) {
+		CAPTCHA_RESULT( "OK" );
+		RESTART( 1, "Passport reactivated" );
+	} else {
+		CAPTCHA_RESULT( "FAIL" );
+		RESTART( 1, "Wrong captcha ?" );
+	}
 
-	GET( "" );
 stage_download:
 
 	DOWNLOAD( $-{file_uri} );
 
 perl:
 
-sub run_ocr
+sub ms_decaptcha
 {
-	my $prog = shift;
-	my $png = shift;
+	my $img = shift;
 
-	IPC::Open2::open2( *READ, *WRITE, "pngtopnm | $prog - 2>/dev/null" );
-	print WRITE $$png;
-	close WRITE;
-	my $num = <READ> || "";
-	close READ;
-
-	my ($ret) = ($num =~ /([0-9]{4})/);
-	return $ret;
-}
-
-
-sub captcha
-{
-	my $png = shift;
-
-	foreach ( @ocr ) {
-		my $ret = run_ocr( $_, $png );
-		return $ret if $ret;
-	}
-
-	return undef;
+	$img->color_filter( sub { shift } );
+	$img->luma_emphasize( 50, 51 );
+	$img = $img->crop( x1 => 9, x2 => 45, y1 => 4, y2 => 15 );
+	return $img->doublesize->ocr();
 }
 
 # vim:ts=4:sw=4
