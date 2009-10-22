@@ -3,7 +3,7 @@
 name: RapidShark
 short: RK
 uri: qr{rapidshark\.pl/}
-status: OK 2009-09-22
+status: OK 2009-10-22
 
 start:
 	GET( $-{_uri} );
@@ -16,57 +16,83 @@ start:
 	m{<font style="font-size:12px;">Chcesz pobrac plik <font color="red">.*/(.*?)</font> \(($STDSIZE)\)</font>};
 	INFO( name => $1, asize => $2 );
 
-	! s/^.*?<Form method="POST" action=''>//s;
-	! s/(.*?)<\/Form>.*$/$1/s;
+	! my $form = $self->form( match => { body => qr/"method_free"/ } );
+	! $form->select( method_free => 0 );
 
-	my %opts;
-	$opts{$1} = $2 while s/<input\s+type="hidden"\s+name="(.*?)"\s+value="(.*?)">//;
-
-	! m{<input type="submit" name="method_free" value="(.*?)">};
-	$opts{method_free} = $1;
-
-	GET( "", post => \%opts );
-	$-{dl_page} = $-{_referer};
+	CLICK( $form->post() );
 
 	if ( /(?:You have to wait|Proszę czekać) (.*) (?:till next download|aby ściągnąć kolejny plik)/ ) {
 		$_ = $1;
 		my $wait = 0;
-		$wait += 60 * 60 * $1 if /(\d+) hour/;
-		$wait += 60 * $1 if /(\d+) minute/;
-		$wait += $1 if /(\d+) second/;
+		$wait += 60 * 60 * $1 if /(\d+) (hour|godzin)/;
+		$wait += 60 * $1 if /(\d+) minut/;
+		$wait += $1 if /(\d+) (second|sekund)/;
 		RESTART( $wait, "free limit reached" );
 	}
 
-	! s/^.*?<form name="F1" method="post" action=""//si;
-	! s/(.*?)<\/form>.*$/$1/si;
-
-	my %opts;
-	$opts{$1} = $2 while s/<input name="(.*?)" value="(.*?)" type="hidden">//s;
-	$opts{$1} = $2 while s/<input type="hidden" name="(.*?)" value="(.*?)">//s;
-
-	#! m{<input.*?id="btn_download" value="(.*?)">};
-	#$opts{btn_download} = $1;
-
-	$-{post} = \%opts;
+stage_captcha:
+	! $-{form} = $self->form( name => "F1" );
 
 	! m{<span id="countdown">(\d+)</span>};
 	$-{wait} = $1;
 
 	! m{<img src="(http://www\.rapidshark\.pl/captchas/.*?jpg)">};
-	my $img = $1;
+	GET( $1, keep_referer => 1 );
 
-	GET( $img );
-	$-{_referer} = $-{dl_page};
-	$-{cap_start} = time;
+	CAPTCHA(
+		qr/[0-9]{4}/,
+		process => \&rk_decaptcha
+	);
 
-	CAPTCHA( "image/jpeg" );
-	$-{post}->{code} = $_;
+	RESTART( 1, "captcha unsolved" ) unless $_;
 
-	my $wait = $-{wait} - (time - $-{cap_start});
-	$wait = 1 if $wait < 1;
+	$-{form}->set( code => $_ );
 
-	WAIT( $wait, "starting download" );
+	WAIT( $-{wait}, "starting download" );
 	
-	DOWNLOAD( "", post => $-{post} );
+	DOWNLOAD( $-{form}->post() );
+
+	if ( /{lang_dod_7}/ ) {
+		CAPTCHA_RESULT( "FAIL" );
+		GOTO stage_captcha;
+	}
+
+
+perl:
+
+sub rk_filter_spots # remove dark pixels
+{
+	my $pix = shift;
+
+	my $lim = 100;
+	return if $pix->isAbove( 10 );
+
+	my $whites = 0;
+	my @sides = ( $pix->up, $pix->down, $pix->left, $pix->right );
+	foreach my $spix ( @sides ) {
+		return unless $spix; # borders are taken care of
+		$whites++ if $spix->isAbove( $lim );
+	}
+	return if $whites < 4;
+	my @corners = ( $sides[0]->left, $sides[0]->right,
+					$sides[1]->left, $sides[1]->right );
+	foreach my $cpix ( @corners ) {
+		$whites++ if $cpix->isAbove( $lim );
+	}
+	
+	$pix->set( 0xff ) if $whites >= 7;
+	return;
+}
+
+sub rk_decaptcha
+{
+	my $img = shift;
+	$img->color_filter( sub { $_[0] } );
+	$img = $img->crop( x1 => 21, y1 => 7, x2 => 57, y2 => 18 );
+	$img->set_border( 255 );
+	$img->luma_emphasize( 50, 80 );
+	$img->pix_filter( \&rk_filter_spots );
+	return $img->doublesize->ocr();
+}
 
 # vim:ts=4:sw=4
