@@ -4,11 +4,10 @@ name: SharingMatrix
 short: SM
 uri: qr{sharingmatrix\.com/}
 cookie: sm
-status: OK 2009-09-17
+status: OK 2009-10-23
 
 start:
 	GET( $-{_uri} );
-	$-{page} = $-{_referer};
 
 	ERROR( "file not found" ) if m#File has been deleted#;
 
@@ -29,8 +28,7 @@ start:
 	! m#case 'free':.*?sUrl2 = '(.*?)' \+ link_id;#s;
 	my $link = $1 . $-{link_id};
 
-	GET( $link );
-	$-{_referer} = $-{page};
+	CLICK( $link, keep_referer => 1 );
 
 	! m#link_name = '(.*?)';#;
 	$-{link_name} = $1;
@@ -40,37 +38,62 @@ start:
 	! m#sid='(.*?)';#;
 	$-{sid} = $1;
 
-	! m#<img alt=.*? id='cryptogram' src='(.*?)'>#;
-	my $img = $1;
+	! m#onclick="javascript:document\.images\.cryptogram\.src='(.*?)'#;
+	$-{img_base} = $1;
 
-	GET( $img );
-	$-{_referer} = $-{page};
+stage_captcha:
+	$-{img} = $-{img_base} . (int rand 1000) . 1;
+	GET( $-{img}, keep_referer => 1 );
 
-	CAPTCHA( "image/jpeg" );
+	CAPTCHA(
+		qr/[a-z]{5}/,
+		process => \&sm_decaptcha,
+	);
 
-	GET( '/ajax_scripts/verifier.php', post => "?$-{sid}&code=$_" );
-	$-{_referer} = $-{page};
+	GOTO stage_captcha unless defined $_;
 
-	RESTART( 0, "invalid captcha" ) unless /^\s*1\s*$/s;
+	GET( '/ajax_scripts/verifier.php', post => "?$-{sid}&code=$_", keep_referer => 1 );
 
-	GET( '/ajax_scripts/dl.php' );
-	$-{_referer} = $-{page};
+	if ( /^\s*1\s*$/s ) {
+		CAPTCHA_RESULT( "OK" );
+	} else {
+		CAPTCHA_RESULT( "FAIL" );
+		GOTO stage_captcha;
+	}
+
+	GET( '/ajax_scripts/dl.php', keep_referer => 1 );
 
 	s/\s+//sg;
 	$-{dl_id} = $_;
 
-	GET( '/ajax_scripts/update_dl.php?id=' . $-{dl_id} );
-	$-{_referer} = $-{page};
+	GET( '/ajax_scripts/update_dl.php?id=' . $-{dl_id}, keep_referer => 1 );
 
-	GET( "/ajax_scripts/_get.php?link_id=$-{link_id}&link_name=$-{link_name}&dl_id=$-{dl_id}&password=" );
-	$-{_referer} = $-{page};
+	GET( "/ajax_scripts/_get.php?link_id=$-{link_id}&link_name=$-{link_name}&dl_id=$-{dl_id}&password=",
+		keep_referer => 1 );
 
 	s/^{//; s/}$//;
 	my %js = map { /^(.*?)\s*:\s*"(.*?)"/ } split /\s*,\s*/, $_;
 
-	DOWNLOAD( "$js{serv}/download/$js{hash}/$-{dl_id}/" );
+	CLICK_DOWNLOAD( "$js{serv}/download/$js{hash}/$-{dl_id}/" );
 
 	# most likely multi-download
 	RESTART( 0, "download error" ) if /Download Error/;
+
+perl:
+
+sub sm_color_select
+{
+	my @s = sort { $a <=> $b } @_;
+	return $s[0];
+}
+
+sub sm_decaptcha
+{
+	my $img = shift;
+
+	$img->color_filter( \&sm_color_select );
+	$img->luma_emphasize( 50, 150 );
+	return $img->ocr();
+}
 
 # vim:ts=4:sw=4
