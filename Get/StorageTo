@@ -2,8 +2,8 @@
 
 name: StorageTo
 short: ST
-uri: qr{storage\.to/}
-status: OK 2009-09-29
+uri: qr{storage\.to/get/[a-zA-Z0-9]{8}([\?/].*?)?$}
+status: OK 2009-10-23
 
 start:
 	GET( $-{_uri} );
@@ -13,7 +13,7 @@ start:
 	INFO( name => $1, asize => $2 );
 
 	! /onclick='javascript:startcountdown\("(.*?)",\s*"(?:.*?)",\s*"(.*?)"\);'/;
-	GET( "/getlink/$2/" );
+	CLICK( "/getlink/$2/" );
 
 	! s/^.*?{\s+//;
 	! s/\s+}.*?$//;
@@ -31,6 +31,6 @@ start:
 	WAIT( $wait, "starting download" );
 
 	delete $-{_referer}; # started from ajax, there must be no referer
-	DOWNLOAD( $-{file_uri} );
+	CLICK_DOWNLOAD( $-{file_uri} );
 
 # vim:ts=4:sw=4
