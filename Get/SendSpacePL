@@ -2,9 +2,9 @@
 
 name: SendSpacePL
 short: SS.pl
-uri: qr{sendspace\.pl/file/}
+uri: qr{sendspace\.pl/file/[a-zA-Z0-9]{8}}
 cookie: ss.pl
-status: OK 2009-10-15
+status: OK 2009-10-23
 
 start:
 	GET( $-{_uri} );
@@ -25,7 +25,7 @@ start:
 	! m#<a href="(http://www.sendspace.pl/download/.*?)"><img src=".*?" alt="Pobierz plik" title="Pobierz plik" /></a>#;
 	my $file_uri = $1;
 
-	DOWNLOAD( $file_uri );
+	CLICK_DOWNLOAD( $file_uri );
 
 	RESTART( $1, "free limit reached" ) if /setDownloadTimeOut\('(\d+)'\);/;
 
