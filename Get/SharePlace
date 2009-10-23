@@ -2,9 +2,13 @@
 
 name: SharePlace
 short: SP
-uri: qr{shareplace\.com/}
-slots: 8
-status: OK 2009-09-12
+uri: qr{shareplace\.com/\?[0-9A-F]+(/.*)?}
+slots: max
+status: OK 2009-10-23
+
+unify:
+	return "http://shareplace.com/?$1"
+		if m{shareplace\.com/\?([0-9A-F]+)(/.*)?};
 
 start:
 	GET( $-{_uri} );
@@ -12,17 +16,22 @@ start:
 	ERROR( "file not found" )
 		if /Your requested file is not found/;
 
-	! m#<b>File name: </b>(.*)<b><br>\s*File size: </b>($STDSIZE)<b><br>#s;
+	! m#<b>Filename: </b>(.*)<b><br>\s*File size: </b>($STDSIZE)<b><br>#s;
 	INFO( name => $1, asize => $2 );
 
-	RESTART( - ( 60 + int rand 300 ), "limit reached" ) if /You have got max allowed download sessions from the same IP/;
+	RESTART( - ( 60 + int rand 300 ), "limit reached" )
+		if /You have got max allowed download sessions from the same IP/;
 
-	! m#input type=button.*document.location="(.*?)"'>#;
-	$-{file_uri} = $1;
+	! m#var cgcsccccsccrctcc = unescape\(\s*([a-zA-Z0-9_]+?)\s*\);#;
+	my $varname = $1;
 
-	! /var timeout='(\d+)';/;
+	! m#var $varname = '(.+?)';#;
+	$-{file_uri} = uri_unescape( $1 );
+	$-{file_uri} =~ s/^.{3}//;
+
+	! m#var zziptimme = (\d+);#;
 	WAIT( $1, "starting download" );
 
-	DOWNLOAD( $-{file_uri} );
+	CLICK_DOWNLOAD( $-{file_uri} );
 
 # vim:ts=4:sw=4
