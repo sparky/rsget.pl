@@ -2,9 +2,9 @@
 
 name: SendSpace
 short: SS
-uri: qr{sendspace\.com/}
+uri: qr{sendspace\.com/file/}
 cookie: ss
-status: OK 2009-09-12
+status: OK 2009-10-23
 
 start:
 	GET( $-{_uri} );
@@ -15,11 +15,19 @@ start:
 	! m#<b>Name:</b>\s*(.*?)\s*<br><b>Size:</b>\s*(\d+MB)\s*<br>#;
 	INFO( name => $1, asize => $2 );
 
+	! my $form = $self->form( match => { body => qr/"download"/ } );
+	! $form->select( download => 0 );
+
+	CLICK( $form->post() );
+
 	! m#<a id="downlink" class="mango" href="(.*?)"#;
 	my $file_uri = $1;
 
-	DOWNLOAD( $file_uri );
+	CLICK_DOWNLOAD( $file_uri );
 
+	RESTART( -(60 + int rand 300), "servers overloaded" )
+		if /Sorry, the free service is at full capacity/;
+	RESTART( 0, "empty page" ) unless /\S/;
 	MULTI() if /You cannot download more than one file at a time/;
 
 # vim:ts=4:sw=4
