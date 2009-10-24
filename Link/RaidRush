@@ -4,7 +4,7 @@ name: RaidRush
 short: L:RaidRush
 uri: qr{save\.raidrush\.ws/}
 slots: max
-status: OK 2009-10-04
+status: OK 2009-10-24
 
 start:
 	GET( $-{_uri} );

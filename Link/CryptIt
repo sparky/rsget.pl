@@ -4,7 +4,7 @@ name: CryptIt
 short: L:CryptIt
 uri: qr{crypt-it\.com/}
 slots: max
-status: OK 2009-09-19
+status: OK 2009-10-24
 
 pre:
 	use MIME::Base64;

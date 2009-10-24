@@ -5,7 +5,7 @@ short: L:4Shared
 uri: qr{4shared\.com/dir/}
 slots: max
 cookie: !4sh
-status: OK 2009-10-13
+status: OK 2009-10-24
 
 unify:
 	return "http://www.4shared.com/dir/$1/$2"
@@ -27,8 +27,7 @@ stage_morelinks:
 	push @{$-{links}}, @links;
 
 	if ( @{ $-{dirs} } ) {
-		my $form;
-		! $form = $self->form( name => "leftPanelForm" );
+		! my $form = $self->form( name => "leftPanelForm" );
 		$form->set( changedir => shift @{ $-{dirs} } );
 		$form->set( refreshAfterUnzip => "false" );
 		GET_NEXT( stage_morelinks, $form->post() );

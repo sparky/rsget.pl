@@ -4,7 +4,7 @@ name: ShareBee
 short: L:ShareBee
 uri: qr{sharebee\.com/}
 slots: max
-status: OK 2009-10-10
+status: OK 2009-10-24
 
 start:
 	GET( $-{_uri} );

@@ -4,7 +4,7 @@ name: CryptedBiz
 short: L:CryptedBiz
 uri: qr{crypted\.biz/}
 slots: max
-status: OK 2009-08-27
+status: OK 2009-10-24
 
 pre:
 	use MIME::Base64;
