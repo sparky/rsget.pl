@@ -4,7 +4,10 @@ name: RSProtect
 short: L:RSProtect
 uri: qr{rsprotect\.com/rc-.*?/}
 slots: max
-status: OK 2009-10-04
+status: OK 2009-10-24
+
+unify:
+	s/#.*//;
 
 start:
 	GET( $-{_uri} );
