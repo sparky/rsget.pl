@@ -4,7 +4,7 @@ name: SecuredIn
 short: L:SecuredIn
 uri: qr{secured\.in/download-\d+-[0-9a-f]+\.html$}
 slots: max
-status: OK 2009-10-04
+status: OK 2009-10-24
 
 pre:
 	use MIME::Base64;
@@ -46,7 +46,6 @@ stage_captcha:
 	GET( "/ajax-handler.php", post => { cmd => "captcha" }, keep_referer => 1 );
 
 	s/\s+//g;
-	warn "resp: '$_'\n";
 	$-{cap_form}->set( captcha_hash => $_ );
 
 	GOTO stage_captcha;
