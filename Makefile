@@ -40,6 +40,6 @@ install: clean
 
 .PHONY: clean
 clean:
-	rm -f {$(DIRS)}/*~
-	rm -f {$(DIRS)}/svn-commit.tmp*
-	rm -f rsget.pl.datadir
+	rm -fv {$(DIRS),.}/*~
+	rm -fv {$(DIRS),.}/svn-commit.tmp*
+	rm -fv rsget.pl.datadir
