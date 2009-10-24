@@ -39,13 +39,30 @@ stage_captcha:
 
 	GET( $img, keep_referer => 1 );
 
-	CAPTCHA( "image/jpeg" );
+	CAPTCHA( qr/[A-Z0-9]/i );
+
+	GOTO stage_checkcaptcha if defined $_;
+
+	GET( "/ajax-handler.php", post => { cmd => "captcha" }, keep_referer => 1 );
+
+	s/\s+//g;
+	warn "resp: '$_'\n";
+	$-{cap_form}->set( captcha_hash => $_ );
+
+	GOTO stage_captcha;
+
+stage_checkcaptcha:
 	$-{cap_form}->set( captcha_key => $_ );
 
 	GET( $-{cap_form}->post() );
 
 	$-{cap_form} = $self->form( id => "frm_captcha" );
-	GOTO stage_captcha if $-{cap_form};
+	if ( $-{cap_form} ) {
+		CAPTCHA_RESULT( "FAIL" );
+		GOTO stage_captcha;
+	}
+
+	CAPTCHA_RESULT( "OK" );
 
 stage_find_links:
 
