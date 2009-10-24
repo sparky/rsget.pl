@@ -4,12 +4,12 @@ name: AnonymTo
 short: L:AnonymTo
 uri: qr{anonym\.to/}
 slots: max
-status: OK 2009-08-25
+status: OK 2009-10-24
 
 start:
 	GET( $-{_uri} );
 	$_ = $-{_uri};
-	s{^http://anonym.to/\?}{};
+	s{^http://.*?http}{http};
 	LINK( $_ );
 
 # vim:ts=4:sw=4
