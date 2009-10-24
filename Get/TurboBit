@@ -5,8 +5,8 @@ short: TB
 uri: qr{turbobit\.net/}
 uri: qr{turbobit\.ru/}
 cookie: tb
-slots: 8
-status: OK 2009-09-13
+slots: max
+status: OK 2009-10-24
 
 start:
 	GET( $-{_uri} );
@@ -22,25 +22,35 @@ start:
 	INFO( name => $name, asize => $size );
 
 	! m#<td><a class="free" href="(.*?)" onclick#;
-	GET( $1 );
-stage_captcha:
-	$-{c_page} = $-{_referer};
+	CLICK( $1 );
 
-	unless ( m#<img alt="Captcha" src="(.*?)"# ) {
+stage_captcha:
+	if ( m#<img alt="Captcha" src="(.*?)"# ) {
+		$-{capimg} = $1;
+	} else {
 		! m#var Timeout = {\s*limit: (\d+),#s;
 		RESTART( $1, "free limit reached" );
 	}
-	GET( $1 );
+	! $-{form} = $self->form( match => { body => qr#<img alt="Captcha"# } );
 
-	CAPTCHA( "image/png" );
-	$-{_referer} = $-{c_page};
+stage_getimg:
+	GET( $-{capimg}, keep_referer => 1 );
+
+	CAPTCHA(
+		qr/[A-Z0-9]{4}/i,
+		process => \&tb_decaptcha,
+	);
+
+	GOTO stage_getimg unless defined $_;
 	
-	GET( "#", post => { captcha_response => $_ } );
-	$-{dl_page} = $-{_referer};
+	$-{form}->set( captcha_response => uc $_ );
+	GET( $-{form}->post() );
 
-	unless ( /updateTime: function/ ) {
-		PRINT( "Invalid captcha" );
-		return $self->stage_captcha();
+	if ( /updateTime: function/ ) {
+		CAPTCHA_RESULT( "OK" );
+	} else {
+		CAPTCHA_RESULT( "FAIL" );
+		GOTO stage_captcha;
 	}
 
 	! m{\$\("#timeout"\)\.load\("(/download/timeout/.*?)"\);};
@@ -49,12 +59,28 @@ stage_captcha:
 	! m#var Timeout = {\s*limit: (\d+),#;
 	WAIT( -$1, "starting download" );
 
-	GET( $-{dl_link} );
-
-	$-{_referer} = $-{dl_page};
+	GET( $-{dl_link}, keep_referer => 1 );
 
 	! m#<a href='(.*?)'>#;
 
-	DOWNLOAD( $1 );
+	CLICK_DOWNLOAD( $1 );
+
+perl:
+
+sub tb_color_select
+{
+	my @s = sort { $a <=> $b } @_;
+	return $s[2];
+}
+
+sub tb_decaptcha
+{
+	my $img = shift;
+	$img->color_filter( \&tb_color_select );
+	$img->luma_emphasize( 200, 160 );
+	local $_ = $img->ocr();
+	s/\s+//g;
+	return $_;
+}
 
 # vim:ts=4:sw=4
