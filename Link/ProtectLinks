@@ -4,7 +4,7 @@ name: ProtectLinks
 short: L:ProtectLinks
 uri: qr{protectlinks\.com/}
 slots: max
-status: OK 2009-08-25
+status: OK 2009-10-24
 
 start:
 	$_ = $-{_uri};
@@ -17,7 +17,7 @@ start:
 	GET( $1 . "redirect.php?id=" . $3 );
 
 	ERROR( "Can't find link" )
-		unless m#<iframe name="pagetext".*? src="(.*?)">#;
+		unless m#<iframe name="pagetext".*? src="\s*(.*?)\s*">#;
 
 	LINK( $1 );
 
