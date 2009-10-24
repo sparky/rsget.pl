@@ -2,12 +2,12 @@
 
 name: MegaShares
 short: MS
-uri: qr{d01\.megashares\.com/\?d01=}
+uri: qr{d01\.megashares\.com/(\?d01=|dl/)}
 cookie: !ms
-status: OK 2009-10-22
+status: OK 2009-10-24
 
 unify:
-	return "http://d01.megashares.com/?d01=$1" if /\?d01=([0-9a-f]{7})/;
+	return "http://d01.megashares.com/?d01=$1" if m#(?:\?d01=|/dl/)([0-9a-f]{7})#;
 
 start:
 	# create fake cookie to skip first page
