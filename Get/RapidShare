@@ -1,7 +1,7 @@
 # $Id$
 # Get::RapidShare - File getter plugin for rsget.pl
 #
-# (c) 2009 Przemysław Iskra <sparky@pld-linux.org>
+# 2009 (c) Przemysław Iskra <sparky@pld-linux.org>
 #		This program is free software,
 # you may distribute it under GPL v2 or newer.
 
@@ -28,6 +28,11 @@ start:
 	CLICK( $form->post() );
 
 	MULTI() if /Please wait until the download is completed/;
+
+	# TODO: this should decrease file priority to delay its download,
+	# postpone it, download after the next file.
+	return $self->problem( "No slots for free users" )
+		if /There are no more download slots available for free users right now/;
 
 	RESTART( $1 * 60 + 10, "free limit reached" )
 		if /Instant download access! Or try again in about (\d+) minutes\./;
