@@ -1,4 +1,9 @@
-#!/usr/bin/perl
+# $Id$
+# Get::DepositFiles - File getter plugin for rsget.pl
+#
+# (c) 2009 Przemysław Iskra <sparky@pld-linux.org>
+#		This program is free software,
+# you may distribute it under GPL v2 or newer.
 
 name: DepositFiles
 short: DF
@@ -36,4 +41,4 @@ stage_download:
 
 	RESTART( $1, "traffic limit" ) if /Wait (\d+) seconds/;
 
-# vim:ts=4:sw=4
+# vim: filetype=perl:ts=4:sw=4
