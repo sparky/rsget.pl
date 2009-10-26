@@ -1,0 +1,72 @@
+#!/usr/bin/perl
+
+name: LixIn
+short: L:LixIn
+uri: qr{lix\.in/-?[0-9a-f]+(#.*)?$}
+slots: !1
+cookie: !lix
+status: OK 2009-10-25
+
+start:
+	GET( $-{_uri} );
+
+	if ( m#<img src="(captcha_img.*?)"# ) {
+		$-{img} = $1;
+	} else {
+		GOTO stage_getlinks;
+	}
+
+stage_captcha:
+	! $-{form} = $self->form( num => 0 );
+
+stage_getimg:
+	GET( $-{img}, keep_referer => 1 );
+
+	CAPTCHA( qr/[A-Z0-9]{3}/ );
+
+	GOTO stage_getimg unless defined $_;
+
+	$-{form}->set( capt => $_ );
+
+	GET( $-{form}->post() );
+
+	if ( m#<img src="(captcha_img.*?)"# ) {
+		$-{img} = $1;
+		CAPTCHA_RESULT( "FAIL" );
+		GOTO stage_captcha;
+	} else {
+		CAPTCHA_RESULT( "OK" );
+	}
+
+	if ( m#<iframe .*?src="\s*(.*?)\s*"# ) {
+		LINK( $1 );
+	}
+
+stage_getlinks:
+	my @forms;
+	my $i = 0;
+	while ( my $form = $self->form( num => $i ) ) {
+		push @forms, $form
+			if $form->action() eq $-{_referer};
+		$i++;
+	}
+
+	$-{forms} = \@forms;
+	$-{links} = [];
+
+stage_nextlink:
+	my $f;
+	unless ( $f = shift @{ $-{forms} } ) {
+		LINK( @{ $-{links} } );
+	}
+	$f->select( submit => 0 );
+	GET( $f->post() );
+
+	! m#<iframe .*?src="\s*(.*?)\s*"#;
+
+	push @{ $-{links} }, $1;
+
+	GOTO stage_nextlink;
+
+
+# vim:ts=4:sw=4
