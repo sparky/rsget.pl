@@ -21,8 +21,10 @@ start:
 	my ( $file_uri, $name ) = ( $1, $2 );
 
 	m#<td width="23%">Dateigröße</td>\s*<td width="77%">: (\d+) Bytes#s;
-	INFO( name => $name, size => $1 );
+	my $size = $1;
 
-	CLICK_DOWNLOAD( de_ml( $file_uri ) );
+	INFO( name => $name, size => $size );
+
+	CLICK_DOWNLOAD( de_ml( $file_uri ), fsize => $size );
 
 # vim: filetype=perl:ts=4:sw=4
