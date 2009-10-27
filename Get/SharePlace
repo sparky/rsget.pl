@@ -24,7 +24,7 @@ start:
 	! m#<b>Filename: </b>(.*)<b><br>\s*File size: </b>($STDSIZE)<b><br>#s;
 	INFO( name => $1, asize => $2 );
 
-	RESTART( - ( 60 + int rand 300 ), "limit reached" )
+	RESTART( - irand( 60, 300 ), "limit reached" )
 		if /You have got max allowed download sessions from the same IP/;
 
 	! m#var cgcsccccsccrctcc = unescape\(\s*([a-zA-Z0-9_]+?)\s*\);#;

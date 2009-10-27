@@ -18,7 +18,7 @@ unify:
 start:
 	GET( $-{_uri} );
 
-	RESTART( 60 + int rand 180, "temporarily unavailable" )
+	RESTART( irand( 60, 300 ), "temporarily unavailable" )
 		if m{<h1>Service Not Available</h1>};
 	ERROR( "file not found" ) if /Requested file not found/;
 

@@ -43,8 +43,8 @@ start:
 
 	! $-{form} = $self->form( name => "dlf" );
 	$-{form}->set( mirror => "on" );
-	$-{form}->set( x => int rand 108 );
-	$-{form}->set( y => int rand 108 );
+	$-{form}->set( x => irand 5, 103 );
+	$-{form}->set( y => irand 5, 103 );
 
 	! /var c=(\d+);/;
 	WAIT( $1, "starting download" );

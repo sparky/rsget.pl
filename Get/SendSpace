@@ -30,7 +30,7 @@ start:
 
 	CLICK_DOWNLOAD( $file_uri );
 
-	RESTART( -(60 + int rand 300), "servers overloaded" )
+	RESTART( - irand( 60, 300 ), "servers overloaded" )
 		if /Sorry, the free service is at full capacity/;
 	RESTART( 0, "empty page" ) unless /\S/;
 	MULTI() if /You cannot download more than one file at a time/;

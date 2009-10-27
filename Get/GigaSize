@@ -40,7 +40,7 @@ stage_getimage:
 		CAPTCHA_RESULT( "FAIL" );
 		GOTO stage_captcha;
 	}
-	RESTART( -180 - int rand 360, "free limit reached, waiting time unknown" )
+	RESTART( - irand( 60, 300 ), "free limit reached, waiting time unknown" )
 		if /YOU HAVE REACHED YOUR FREE DOWNLOAD LIMIT/;
 
 	! $-{form} = $self->form( id => "formDownload" );

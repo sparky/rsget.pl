@@ -47,7 +47,7 @@ start:
 	$-{img_base} = $1;
 
 stage_captcha:
-	$-{img} = $-{img_base} . (int rand 1000) . 1;
+	$-{img} = $-{img_base} . (irand 1000) . 1;
 	GET( $-{img}, keep_referer => 1 );
 
 	CAPTCHA(

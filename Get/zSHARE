@@ -23,8 +23,8 @@ start:
 	INFO( name => $name, asize => $1 );
 
 	! my $form = $self->form( name => "form1" );
-	$form->set( "imageField.x" => 10 + int rand 180 );
-	$form->set( "imageField.y" => 10 + int rand 37 );
+	$form->set( "imageField.x" => irand 10, 190 );
+	$form->set( "imageField.y" => irand 10, 37 );
 	$form->set( "imageField" => "" );
 
 	CLICK( $form->post() );

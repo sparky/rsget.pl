@@ -111,7 +111,7 @@ stage_download:
 	DOWNLOAD( $-{file_uri} );
 
 	MULTI() if m{<h3>FREE MEMBER WAITING PERIOD</h3>};
-	RESTART( -(60 + int rand 300), "free limit reached" )
+	RESTART( - irand( 60, 300 ), "free limit reached" )
 		if /You have exceeded your Download Quota/;
 
 
