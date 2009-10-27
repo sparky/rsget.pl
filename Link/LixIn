@@ -56,22 +56,20 @@ stage_getlinks:
 		$i++;
 	}
 
+	ERROR( "no links" ) unless @forms;
 	$-{forms} = \@forms;
 	$-{links} = [];
 
 stage_nextlink:
-	my $f;
-	unless ( $f = shift @{ $-{forms} } ) {
-		LINK( @{ $-{links} } );
-	}
+	my $f = shift @{ $-{forms} };
 	$f->select( submit => 0 );
 	GET( $f->post() );
 
 	! m#<iframe .*?src="\s*(.*?)\s*"#;
-
 	push @{ $-{links} }, $1;
 
-	GOTO stage_nextlink;
+	GOTO stage_nextlink if @{ $-{forms} };
 
+	LINK( @{ $-{links} } );
 
 # vim: filetype=perl:ts=4:sw=4
