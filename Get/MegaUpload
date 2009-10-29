@@ -7,11 +7,11 @@
 
 name: MegaUpload
 short: MU
-uri: qw{megaupload\.com/(../)?\?d=}
-uri: qw{megaporn\.com/(../)?\?d=}
-uri: qw{megarotic\.com/(../)?\?d=}
-uri: qw{sexuploader\.com/(../)?\?d=}
-uri: qw{megavideo\.com/\?d=}
+uri: qr{megaupload\.com/(../)?\?d=}
+uri: qr{megaporn\.com/(../)?\?d=}
+uri: qr{megarotic\.com/(../)?\?d=}
+uri: qr{sexuploader\.com/(../)?\?d=}
+uri: qr{megavideo\.com/\?d=}
 status: OK 2009-10-22
 
 pre:
