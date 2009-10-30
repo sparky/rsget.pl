@@ -1,0 +1,80 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+use RSGet::CaptchaImage;
+
+sub solve
+{
+	my $dataref = shift;
+	my $procedure = shift;
+	my @args = @_;
+
+	my $image = new RSGet::CaptchaImage( $dataref );
+
+	my $text;
+	eval {
+		$text = &$procedure( $image, @args );
+	};
+	if ( $@ ) {
+		warn "Captcha problem: $@\n";
+		return undef;
+	}
+
+	return $text;
+}
+
+sub fread
+{
+	my $file = shift;
+	my $data;
+
+	open F_IN, "<", $file;
+	binmode F_IN;
+	{
+		local $/ = undef;
+		$data = <F_IN>;
+	}
+	close F_IN;
+
+	return \$data;
+}
+
+my $total = 0;
+my $guessed = 0;
+my $wrong = 0;
+foreach my $file ( @ARGV ) {
+	( my $f = $file ) =~ s{.*/}{};
+	$f =~ s{\.jpeg$}{};
+
+	my $ret = solve(
+		fread( $file ),
+		\&decaptcha,
+		$f,
+	);
+	$total++;
+	if ( $ret ) {
+		printf "$f: %8s\t%s\n", $ret, $ret eq $f ? "OK" : "";
+		$guessed++;
+		if ( $ret ne $f ) {
+			$wrong++;
+		}
+	}
+}
+
+print "Total: $total\n";
+print "Guessed: $guessed\n";
+printf "OK: %d\n", $guessed - $wrong;
+print "Wrong: $wrong\n";
+printf "W: %f%%\n", $wrong / $guessed * 100 if $guessed;
+
+
+sub decaptcha
+{
+	my $img = shift;
+	my $name = shift;
+
+	return $img->ocr();
+}
+
+# vim:ts=4:sw=4:fdm=marker
