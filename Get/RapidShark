@@ -18,7 +18,7 @@ start:
 	ERROR( "file not found" )
 		if m{<font class="err">No such file};
 
-	m{<font style="font-size:12px;">Chcesz pobrac plik <font color="red">.*/(.*?)</font> \(($STDSIZE)\)</font>};
+	! m{<font style="font-size:12px;">Probujesz otworzyć adres <font color="red">.*/(.*?)</font> \(($STDSIZE)\)</font>};
 	INFO( name => $1, asize => $2 );
 
 	! my $form = $self->form( match => { body => qr/"method_free"/ } );
@@ -97,7 +97,9 @@ sub rk_decaptcha
 	$img->set_border( 255 );
 	$img->luma_emphasize( 50, 80 );
 	$img->pix_filter( \&rk_filter_spots );
-	return $img->doublesize->ocr();
+	my $ocr = $img->doublesize->ocr();
+	$ocr =~ s/[^0-9]+//;
+	return $ocr;
 }
 
 # vim: filetype=perl:ts=4:sw=4
