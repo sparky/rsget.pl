@@ -92,8 +92,8 @@ foreach my $file ( glob "????*.gif" ) {
 	my $min = 1;
 	my $min_n = undef;
 	foreach my $n ( keys %avg_1 ) {
-		my $x = $bg->Compare( image => $avg_1{$n} );
-		my ($e, $em) = $bg->Get( 'error', 'mean-error' );
+		my $x = $bg->Compare( image => $avg_1{$n}, metric => 'MEPP' );
+		my $em = $x->Get( 'mean-error' );
 		if ( $em < $min ) {
 			$min = $em;
 			$min_n = $n;
@@ -182,8 +182,8 @@ foreach my $file ( glob "????*.gif" ) {
 	my $min = 1;
 	my $min_n = undef;
 	foreach my $n ( keys %avg_2 ) {
-		my $x = $bg->Compare( image => $avg_2{$n} );
-		my ($e, $em) = $bg->Get( 'error', 'mean-error' );
+		my $x = $bg->Compare( image => $avg_2{$n}, metric => 'MEPP' );
+		my $em = $x->Get( 'mean-error' );
 		if ( $em < $min ) {
 			$min = $em;
 			$min_n = $n;
@@ -272,8 +272,8 @@ foreach my $file ( glob "????*.gif" ) {
 	my $min = 1;
 	my $min_n = undef;
 	foreach my $n ( keys %avg_3 ) {
-		my $x = $bg->Compare( image => $avg_3{$n} );
-		my ($e, $em) = $bg->Get( 'error', 'mean-error' );
+		my $x = $bg->Compare( image => $avg_3{$n}, metric => 'MEPP' );
+		my $em = $x->Get( 'mean-error' );
 		if ( $em < $min ) {
 			$min = $em;
 			$min_n = $n;
@@ -351,8 +351,8 @@ foreach my $file ( glob "????*.gif" ) {
 	my $min = 1;
 	my $min_n = undef;
 	foreach my $n ( keys %avg_4 ) {
-		my $x = $bg->Compare( image => $avg_4{$n} );
-		my ($e, $em) = $bg->Get( 'error', 'mean-error' );
+		my $x = $bg->Compare( image => $avg_4{$n}, metric => 'MEPP' );
+		my $em = $x->Get( 'mean-error' );
 		if ( $em < $min ) {
 			$min = $em;
 			$min_n = $n;
@@ -391,4 +391,5 @@ my $avg_4;
 	my $a = $avg->Append(stack=>0);
 	$a->Quantize(colorspace=>'gray');
 	$a->Write("avg_all.png");
+	$a->Write("avg_all.gif");
 }
