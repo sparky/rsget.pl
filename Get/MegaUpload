@@ -17,9 +17,9 @@ status: OK 2009-10-22
 pre:
 	my @captcha_solver;
 
-	my $mu_font_db = data_file( "mu_font_db.png" );
+	my $mu_font_db = data_file( "mu_font_db.gif" );
 	eval {
-		die "Font DB 'mu_font_db.png' does not exist\n" unless $mu_font_db;
+		die "Font DB 'mu_font_db.gif' does not exist\n" unless $mu_font_db;
 
 		require Image::Magick;
 		my $dbf = new Image::Magick;
