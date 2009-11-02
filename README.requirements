@@ -1,0 +1,48 @@
+List of system requirements:
+
+Any system:
+* Required:
+  - Most required modules are found in standard perl distribution. Only perl
+    5.8 and 5.10 was tested.
+  - WWW::Curl (perl) is required at least in version 4, older versions are
+    missing some options.
+  - URI (perl).
+* Recomended:
+  - GD (perl) and tesseract application - both required for automatic captcha
+    recognition.
+  - subversion - svn client may be used for automatic updates.
+* Optional:
+  - Term::Size allows to redraw the screen correctly after terminal size change.
+  - Image::Magick - better support for MegaUpload captcha (higher probability of success)
+  - Crypt::Blowfish - required for Link/SecuredIn
+  - Crypt::Rijndael - required for Link/CryptIt
+
+
+PLD Linux:
+* Required:
+  - perl-modules
+  - perl-WWW-Curl version 4 or newer
+  - perl-URI
+* Recomended:
+  - perl-GD and tesseract
+  - subversion
+* Optional:
+  - perl-Term-Size
+  - ImageMagick-perl
+  - perl-Crypt-Blowfish
+  - perl-Crypt-Rijndael
+
+
+FreeBSD:
+* Required:
+  - lang/perl5.8 or lang/perl5.10
+  - www/p5-WWW-Curl version 4
+  - net/p5-URI
+* Recomended:
+  - graphics/p5-GD and graphics/tesseract
+  - devel/subversion
+* Optional:
+  - devel/p5-Term-Size
+  - graphics/ImageMagick with IMAGEMAGICK_PERL support
+  - security/p5-Crypt-Blowfish
+  - security/p5-Crypt-Rijndael
