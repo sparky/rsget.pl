@@ -33,6 +33,21 @@ PLD Linux:
   - perl-Crypt-Rijndael
 
 
+OpenSolaris:
+* Required:
+  - SUNWperl584core
+  - SUNWcurl and pending/WWW-Curl
+  - pending/perl-uri
+* Recomended:
+  - (?)/GD and (?)/tesseract
+  - SUNWsvn
+* Optional:
+  - pending/Term-Size
+  - SUNWimagick
+  - (?)/Crypt-Blowfish
+  - pending/Crypt-Rijndael
+
+
 FreeBSD:
 * Required:
   - lang/perl5.8 or lang/perl5.10
