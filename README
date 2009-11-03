@@ -6,6 +6,8 @@ TODO:
 - Add commands: pause downloads, allow/don't allow captcha, clean done
   downloads, and more
 - File group support (first step for multiuser support)
+- Finish daemon option - use Proc::Deamon
+- Selectable temporary directory.
 
 Planned features:
 - Multiuser support (may require major changes in the code).
