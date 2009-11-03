@@ -1,0 +1,40 @@
+# $Id$
+# Audio::GoEar - Audio getter plugin for rsget.pl
+#
+# 2009 (c) Przemysław Iskra <sparky@pld-linux.org>
+#		This program is free software,
+# you may distribute it under GPL v2 or newer.
+
+name: GoEar
+short: A:GoEar
+uri: qr{goear\.com/listen/[0-9a-f]+/}
+slots: max
+status: OK 2009-11-03
+
+unify:
+	my ( $id ) = m{/listen/([0-9a-f]+)/};
+	return "http://goear.com/listen/$id/";
+
+start:
+	GET( $-{_uri} );
+
+	! m{<param name="FlashVars" value="file=([0-9a-f]+)" />};
+	my $id = $1;
+	my $first = substr $id, 0, 1;
+
+	GET( "/files/xmlfiles/$first/secm$id.xml" );
+
+	! m{<song path="(.*?)" bild=".*?" artist="(.*?)" title="(.*?)"/>};
+	my ( $file_uri, $artist, $title ) = ( $1, $2, $3 );
+
+	my $ext = "mp3";
+	$ext = $1 if $file_uri =~ /\.(\S{1,5}?)$/;
+
+	my $fname = de_ml( "$artist - $title.$ext" );
+	$fname =~ s{/}{_}g;
+
+	INFO( name => $fname, quality => $ext );
+
+	DOWNLOAD( $file_uri, fname => $fname );
+
+# vim: filetype=perl:ts=4:sw=4
