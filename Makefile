@@ -17,7 +17,7 @@ pkg: clean
 	rm -rf $(PKGDIR)
 	install -d $(PKGDIR)/{$(DIRS)}
 	install rsget.pl $(PKGDIR)
-	cp Makefile README README.config $(PKGDIR)
+	cp Makefile README README.config README.requirements $(PKGDIR)
 	cp RSGet/*.pm $(PKGDIR)/RSGet
 	for DIR in $(PLUGIN_DIRS); do \
 		cp $$DIR/* $(PKGDIR)/$$DIR || exit 1; \
