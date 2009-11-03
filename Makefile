@@ -4,8 +4,8 @@ BINDIR = /usr/bin
 VER =
 PKGDIR = rsget.pl-$(VER)
 
-PLUGIN_DIRS = Get Link Video
-DIRS = RSGet,Get,Link,Video,data
+PLUGIN_DIRS = Get Video Audio Image Link
+DIRS = RSGet,Get,Video,Audio,Image,Link,data
 
 all: rsget.pl
 
@@ -35,8 +35,8 @@ install: clean
 	cp data/* $(DESTDIR)$(DATADIR)/data
 	for DIR in $(PLUGIN_DIRS); do \
 		cp $$DIR/* $(DESTDIR)$(DATADIR)/$$DIR || exit 1; \
+		grep -l "status:\s*BROKEN" $(DESTDIR)$(DATADIR)/$$DIR/* | xargs -r rm -v; \
 	done
-	grep -l "status:\s*BROKEN" $(DESTDIR)$(DATADIR)/{Get,Link,Video}/* | xargs -r rm -v
 
 .PHONY: clean
 clean:
