@@ -1,0 +1,33 @@
+# $Id$
+# Image::ImageShack - Image getter plugin for rsget.pl
+#
+# 2009 (c) Przemysław Iskra <sparky@pld-linux.org>
+#		This program is free software,
+# you may distribute it under GPL v2 or newer.
+
+name: ImageShack
+short: I:ImageShack
+uri: qr{profile\.imageshack\.us/user/.*?/images/detail/#\d+/.+}
+uri: qr{img\d+\.imageshack\.us/i/.+/}
+slots: max
+status: OK 2009-11-03
+
+unify:
+	return "http://img$1.imageshack.us/i/$2/"
+		if m{http://profile\.imageshack\.us/user/.*?/images/detail/#(\d+)/(.+)};
+
+start:
+	GET( $-{_uri} );
+
+	! m{<a href="(.*?)" target="_blank" class="last">Full Size</a>};
+	my $file_uri = de_ml( $1 );
+	( my $fname = $file_uri ) =~ s{.*/}{};
+
+	my $q = "image";
+	$q = $1 if $fname =~ /\.(\S{1,5}?)$/;
+
+	INFO( name => $fname, quality => $q );
+
+	DOWNLOAD( $file_uri );
+
+# vim: filetype=perl:ts=4:sw=4
