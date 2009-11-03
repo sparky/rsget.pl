@@ -1,0 +1,28 @@
+# $Id$
+# Audio::[NAME] - Audio getter plugin for rsget.pl
+#
+# 2009 (c) ??? <???@???.??>
+#		This program is free software,
+# you may distribute it under GPL v2 or newer.
+
+name: [NAME]
+short: A:[NAME]
+uri: qr{asite\.com/}
+slots: max
+status: OK [DATE]
+
+start:
+	GET( $-{_uri} );
+
+	! m{<title>(.*?)</title>};
+	my $fname = de_ml( $1 );
+	$fname =~ s{/}{_}g;
+	$fname .= ".mp3";
+
+	INFO( name => $fname, quality => "mp3" );
+
+	! m{file_uri_here:'(.*?)'};
+	my $file_uri = uri_unescape( $1 );
+	DOWNLOAD( $file_uri, fname => $fname );
+
+# vim: filetype=perl:ts=4:sw=4
