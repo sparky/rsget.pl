@@ -7,6 +7,7 @@
 
 name: SpankWire
 short: V:SpankWire
+web: "http://www.spankwire.com/"
 uri: qr{spankwire\.com/[^/]+/video\d+}
 slots: max
 status: OK 2009-10-05

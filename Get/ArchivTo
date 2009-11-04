@@ -7,6 +7,8 @@
 
 name: ArchivTo
 short: AT
+web: "http://archiv.to/"
+tos: "http://archiv.to/?Module=Policy"
 uri: qr{archiv\.to/}
 slots: max
 status: OK 2009-10-21

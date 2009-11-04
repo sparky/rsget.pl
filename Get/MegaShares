@@ -7,6 +7,8 @@
 
 name: MegaShares
 short: MS
+web: "http://megashares.com/"
+tos: "http://megashares.com/tos.php"
 uri: qr{d01\.megashares\.com/(\?d01=|dl/)}
 cookie: !ms
 status: OK 2009-10-24

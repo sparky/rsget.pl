@@ -7,6 +7,8 @@
 
 name: TurboBit
 short: TB
+web: "http://turbobit.net/"
+tos: "http://turbobit.net/rules"
 uri: qr{turbobit\.net/}
 uri: qr{turbobit\.ru/}
 cookie: tb

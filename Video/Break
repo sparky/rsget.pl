@@ -7,6 +7,7 @@
 
 name: Break
 short: V:Break
+web: "http://www.break.com/"
 uri: qr{break\.com}
 slots: max
 status: OK 2009-10-05

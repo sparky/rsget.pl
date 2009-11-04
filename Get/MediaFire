@@ -7,6 +7,8 @@
 
 name: MediaFire
 short: MF
+web: "http://www.mediafire.com/"
+tos: "http://www.mediafire.com/terms_of_service.php"
 uri: qr{mediafire\.com/}
 cookie: mf
 slots: max

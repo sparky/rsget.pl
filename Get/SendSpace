@@ -7,6 +7,8 @@
 
 name: SendSpace
 short: SS
+web: "http://sendspace.com/"
+tos: "http://sendspace.com/terms.html"
 uri: qr{sendspace\.com/file/}
 cookie: ss
 status: OK 2009-10-23

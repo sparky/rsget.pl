@@ -7,6 +7,7 @@
 
 name: RapidShareDE
 short: RS.de
+web: "http://rapidshare.de/"
 uri: qr{rapidshare\.de/}
 status: OK 2009-10-22
 

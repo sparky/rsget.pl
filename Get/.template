@@ -7,6 +7,7 @@
 
 name: [NAME]
 short: [NAME]
+web: "http://gsite.com/"
 uri: qr{gsite\.com/}
 status: OK [DATE]
 

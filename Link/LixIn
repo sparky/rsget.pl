@@ -7,6 +7,7 @@
 
 name: LixIn
 short: L:LixIn
+web: "http://lix.in/"
 uri: qr{lix\.in/-?[0-9a-f]+(#.*)?$}
 slots: !1
 cookie: !lix

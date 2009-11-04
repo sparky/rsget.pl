@@ -7,6 +7,8 @@
 
 name: 4Shared
 short: 4S
+web: "http://www.4shared.com/"
+tos: "http://www.4shared.com/terms.jsp"
 uri: qr{4shared\.com/(account/)?file/}
 slots: max
 status: OK 2009-10-21

@@ -7,6 +7,8 @@
 
 name: GigaSize
 short: GS
+web: "http://gigasize.com/"
+tos: "http://www.gigasize.com/page.php?p=terms"
 uri: qr{gigasize\.com/get\.php\?d=}
 cookie: gs
 status: OK 2009-10-22

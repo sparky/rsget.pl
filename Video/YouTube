@@ -7,6 +7,7 @@
 
 name: YouTube
 short: V:YouTube
+web: "http://www.youtube.com/"
 uri: qr{youtube\.com/watch\?v=.*}
 slots: max
 status: OK 2009-10-03

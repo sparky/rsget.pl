@@ -6,7 +6,9 @@
 # you may distribute it under GPL v2 or newer.
 
 name: PrzeklejPL
-short: P.pl
+short: przeklej.pl
+web: "http://www.przeklej.pl/"
+tos: "http://www.przeklej.pl/regulamin"
 uri: qr{przeklej\.pl/plik/}
 slots: max
 status: OK 2009-10-22

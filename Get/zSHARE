@@ -7,6 +7,8 @@
 
 name: zSHARE
 short: zS
+web: "http://zshare.net/"
+tos: "http://zshare.net/TOS.html"
 uri: qr{zshare\.net}
 #cookie: zs
 slots: max

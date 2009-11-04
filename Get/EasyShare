@@ -7,6 +7,8 @@
 
 name: EasyShare
 short: ES
+web: "http://easy-share.com/"
+tos: "http://easy-share.com/tos.html"
 uri: qr{(?:w\d+\.)?easy-share\.com/(../)?(\d+)}
 cookie: !es
 status: OK 2009-10-21

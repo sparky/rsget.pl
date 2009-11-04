@@ -7,6 +7,8 @@
 
 name: UploadingCom
 short: UC
+web: "http://uploading.com/"
+tos: "http://uploading.com/terms/"
 uri: qr{uploading\.com/(../)?files/(get/)?[A-Za-z0-9]{8}}
 cookie: uc
 status: OK 2009-10-22

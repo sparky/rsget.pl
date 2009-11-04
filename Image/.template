@@ -7,6 +7,7 @@
 
 name: [NAME]
 short: I:[NAME]
+web: "http://isite.com/"
 uri: qr{isite\.com/}
 slots: max
 status: OK [DATE]

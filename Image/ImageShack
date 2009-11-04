@@ -7,6 +7,8 @@
 
 name: ImageShack
 short: I:ImageShack
+web: "http://imageshack.us/"
+tos: "http://reg.imageshack.us/content.php?page=rules"
 uri: qr{profile\.imageshack\.us/user/.*?/images/detail/#\d+/.+}
 uri: qr{img\d+\.imageshack\.us/i/.+/}
 slots: max

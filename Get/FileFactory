@@ -7,6 +7,8 @@
 
 name: FileFactory
 short: FF
+web: "http://filefactory.com/"
+tos: "http://filefactory.com/legal/terms.php"
 uri: qr{filefactory\.com/}
 status: OK 2009-10-22
 

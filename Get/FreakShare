@@ -7,7 +7,9 @@
 
 name: FreakShare
 short: FS
-uri: qr{freakshare\.net/}
+web: "http://freakshare.net/"
+tos: "http://freakshare.net/terms-of-service.html"
+uri: qr{freakshare\.net/files/}
 cookie: fs
 status: OK 2009-10-22
 

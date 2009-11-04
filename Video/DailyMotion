@@ -7,6 +7,7 @@
 
 name: DailyMotion
 short: V:DailyMotion
+web: "http://www.dailymotion.com/"
 uri: qr{dailymotion\.(com|pl)/(.*?/)?video/[a-z0-9]+}
 slots: max
 status: OK 2009-10-04

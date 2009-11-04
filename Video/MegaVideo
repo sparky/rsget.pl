@@ -7,6 +7,8 @@
 
 name: MegaVideo
 short: V:MegaVideo
+web: "http://megavideo.com/"
+tos: "http://megavideo.com/?c=terms"
 uri: qr{megavideo\.com/\?v=}
 uri: qr{megaporn\.com/(.*?/)?\?v=}
 slots: max

@@ -7,6 +7,7 @@
 
 name: YouPorn
 short: V:YouPorn
+web: "http://youporn.com/"
 uri: qr{youporn\.com/watch/\d+(/.*)?$}
 slots: max
 cookie: !v_yp

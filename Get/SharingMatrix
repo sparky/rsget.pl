@@ -7,6 +7,8 @@
 
 name: SharingMatrix
 short: SM
+web: "http://sharingmatrix.com/"
+tos: "http://sharingmatrix.com/user_agreement"
 uri: qr{sharingmatrix\.com/}
 cookie: sm
 status: OK 2009-10-23

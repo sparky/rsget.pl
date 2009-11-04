@@ -7,6 +7,8 @@
 
 name: FlyfileUs
 short: FU
+web: "http://flyfile.us/"
+tos: "http://flyfile.us/tos.html"
 uri: qr{flyfile\.us/}
 status: OK 2009-10-22
 

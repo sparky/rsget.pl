@@ -7,6 +7,7 @@
 
 name: AnonymTo
 short: L:AnonymTo
+web: "http://anonym.to/"
 uri: qr{anonym\.to/}
 slots: max
 status: OK 2009-10-24

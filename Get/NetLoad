@@ -7,6 +7,8 @@
 
 name: NetLoad
 short: NL
+web: "http://netload.in/"
+tos: "http://netload.in/index.php?id=13"
 uri: qr{netload\.in/datei}
 cookie: nl
 status: OK 2009-10-22

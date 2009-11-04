@@ -7,6 +7,8 @@
 
 name: RapidShark
 short: RK
+web: "http://www.rapidshark.pl/"
+tos: "http://www.rapidshark.pl/tos.html"
 uri: qr{rapidshark\.pl/}
 status: OK 2009-10-22
 

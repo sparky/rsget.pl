@@ -7,6 +7,8 @@
 
 name: MegaUpload
 short: MU
+web: "http://megaupload.com/"
+tos: "http://megaupload.com/?c=terms"
 uri: qr{megaupload\.com/(../)?\?d=}
 uri: qr{megaporn\.com/(../)?\?d=}
 uri: qr{megarotic\.com/(../)?\?d=}

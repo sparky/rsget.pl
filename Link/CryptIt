@@ -7,6 +7,7 @@
 
 name: CryptIt
 short: L:CryptIt
+web: "http://crypt-it.com/"
 uri: qr{crypt-it\.com/}
 slots: max
 status: OK 2009-10-24

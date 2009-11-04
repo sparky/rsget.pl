@@ -7,6 +7,7 @@
 
 name: InteriaPL
 short: V:InteriaPL
+web: "http://video.interia.pl/"
 uri: qr{video\.interia\.pl/obejrzyj,film,\d+}
 slots: max
 status: OK 2009-10-13

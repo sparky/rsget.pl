@@ -7,6 +7,7 @@
 
 name: Simple
 short: L:Simple
+web: "http://tinyurl.com/"
 uri: qr{4gk\.com/}
 uri: qr{xurl\.jp/}
 uri: qr{tinyurl\.com/}
