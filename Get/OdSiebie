@@ -11,7 +11,7 @@ web: "http://odsiebie.com/"
 uri: qr{odsiebie\.com/pokaz/}
 cookie: os
 slots: max
-status: OK 2009-10-22
+status: SERVICE CLOSED
 
 start:
 	GET( $-{_uri} );
