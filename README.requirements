@@ -62,3 +62,7 @@ FreeBSD:
   - graphics/ImageMagick with IMAGEMAGICK_PERL support
   - security/p5-Crypt-Blowfish
   - security/p5-Crypt-Rijndael
+
+MacOS X
+* Required:
+  - XCode
