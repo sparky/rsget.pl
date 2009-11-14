@@ -66,3 +66,17 @@ FreeBSD:
 MacOS X
 * Required:
   - XCode
+
+NetBSD:
+* Required:
+  ! substitute #!/usr/bin/perl with #!/usr/pkg/bin/perl in ./rsget.pl file
+  - perl5/perl
+  - perl5/p5-WWW-Curl
+  - perl5/p5-URI
+* Recomended:
+  - perl/p5-GD and graphicd/tesseract
+  - scm/subversion-base
+* Optional:
+  - perl5/p5-Term-Size
+  - perl5/p5-Crypt-Blowfish
+  - perl5/p5-Crypt-Rijndael
