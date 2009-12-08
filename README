@@ -6,8 +6,10 @@ TODO:
 - Add commands: pause downloads, allow/don't allow captcha, clean done
   downloads, and more
 - File group support (first step for multiuser support)
-- Finish daemon option - use Proc::Deamon
 - Selectable temporary directory.
+- Fix freezing http server - move to separate thread/process ?
+- Fix bugs in http server, and speed it up.
+- Better file writing methods, to allow downloading from multiple sources.
 
 Planned features:
 - Multiuser support (may require major changes in the code).
