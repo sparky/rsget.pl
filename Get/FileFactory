@@ -30,14 +30,14 @@ start:
 	! m#<a href="(/dlf.*?)"><img.*?alt="Download Now" /></a>#;
 	CLICK( $1 );
 
-	! m#<a href="(http.*?)"><img.*?alt="Download Now" /></a>#;
+	! m#<a href="(http.*?)"><strong>Download with FileFactory Basic</strong></a>#;
 	$-{file_uri} = $1;
 
 	! m#<span id="countdown".*?>(\d+)</span>#;
 	my $wait = $1;
 	RESTART( $wait, "free limit reached" ) if $wait > 30;
 
-	WAIT( $wait, "starting" );
+	WAIT( $wait, "expecting download link" );
 
 	CLICK_DOWNLOAD( $-{file_uri} );
 
