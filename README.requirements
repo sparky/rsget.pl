@@ -8,8 +8,8 @@ Any system:
     missing some options.
   - URI (perl).
 * Recomended:
-  - GD (perl) and tesseract (version 2.00 or newer) - both required for
-    automatic captcha recognition.
+  - GD (perl) and tesseract (version 2.00 or newer) with english data files -
+    both required for automatic captcha recognition.
   - subversion - svn client may be used for automatic updates.
 * Optional:
   - Term::Size allows to redraw the screen correctly after terminal size change.
@@ -25,7 +25,7 @@ PLD Linux:
   - perl-WWW-Curl version 4
   - perl-URI
 * Recomended:
-  - perl-GD and tesseract
+  - perl-GD, tesseract 2 and tesseract-lang-en
   - subversion
 * Optional:
   - perl-Term-Size
@@ -74,9 +74,10 @@ NetBSD:
   - perl5/p5-WWW-Curl
   - perl5/p5-URI
 * Recomended:
-  - perl/p5-GD and graphicd/tesseract
+  - perl/p5-GD and graphics/tesseract
   - scm/subversion-base
 * Optional:
   - perl5/p5-Term-Size
+  - ?
   - perl5/p5-Crypt-Blowfish
   - perl5/p5-Crypt-Rijndael
