@@ -6,11 +6,12 @@ TODO:
 - Add commands: pause downloads, allow/don't allow captcha, clean done
   downloads, and more
 - File group support (first step for multiuser support)
+- File priorities and group priorities.
 - Selectable temporary directory.
 - Fix freezing http server - move to separate thread/process ?
 - Fix bugs in http server, and speed it up.
 - Better file writing methods, to allow downloading from multiple sources.
-- Backoff if captcha fails to many times.
+- Backoff if captcha fails too many times; lower prio.
 
 Planned features:
 - Multiuser support (may require major changes in the code).
