@@ -10,6 +10,7 @@ TODO:
 - Fix freezing http server - move to separate thread/process ?
 - Fix bugs in http server, and speed it up.
 - Better file writing methods, to allow downloading from multiple sources.
+- Backoff if captcha fails to many times.
 
 Planned features:
 - Multiuser support (may require major changes in the code).
