@@ -37,16 +37,18 @@ start:
 	RESTART( 600, "servers overloaded" )
 		if m{All download slots for this link are currently filled};
 
-	m{<dt>Filename:&nbsp;<strong>(.*?)</strong>&nbsp;&nbsp;&nbsp;size: ($STDSIZE)(?:ytes)?</dt>};
-	my ( $name, $size ) = ( $1, $2 );
+	! m{<!-- download page link title //-->\s*<h1.*>(.+?)</h1>}s;
+	my $name = $1;
 	$name =~ s/\.\.\.$/\0/;
+	! m{<strong><span.*>Filesize:</span></strong> ($STDSIZE)<br />}so;
+	my $size = $1;
 	INFO( iname => $name, asize => $size );
 
 	RESTART( $1 * 60 + $2, "free limit reached" )
 		if m{Your download passport will renew\s*in 00:<strong>(\d+)</strong>:<strong>(\d+)</strong>};
 
 	unless( m{<dt>Your Passport needs to be reactivated.</dt>} ) {
-		! m{<a href="(.*?)">Click here to download</a>};
+		! m{.*<a href="(.+?)">\s*<img.*src="images/download_file\.png" alt="download file"}s;
 		$-{file_uri} = $1;
 
 		m{You have ([\d\.]+ .*?) left that you can download with this passport.};
