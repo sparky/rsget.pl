@@ -15,27 +15,7 @@ status: OK 2009-10-22
 start:
 	GET( $-{_uri} );
 
-	ERROR( "file not found" ) if /(No such file|No such user)/;
-	m{<h2>Download File (.*?)</h2>};
-	$-{name} = $1;
-
-	! my $form = $self->form( match => { body => qr/"Free Download"/ } );
-	! $form->select( method_free => 0 );
-	CLICK( $form->post() );
-
-	ERROR( "file removed" )
-		if m{<font class="err">File was deleted by administrator</font>};
-
-	m{<small>\((\d+) bytes\)</small>};
-	INFO( name => $-{name}, size => $1 );
-
-	RESTART( 600, "download-limit reached" )
-		if /You have reached the download-limit/;
-
-	! my $form = $self->form( name => "F1" );
-	CLICK_DOWNLOAD( $form->post() );
-
-	RESTART( 120, "temporarily unavailable" )
-		if /temporarily unavailable/;
+	ERROR( "file not found" ) if m{<b>File Not Found</b>};
+	ERROR( "file found but I don't know what to do" );
 
 # vim: filetype=perl:ts=4:sw=4
