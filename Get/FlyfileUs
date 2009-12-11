@@ -10,12 +10,12 @@ short: FU
 web: "http://flyfile.us/"
 tos: "http://flyfile.us/tos.html"
 uri: qr{flyfile\.us/}
-status: OK 2009-10-22
+status: OK 2009-12-11
 
 start:
 	GET( $-{_uri} );
 
 	ERROR( "file not found" ) if m{<b>File Not Found</b>};
-	ERROR( "file found but I don't know what to do" );
+	ERROR( "file found but I don't know what to do, please send this link to rsget.pl author" );
 
 # vim: filetype=perl:ts=4:sw=4
