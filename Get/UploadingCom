@@ -10,24 +10,26 @@ short: UC
 web: "http://uploading.com/"
 tos: "http://uploading.com/terms/"
 uri: qr{uploading\.com/(../)?files/(get/)?[A-Za-z0-9]{8}}
-cookie: uc
-status: OK 2009-10-22
+cookie: !uc
+status: OK 2009-12-11
 
 unify:
 	return "http://uploading.com/files/$1/"
 		if m{uploading\.com/(?:../)?files/(?:get/)?([A-Za-z0-9]{8})/?};
 
 start:
+	COOKIE( [ (qw(.uploading.com TRUE / FALSE), time() + 43200, 'lang', 1 ) ] );
+
 	GET( $-{_uri} );
 
 	RESTART( irand( 60, 300 ), "temporarily unavailable" )
 		if m{<h1>Service Not Available</h1>};
 	ERROR( "file not found" ) if /Requested file not found/;
 
-	! m{<h2 style=".*?">File download</h2><br/>\s*<h2>(.*?)</h2><br/>\s*File size: <b>($STDSIZE)</b>};
+	! m{.*<h2>(.+?)</h2><br/>\s*File size: <b>($STDSIZE)</b>}so;
 	my $name = $1; my $size = $2;
 	if ( $name =~ /\.\..{1,5}$/ ) {
-		! m{<title>Download (.*?) for free on uploading\.com</title>};
+		! m{<title>Download (.+?) for free on uploading\.com</title>};
 		$name = $1;
 	}
 	INFO( name => $name, asize => $size );
