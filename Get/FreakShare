@@ -17,6 +17,8 @@ start:
 	GET( $-{_uri} );
 
 	ERROR( "file not found" ) if /Sorry, this Download doesnt exist anymore/;
+	RESTART( - irand( 60, 300 ), "free limit reached" )
+		if /Sorry, your Traffic is used up for today/;
 
 	! m#<h1 class="box_heading" style="text-align:center;">(.*)</h1>#;
 	INFO( name => $1, size => -1 );
