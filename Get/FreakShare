@@ -24,7 +24,7 @@ start:
 	! $-{form} = $self->form( match => { body => qr/"Free Download"/ } );
 
 	! m#var time = (\d+)(?:\.\d+);\s*var intervall;#;
-	WAIT( $1, "starting" );
+	WAIT( -$1, "starting" );
 
 	CLICK( $-{form}->post() );
 	
