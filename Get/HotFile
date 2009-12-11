@@ -9,8 +9,8 @@ name: HotFile
 short: HF
 web: "http://hotfile.com/"
 tos: "http://hotfile.com/terms-of-service.html"
-uri: qr{hotfile\.com/}
-status: OK 2009-10-22
+uri: qr{hotfile\.com/dl/\d+/[0-9a-f]+/.+}
+status: OK 2009-12-11
 
 start:
 	GET( $-{_uri} );
@@ -38,18 +38,23 @@ stage_getcaptcha:
 
 	GOTO stage_download if m#<a href="(.*?)">Click here to download</a>#;
 
-	! $-{capform} = $self->form( match => { body => qr/Enter word above/ } );
+	! $-{capform} = $self->form( match => { body => qr/recaptcha\.net/ } );
 
-	! m#<img src="(/captcha\.php.*?)">#;
+	! m{ src="(http://api\.recaptcha\.net/challenge.*)"};
+
 	GET( $1, keep_referer => 1 );
 
+	! m{challenge : '(\S+)',};
+	$-{capform}->set( recaptcha_challenge_field => $1 );
+
+	GET( "http://api.recaptcha.net/image?c=" . $1, keep_referer => 1 );
+
 	CAPTCHA(
-		qr/[a-zA-Z]{5,6}/,
-		process => \&hf_decaptcha
+		qr/\S+ \S+/
 	);
 
 	GOTO stage_getcaptcha unless defined $_;
-	$-{capform}->set( captcha => $_ );
+	$-{capform}->set( recaptcha_response_field => $_ );
 
 	GET( $-{capform}->post() );
 stage_download:
@@ -62,21 +67,5 @@ stage_download:
 	}
 
 	CLICK_DOWNLOAD( $1 );
-
-perl:
-
-sub hf_color_select_lowest
-{
-	my @s = sort { $a <=> $b } @_;
-	return $s[0];
-}
-
-sub hf_decaptcha
-{
-	my $img = shift;
-	$img->color_filter( \&hf_color_select_lowest );
-	$img->luma_emphasize( 90, 130 );
-	return $img->ocr();
-}
 
 # vim: filetype=perl:ts=4:sw=4
