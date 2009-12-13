@@ -11,7 +11,7 @@ web: "http://sharingmatrix.com/"
 tos: "http://sharingmatrix.com/user_agreement"
 uri: qr{sharingmatrix\.com/}
 cookie: sm
-status: OK 2009-10-23
+status: OK 2009-12-13
 
 start:
 	GET( $-{_uri} );
@@ -54,7 +54,7 @@ stage_captcha:
 
 	CAPTCHA(
 		qr/[a-z]{5}/,
-		process => \&sm_decaptcha,
+		#process => \&sm_decaptcha,
 	);
 
 	GOTO stage_captcha unless defined $_;
