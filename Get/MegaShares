@@ -39,7 +39,13 @@ start:
 
 	! m{<!-- download page link title //-->\s*<h1.*>(.+?)</h1>}s;
 	my $name = $1;
-	$name =~ s/\.\.\.$/\0/;
+	if ( $name =~ s/\.\.\.$// ) {
+		if ( m{/(\Q$name\E.*?)["']} ) {
+			$name = $1;
+		} else {
+			$name .= "\0";
+		}
+	}
 	! m{<strong><span.*>Filesize:</span></strong> ($STDSIZE)<br />}so;
 	my $size = $1;
 	INFO( iname => $name, asize => $size );
