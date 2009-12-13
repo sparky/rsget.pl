@@ -9,9 +9,13 @@ name: UploadedTo
 short: UT
 web: "http://uploaded.to/"
 tos: "http://uploaded.to/agb"
-uri: qr{uploaded\.to/}
-uri: qr{ul\.to/}
-status: OK 2009-10-22
+uri: qr{uploaded\.to/(?:file/|\?id=)[0-9a-z]{6}}
+uri: qr{ul\.to/[0-9a-z]{6}}
+status: OK 2009-12-12
+
+unify:
+	return "http://uploaded.to/file/$1" if
+		m{ul\.to/([0-9a-z]{6})} or m{uploaded\.to/(?:file/|\?id=)([0-9a-z]{6})};
 
 start:
 	GET( $-{_uri} );
@@ -29,6 +33,7 @@ start:
 	if ( length $name >= 60 ) {
 		! m{<tr><td style="padding-left:4px;">Filename: &nbsp;</td><td><b>\s+(.*?)\s+</b></td></tr>}s;
 		$name = $1;
+		$name =~ s/\.\.\.$/\0/;
 		! m{<tr><td style="padding-left:4px;">Filetype: &nbsp;</td><td>(.*?)</td></tr>};
 		$name .= $1;
 	}
