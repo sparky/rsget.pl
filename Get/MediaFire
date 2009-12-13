@@ -9,26 +9,27 @@ name: MediaFire
 short: MF
 web: "http://www.mediafire.com/"
 tos: "http://www.mediafire.com/terms_of_service.php"
-uri: qr{mediafire\.com/}
+uri: qr{mediafire\.com/file/[a-z0-9]+}
 cookie: mf
 slots: max
-status: OK 2009-10-22
+status: OK 2009-12-13
 
 start:
 	GET( $-{_uri} );
 
+stage_init:
 	if ( $-{_referer} =~ /error\.php/ ) {
 		ERROR( "file not found" ) if /Invalid File/;
 		ERROR( "some error" );
 	}
 
-	! m{You requested: (.*?) \(($STDSIZE)\)</div>};
+	! m{<div class="download_file_title".*> (.+?) <div.*>\(($STDSIZE)\)</div> </div>}o;
 	INFO( name => $1, asize => $2 );
 
 	! /cu\('(.*?)','(.*?)','(.*?)'\);/;
 	GET( "/dynamic/download.php?qk=$1&pk=$2&r=$3", keep_referer => 1 );
 
-	! /^(var.*var.*var.*)\s*function/m;
+	! /^\s*(var.*var.*var.*)\s*function/m;
 	my $vars = $1;
 	my %vars = map { /var (.*?)='(.*?)'/ } split /;/, $vars;
 
@@ -37,6 +38,8 @@ start:
 	my $code = join "", map { /'(.*)'/ ? $1 : $vars{ $_ } } split /\s*\+\s*/, $order;
 	my $uri = "http://" . $code;
 
-	CLICK_DOWNLOAD( $uri );
+	DOWNLOAD( $uri );
+
+	GOTO stage_init;
 
 # vim: filetype=perl:ts=4:sw=4
