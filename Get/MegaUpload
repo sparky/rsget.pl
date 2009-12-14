@@ -43,6 +43,7 @@ unify:
 start:
 	GET( unify( $-{_uri} ) );
 
+stage_init:
 	RESTART( 10 * 60, "temporarily blocked" )
 		if m{document\.location='http://www\.megaupload\.com/\?c=msg'};
 
@@ -102,6 +103,7 @@ stage_last:
 
 	CLICK_DOWNLOAD( $-{file_uri} );
 
+	GOTO stage_init if m{/download\.jpg'.*Filename:}s;
 
 perl:
 	
