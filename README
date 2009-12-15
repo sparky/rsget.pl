@@ -11,7 +11,10 @@ TODO:
 - Fix freezing http server - move to separate thread/process ?
 - Fix bugs in http server, and speed it up.
 - Better file writing methods, to allow downloading from multiple sources.
-- Backoff if captcha fails too many times; lower prio.
+- Backoff if captcha fails too many times; lower uri prio.
+- If multi-download problem appears while checking files force check on
+  another interface/ip.
+- Posibility to mark uri as "cannot continue".
 
 Planned features:
 - Multiuser support (may require major changes in the code).

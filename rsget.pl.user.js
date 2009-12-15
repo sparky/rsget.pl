@@ -146,9 +146,12 @@ function push_from_node( links, node )
 	}
 }
 
-function crawl_nodes( links, node, end )
+function crawl_nodes( links, node, selection )
 {
-	while ( node != end ) {
+	while ( node ) {
+		if ( selection.containsNode( node, false ) )
+			push_from_node( links, node );
+
 		if ( node.firstChild ) {
 			node = node.firstChild;
 		} else if ( node.nextSibling ) {
@@ -156,14 +159,11 @@ function crawl_nodes( links, node, end )
 		} else {
 			do {
 				node = node.parentNode;
-				if ( node == end )
+				if ( ! node )
 					return;
 			} while ( !node.nextSibling );
 			node = node.nextSibling;
 		}
-		if ( node == end )
-			return;
-		push_from_node( links, node );
 	}
 }
 
@@ -174,14 +174,20 @@ function send_links()
 	var sel_text;
 	try {
 		selection = window.getSelection();
-		sel_text = selection.toString()
+		sel_text = selection.toString();
 		range = selection.getRangeAt( 0 );
 	} catch ( e ) {};
 	var links = new Array;
 
 
 	if ( !range || range.collapsed ) {
-		crawl_nodes( links, docbody(), document );
+		crawl_nodes( links, docbody(),
+			{
+				containsNode: function ( node, flag ) {
+					return true;
+				} 
+			}
+		);
 		if ( selection ) {
 			selection.selectAllChildren( docbody() );
 			sel_text = selection.toString();
@@ -192,14 +198,16 @@ function send_links()
 		var end = range.endContainer;
 		
 		if ( start == end ) {
-			push_from_text( links, start.nodeValue.substring( range.startOffset, range.endOffset ) );
+			push_from_text( links,
+				start.nodeValue.substring( range.startOffset, range.endOffset )
+			);
 		} else {
 			if ( start.nodeName == 'A' ) {
 				push_a_href( links, start );
 			} else if ( start.nodeName == '#text' && start.nodeValue ) {
 				push_from_text( links, start.nodeValue.substr( range.startOffset ) );
 			}
-			crawl_nodes( links, start, end );
+			crawl_nodes( links, start, selection );
 			if ( end.nodeName == 'A' ) {
 				push_a_href( end );
 			} else if ( end.nodeName == '#text' && end.nodeValue) {
