@@ -10,7 +10,7 @@ short: V:SpankWire
 web: "http://www.spankwire.com/"
 uri: qr{spankwire\.com/[^/]+/video\d+}
 slots: max
-status: OK 2009-10-05
+status: OK 2009-12-16
 
 start:
 	GET( $-{_uri} );
@@ -22,11 +22,11 @@ start:
 
 	INFO( name => $-{fname}, quality => "flv" );
 
-	! m{videoPath:"(/Player/VideoXML.*?)"};
+	! m{videoPath:\s*"\.\./(PlaylistXml.*?)"};
 	my $uri = uri_unescape( $1 );
-	GET( $uri );
+	GET( "/Controls/UserControls/Players/v3/" . $uri );
 
-	! m{<url type="string">(.*?)</url>};
+	! m{<url>(.*?)</url>};
 	my $file_uri = de_ml( $1 );
 	DOWNLOAD( $file_uri, fname => $-{fname} );
 
