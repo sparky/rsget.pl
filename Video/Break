@@ -10,10 +10,13 @@ short: V:Break
 web: "http://www.break.com/"
 uri: qr{break\.com}
 slots: max
-status: OK 2009-10-05
+status: OK 2009-12-16
 
 start:
 	GET( $-{_uri} );
+
+	ERROR( "file not found" )
+		if m{404 Page Not Found};
 
 	! m{sGlobalFileName='(.*?)'};
 	my $name = $1;
