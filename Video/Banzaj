@@ -8,12 +8,18 @@
 name: Banzaj
 short: V:Banzaj
 web: "http://www.video.banzaj.pl/"
-uri: qr{video\.banzaj\.pl/film/\d+/}
+uri: qr{video\.banzaj\.pl/film/\d+/\S+/}
 slots: max
-status: OK 2009-10-04
+status: OK 2009-12-16
+
+unify:
+	s/#.*//;
 
 start:
 	GET( $-{_uri} );
+
+	ERROR( "file not found" ) if
+		m{: Nie znaleziono video} or m{^\s*404\s*$}s;
 
 	! m{<title>(.*?)</title>};
 	my $fname = de_ml( $1 );
