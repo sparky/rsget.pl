@@ -9,7 +9,7 @@ name: MediaFire
 short: MF
 web: "http://www.mediafire.com/"
 tos: "http://www.mediafire.com/terms_of_service.php"
-uri: qr{mediafire\.com/file/[a-z0-9]+}
+uri: qr{mediafire\.com/(file/|\?)[a-z0-9]+}
 cookie: mf
 slots: max
 status: OK 2009-12-13
