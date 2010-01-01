@@ -14,6 +14,10 @@ cookie: mf
 slots: max
 status: OK 2009-12-13
 
+unify:
+	return "http://www.mediafire.com/?$1"
+		m{mediafire\.com/(?:file/|\?)([a-z0-9]+)};
+
 start:
 	GET( $-{_uri} );
 
