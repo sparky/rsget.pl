@@ -15,7 +15,7 @@ slots: max
 status: OK 2009-12-13
 
 unify:
-	return "http://www.mediafire.com/?$1"
+	return "http://www.mediafire.com/?$1" if
 		m{mediafire\.com/(?:file/|\?)([a-z0-9]+)};
 
 start:
