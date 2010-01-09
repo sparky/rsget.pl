@@ -9,8 +9,9 @@ name: RapidShark
 short: RK
 web: "http://www.rapidshark.pl/"
 tos: "http://www.rapidshark.pl/tos.html"
-uri: qr{rapidshark\.pl/}
-status: OK 2009-10-22
+uri: qr{rapidshark\.pl/[a-z0-9]{12}/}
+slots: max
+status: OK 2010-12-10
 
 start:
 	GET( $-{_uri} );
@@ -28,7 +29,7 @@ start:
 
 	CLICK( $form->post() );
 
-	if ( /(?:You have to wait|Proszę czekać) (.*) (?:till next download|aby ściągnąć kolejny plik)/ ) {
+	if ( /Muszisz poczekać (.*) aby pobrać następny plik/ ) {
 		$_ = $1;
 		my $wait = 0;
 		$wait += 60 * 60 * $1 if /(\d+) (hour|godzin)/;
@@ -55,14 +56,18 @@ stage_captcha:
 
 	$-{form}->set( code => $_ );
 
-	WAIT( $-{wait}, "starting download" );
+	WAIT( $-{wait}, "waiting for download link" );
 	
-	DOWNLOAD( $-{form}->post() );
+	CLICK( $-{form}->post(), "expecting download link" );
 
 	if ( /{lang_dod_7}/ ) {
 		CAPTCHA_RESULT( "FAIL" );
 		GOTO stage_captcha;
 	}
+
+	! m{<a href="(http://shark\d+\.rapidshark\.pl/cgi-bin/dl\.cgi/.*?/.*?)">};
+
+	CLICK_DOWNLOAD( $1 );
 
 
 perl:
