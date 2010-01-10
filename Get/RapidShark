@@ -58,7 +58,7 @@ stage_captcha:
 
 	WAIT( $-{wait}, "waiting for download link" );
 	
-	CLICK( $-{form}->post(), "expecting download link" );
+	CLICK( $-{form}->post() );
 
 	if ( /{lang_dod_7}/ ) {
 		CAPTCHA_RESULT( "FAIL" );
