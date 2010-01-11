@@ -9,7 +9,6 @@ name: StorageTo
 short: ST
 web: "http://storage.to/"
 uri: qr{storage\.to/get/[a-zA-Z0-9]{8}([\?/].*?)?$}
-slots: max
 status: OK 2009-10-23
 
 start:
