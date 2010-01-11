@@ -1,7 +1,7 @@
 # $Id$
 # Get::RapidShare - File getter plugin for rsget.pl
 #
-# 2009 (c) Przemysław Iskra <sparky@pld-linux.org>
+# 2009-2010 (c) Przemysław Iskra <sparky@pld-linux.org>
 #		This program is free software,
 # you may distribute it under GPL v2 or newer.
 
@@ -9,38 +9,67 @@ name: RapidShare
 short: RS
 web: "http://rapidshare.com/"
 uri: qr{(?:rs\d+\.)?rapidshare\.com/files/\d+/.+}
-status: OK 2009-12-12
+status: OK 2010-01-11
+
+pre:
+	sub match($)
+	{
+		my $re = shift;
+		if ( ref $re ) {
+			die "Incorrect match regexp"
+				unless ref $re eq "Regexp";
+		} else {
+			$re = qr/\Q$re\E/;
+		}
+		if ( /.*>(.*?$re.*?)</s ) {
+			$_ = $1;
+			s/\r//g;
+			s/\n/ /g;
+			return m/$re/s;
+		} else {
+			return undef;
+		}
+	}
+
 
 start:
 	GET( $-{_uri} );
 
-	ERROR( "file not found" )
-		if /The file could not be found\.  Please check the download link/;
-	ERROR( "file removed" ) if /file has been removed from the server|The uploader has removed this file from the server/;
-	ERROR( "file removed" ) if /download of this file is currently not possible|This limit is reached/;
+	ERROR( "file not found: $_" )
+		if match "The file could not be found.  Please check the download link.";
+	ERROR( "file removed: $_" )
+		if match "file has been removed from the server";
+	ERROR( "file removed: $_" )
+		if match "The uploader has removed this file from the server";
+	ERROR( "file removed: $_" )
+		if match "download of this file is currently not possible";
+	ERROR( "file removed: $_" )
+		if match "This limit is reached";
 
-	m#<p class="downloadlink">.*/(.+?) <font style=".*?">\| (\d+ KB)</font></p>#;
+	! m#<p class="downloadlink">.*/(.+?) <font style=".*?">\| (\d+ KB)</font></p>#;
 	INFO( name => $1, asize => $2, kilo => 1000 );
 
-	RESTART( $1 * 60, "servers overloaded" )
-		if /Unfortunately you will have to wait (\d+) minutes,/;
-	
+	RESTART( $1 * 60, "servers overloaded: $_" )
+		if match qr/Unfortunately you will have to wait (\d+) minutes/;
+
 	! my $form = $self->form( id => "ff" );
 	CLICK( $form->post() );
 
-	MULTI() if /Please wait until the download is completed/;
+	MULTI( "multi-download not allowed: $_" )
+		if match "Please wait until the download is completed";
 
 	# TODO: this should decrease file priority to delay its download,
 	# postpone it, download after the next file.
-	return $self->problem( "No slots for free users" )
-		if /There are no more download slots available for free users right now/;
+	RESTART( -2 * 60, "no slots for free users: $_" )
+		if match "There are no more download slots available for free users right now"
+			or match "Unfortunately right now our servers are overloaded";
 
-	RESTART( $1 * 60 + 10, "free limit reached" )
-		if /Instant download access! Or try again in about (\d+) minutes\./;
+	RESTART( $1 * 60 + 10, "free limit reached: $_" )
+		if match qr/Instant download access! Or try again in about (\d+) minutes/;
 
-	RESTART( $1 * 60, "servers overloaded" )
-		if /Unfortunately you will have to wait (\d+) minutes,/
-			or /Please try again in (\d+) minutes/;
+	RESTART( $1 * 60, "servers overloaded: $_" )
+		if match qr/Unfortunately you will have to wait (\d+) minutes,/
+			or match qr/Please try again in (\d+) minutes/;
 
 	! $-{form} = $self->form( name => "dlf" );
 	$-{form}->set( mirror => "on" );
@@ -52,6 +81,7 @@ start:
 
 	CLICK_DOWNLOAD( $-{form}->post() );
 
-	MULTI() if /Please wait until the download is completed/;
+	MULTI( "multi-download not allowed: $_" )
+		if match "Please wait until the download is completed";
 
 # vim: filetype=perl:ts=4:sw=4
