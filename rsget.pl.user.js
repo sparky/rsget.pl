@@ -256,13 +256,20 @@ function send_text( text )
 	ar.setAttribute( 'name', 'links' );
 	ar.value = text;
 	form.appendChild( ar );
+	
+	ar = document.createElement( 'textarea' );
+	ar.setAttribute( 'name', 'comment' );
+	ar.value = "source: " + document.location.href;
+	form.appendChild( ar );
+
 	try {
 		docbody().appendChild( form );
 		window.setTimeout( rm_node, 1000, form );
 		form.submit();
 	} catch (e) {
 		GM_log( "Error: " + e );
-		var get = uri + "?links=" + escape( text );
+		var get = uri + "?links=" + escape( text )
+			+ "&comment=" + escape( "source: " + document.location.href );
 		GM_openInTab( get );
 	}
 }
