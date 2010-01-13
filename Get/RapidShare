@@ -12,6 +12,8 @@ uri: qr{(?:rs\d+\.)?rapidshare\.com/files/\d+/.+}
 status: OK 2010-01-11
 
 pre:
+	my $match;
+
 	sub match($)
 	{
 		my $re = shift;
@@ -22,10 +24,11 @@ pre:
 			$re = qr/\Q$re\E/;
 		}
 		if ( /.*>(.*?$re.*?)</s ) {
+			$match = $2;
 			$_ = $1;
 			s/\r//g;
 			s/\n/ /g;
-			return m/$re/s;
+			return 1;
 		} else {
 			return undef;
 		}
@@ -49,7 +52,7 @@ start:
 	! m#<p class="downloadlink">.*/(.+?) <font style=".*?">\| (\d+ KB)</font></p>#;
 	INFO( name => $1, asize => $2, kilo => 1000 );
 
-	RESTART( $1 * 60, "servers overloaded: $_" )
+	RESTART( $match * 60, "servers overloaded: $_" )
 		if match qr/Unfortunately you will have to wait (\d+) minutes/;
 
 	! my $form = $self->form( id => "ff" );
@@ -64,10 +67,10 @@ start:
 		if match "There are no more download slots available for free users right now"
 			or match "Unfortunately right now our servers are overloaded";
 
-	RESTART( $1 * 60 + 10, "free limit reached: $_" )
+	RESTART( $match * 60 + 10, "free limit reached: $_" )
 		if match qr/Instant download access! Or try again in about (\d+) minutes/;
 
-	RESTART( $1 * 60, "servers overloaded: $_" )
+	RESTART( $match * 60, "servers overloaded: $_" )
 		if match qr/Unfortunately you will have to wait (\d+) minutes,/
 			or match qr/Please try again in (\d+) minutes/;
 
