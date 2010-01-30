@@ -10,12 +10,20 @@ short: V:YouTube
 web: "http://www.youtube.com/"
 uri: qr{youtube\.com/watch\?v=.*}
 slots: max
-status: OK 2009-10-03
+status: OK 2010-01-30
 
 unify:
 	s/#.*//;
 	m{[\?&]v=([-_a-zA-Z0-9]+)(?:&.*?)?$};
 	return "http://www.youtube.com/watch?v=$1" if $1;
+
+pre:
+	my @fmt = (
+		[ 37, "mp4", "1080p" ],
+		[ 22, "mp4", "720p" ],
+		[ 35, "flv", "HQ" ],
+		[ 18, "mp4", "LQ" ],
+	);
 
 start:
 	GET( $-{_uri} );
@@ -30,20 +38,21 @@ start:
 	! /"fmt_map"\s*:\s*"(.*?)"/;
 	my %fmts = map { m{(\d+)/}; $1 => $_ } split ",", uri_unescape( $1 );
 
-	my $fmt = "18";
-	$fmt = "35" if $fmts{35};
-	$fmt = "22" if $fmts{22};
-
-	my $ext = "mp4";
-	$ext = "flv" if $fmt eq "35";
+	my $fmt;
+	foreach my $f ( @fmt ) {
+		if ( exists $fmts{ $f->[0] } ) {
+			$fmt = $f;
+			last;
+		}
+	}
 
 	! /"t"\s*:\s*"(.*?)"/;
 	my $t = $1;
 
-	my $fname = $name . "." . $ext;
-	INFO( name => $fname, quality => "fmt$fmt" );
+	my $fname = $name . "." . $fmt->[1];
+	INFO( name => $fname, fmt => $fmt->[0], quality => $fmt->[2] );
 
-	DOWNLOAD( "http://youtube.com/get_video?video_id=$id&t=$t&fmt=$fmt",
+	DOWNLOAD( "http://youtube.com/get_video?video_id=$id&t=$t&fmt=$fmt->[0]",
 		fname => $fname );
 
 # vim: filetype=perl:ts=4:sw=4
