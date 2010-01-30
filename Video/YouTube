@@ -38,7 +38,7 @@ start:
 	! /"fmt_map"\s*:\s*"(.*?)"/;
 	my %fmts = map { m{(\d+)/}; $1 => $_ } split ",", uri_unescape( $1 );
 
-	my $fmt;
+	my $fmt = $fmt[ $#fmt ];
 	foreach my $f ( @fmt ) {
 		if ( exists $fmts{ $f->[0] } ) {
 			$fmt = $f;
