@@ -10,6 +10,7 @@ short: HF
 web: "http://hotfile.com/"
 tos: "http://hotfile.com/terms-of-service.html"
 uri: qr{hotfile\.com/dl/\d+/[0-9a-f]+/.+}
+uri: qr{pl\.hotfile\.com/dl/\d+/[0-9a-f]+/.+}
 status: OK 2009-12-11
 
 start:
