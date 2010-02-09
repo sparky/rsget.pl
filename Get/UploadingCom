@@ -36,7 +36,8 @@ start:
 	INFO( name => $name, asize => $size );
 
 	my $form = $self->form( id => "downloadform" );
-	$-{file_id} = $form->get( "file_id" );
+	! $-{file_id} = $form->get( "file_id" );
+	! $-{file_code} = $form->get( "code" );
 
 	CLICK( $form->post() );
 
@@ -51,7 +52,7 @@ start:
 	WAIT( -$1, "expecting download link" );
 
 	GET( $-{host} . "files/get/?JsHttpRequest=" . jstime() . "-xml",
-		post => "file_id=$-{file_id}&action=get_link&pass=",
+		post => "action=get_link&file_id=$-{file_id}&code=$-{file_code}&pass=",
 		headers => [ "Content-Type: application/octet-stream" ],
 		keep_referer => 1,
 	);
