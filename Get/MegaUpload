@@ -105,6 +105,9 @@ stage_last:
 
 	GOTO stage_init if m{/download\.jpg'.*Filename:}s;
 
+	RESTART( - irand( 60, 300 ), "limit reached" )
+		if /Download limit exceeded/;
+
 perl:
 	
 sub mu_decaptcha
