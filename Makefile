@@ -4,6 +4,11 @@ BINDIR = /usr/bin
 VER =
 PKGDIR = rsget.pl-$(VER)
 
+PERL =
+ifneq ($(PERL),)
+SETINTERPRETER = 1s|^\(..\).*|\1$(PERL)|;
+endif
+
 PLUGIN_DIRS = Get Video Audio Image Link
 DIRS = RSGet,Get,Video,Audio,Image,Link,data
 
@@ -29,7 +34,8 @@ endif
 
 install: clean
 	install -d $(DESTDIR)$(DATADIR)/{$(DIRS)} $(DESTDIR)$(BINDIR)
-	sed 's#\($$install_path\) =.*;#\1 = "$(DATADIR)";#' < rsget.pl > rsget.pl.datadir
+	sed '$(SETINTERPRETER) s#\($$install_path\) =.*;#\1 = "$(DATADIR)";#' \
+		< rsget.pl > rsget.pl.datadir
 	install rsget.pl.datadir $(DESTDIR)$(BINDIR)/rsget.pl
 	cp RSGet/*.pm $(DESTDIR)$(DATADIR)/RSGet
 	cp data/* $(DESTDIR)$(DATADIR)/data
