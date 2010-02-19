@@ -1,0 +1,28 @@
+# $Id$
+# Video::XHamster - Video getter plugin for rsget.pl
+#
+# 2010 (c) Przemysław Iskra <sparky@pld-linux.org>
+#		This program is free software,
+# you may distribute it under GPL v2 or newer.
+
+name: XHamster
+short: V:XHamster
+web: "http://xhamster.com/"
+uri: qr{xhamster\.com/movies/\d+/}
+slots: max
+status: OK 2010-02-19
+
+start:
+	GET( $-{_uri} );
+
+	! m#flashvars.*?'srv': '(.*?)',\s*'file': '(.*?)',#s;
+	my $srv = $1;
+	my $file = $2;
+	( my $fn = $file ) =~ s#.*/##;
+
+	INFO( name => $fn, quality => "flv" );
+
+	my $file_uri = "$srv/flv2/$file";
+	DOWNLOAD( $file_uri );
+
+# vim: filetype=perl:ts=4:sw=4
