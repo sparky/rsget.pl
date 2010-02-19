@@ -17,3 +17,6 @@ while ( <F_IN> ) {
 }
 close F_IN;
 close F_OUT;
+
+system qw(svn add), $fname;
+system qw(svn propset svn:keywords Id), $fname;
