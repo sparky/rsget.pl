@@ -13,6 +13,10 @@ uri: qr{hotfile\.com/dl/\d+/[0-9a-f]+/.+}
 uri: qr{pl\.hotfile\.com/dl/\d+/[0-9a-f]+/.+}
 status: OK 2009-12-11
 
+unify:
+	return "http://hotfile.com/dl/$1"
+		if m{hotfile\.com/dl/(\d+/[0-9a-f]+/.+?)(?:\.html)?$};
+
 start:
 	GET( $-{_uri} );
 
