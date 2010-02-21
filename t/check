@@ -1,0 +1,20 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+my $file = undef;
+while ( <> ) {
+	if ( /^DONE:(?: | .+ )fname=(\S+) / ) {
+		$file = $1;
+	} elsif ( s/^#\s*md5sum:\s*// ) {
+		my $md5 = `md5sum $file`;
+		if ( $md5 ne $_ ) {
+			print "md5 mismatch:\n";
+			print "-$_";
+			print "+$md5\n";
+		} else {
+			print "OK: $file\n";
+		}
+	}
+}

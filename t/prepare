@@ -1,0 +1,13 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+while ( <> ) {
+	if ( /#\s*src:\s*(.+)/ ) {
+		print;
+		print $1 . "\n";
+	} elsif ( /^(#.*|)$/ ) {
+		print;
+	}
+}
