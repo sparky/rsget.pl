@@ -2,11 +2,12 @@
 
 use strict;
 use warnings;
+use URI::Escape;
 
 my $file = undef;
 while ( <> ) {
 	if ( /^DONE:(?: | .+ )fname=(\S+) / ) {
-		$file = $1;
+		$file = uri_unescape( $1 );
 	} elsif ( s/^#\s*md5sum:\s*// ) {
 		my $md5 = `md5sum $file`;
 		if ( $md5 ne $_ ) {
