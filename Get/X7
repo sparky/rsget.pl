@@ -8,6 +8,7 @@
 name: X7
 short: X7
 web: "http://x7.to/"
+tos: "http://x7.to/legal"
 uri: qr{x7\.to/[a-z0-9]{6}}
 status: OK 2010-02-22		
 
@@ -39,7 +40,8 @@ start:
 	! m#{type:'download',wait:(\d+),url:'(.+?)'}#;
 	$-{file_uri} = $2;
 
-	WAIT( $1, "starting download" );
+	# wait a bit longer because server needs some time to prepare the file
+	WAIT( 20 + $1, "starting download" );
 
 	CLICK_DOWNLOAD( $-{file_uri} );
 
