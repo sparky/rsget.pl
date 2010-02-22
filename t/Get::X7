@@ -1,0 +1,9 @@
+# src: http://x7.to/lzlw7c
+DONE: fname=%C4%99%C4%87 fsize=52
++ http://x7.to/lzlw7c asize=52B fname=%C4%99%C4%87 fsize=52 getter=Get%3A%3AX7 name=%C4%99%C4%87
+# md5sum: e124e6cfaf447b6aa9d3a2b0f4b8b57b  ęć
+
+# src: http://www.x7.to/rjogzp/rsget.pl-11111
+DONE: fname=rsget.pl-11111.tar.bz2 fsize=129363
++ http://x7.to/rjogzp asize=126.33KB fname=rsget.pl-11111.tar.bz2 fsize=129363 getter=Get%3A%3AX7 name=rsget.pl-11111.tar.bz2
+# md5sum: 9023f30ac2c713b29f280fdc5d8e0667  rsget.pl-11111.tar.bz2
