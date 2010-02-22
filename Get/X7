@@ -1,0 +1,46 @@
+# $Id$
+# Get::X7 - File getter plugin for rsget.pl
+#
+# 2010 (c) Przemysław Iskra <sparky@pld-linux.org>
+#		This program is free software,
+# you may distribute it under GPL v2 or newer.
+
+name: X7
+short: X7
+web: "http://x7.to/"
+uri: qr{x7\.to/[a-z0-9]{6}}
+status: OK 2010-02-22		
+
+unify:
+	return "http://x7.to/$1"
+		if m#x7\.to/([a-z0-9]{6})#;
+
+start:
+	GET( $-{_uri} );
+
+	ERROR( "file not found" )
+		if /<title>File not found/;
+
+	! m#<b>Download</b>\s+\((\d+(?:,\d+)?\s*[KMG]?B)\)#s;
+	my $asize = $1;
+	$asize =~ tr/,/./;
+	! m#<title>.*? Download: (.*?)</title>#;
+	INFO( name => $1, asize => $asize );
+
+	! m#var dlID = '([a-z0-9]{6})';#;
+	$-{id} = $1;
+
+	CLICK( "/james/ticket/dl/$-{id}" );
+
+	RESTART( - irand( 60, 300 ), "free limit reached" )
+		if /{err:"limit-dl"}/;
+	MULTI() if /{err:"limit-parallel"}/;
+
+	! m#{type:'download',wait:(\d+),url:'(.+?)'}#;
+	$-{file_uri} = $2;
+
+	WAIT( $1, "starting download" );
+
+	CLICK_DOWNLOAD( $-{file_uri} );
+
+# vim: filetype=perl:ts=4:sw=4
