@@ -1,0 +1,31 @@
+# $Id$
+# Link::YouTube - Link decrypter plugin for rsget.pl
+#
+# 2010 (c) Przemysław Iskra <sparky@pld-linux.org>
+#		This program is free software,
+# you may distribute it under GPL v2 or newer.
+
+name: YouTube
+short: L:YouTube
+web: "http://www.youtube.com/"
+uri: qr{youtube\.com/view_play_list\?p=([A-F0-9]{16})}
+slots: max
+status: OK 2010-02-24
+
+unify:
+	return "http://www.youtube.com/view_play_list?p=$1"
+		if m{youtube\.com/view_play_list\?p=([A-F0-9]{16})};
+
+start:
+	GET( $-{_uri} );
+
+stage_morelinks:
+	push @{$-{list}}, $1 while s#<a class="video-thumb-120" href="(/watch\?v=.*?)\&feature=PlayList##;
+
+	if ( m{class="pagerCurrent".*<a href='(.*/view_play_list\?p=.{16}&page=\d+)' class="pagerNotCurrent" >}s ) {
+		GET_NEXT( stage_morelinks, $1 );
+	}
+
+	LINK( map "http://www.youtube.com$_", @{$-{list}} );
+
+# vim: filetype=perl:ts=4:sw=4
