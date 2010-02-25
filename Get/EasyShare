@@ -49,21 +49,21 @@ stage_captcha:
 
 	! $-{capform} = $self->form( match => { class => qr/^captcha1$/ } );
 
-	if ( /<img src/ ) {
-	  ! m#<p class="pb0"><img src="(.*?)" width="220" height="50" alt="" border="1"></p>#;
-	  my $img = $1;
+	GOTO stage_download
+		unless m#<p class="pb0"><img src="(.*?)" width="220" height="50" alt="" border="1"></p>#;
+	my $img = $1;
 
-	  GET( $img, keep_referer => 1 );
+	GET( $img, keep_referer => 1 );
 
-	  CAPTCHA(
+	CAPTCHA(
 	  	qr/[2-9abcdeghkmnpqsuvxyz]{5,6}/,
 	  	process => \&es_decaptcha
-	  );
+	);
 
-	  GOTO stage_cappage unless defined $_;
-	  $-{capform}->set( captcha => $_ );
-    }
+	GOTO stage_cappage unless defined $_;
+	$-{capform}->set( captcha => $_ );
 
+stage_download:
 	DOWNLOAD( $-{capform}->post() );
 
 	if ( /Invalid characters/ ) {
