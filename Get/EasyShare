@@ -33,7 +33,7 @@ start:
 	$-{uri} = $1;
 	my $wait = $2;
 
-	WAIT( $wait, "expecting captcha" );
+	WAIT( $wait, "expecting captcha or download button" );
 stage_cappage:
 
 	GET( $-{uri}, keep_referer => 1 );
