@@ -12,6 +12,8 @@ endif
 PLUGIN_DIRS = Get Video Audio Image Link
 DIRS = RSGet,Get,Video,Audio,Image,Link,data
 
+export LC_ALL=C
+
 all: rsget.pl
 
 ifeq ($(VER),)
