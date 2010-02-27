@@ -9,7 +9,7 @@ while ( <> ) {
 	if ( /^DONE:(?: | .+ )fname=(\S+) / ) {
 		$file = uri_unescape( $1 );
 	} elsif ( s/^#\s*md5sum:\s*// ) {
-		my $md5 = `md5sum $file`;
+		my $md5 = `md5sum "$file"`;
 		if ( $md5 ne $_ ) {
 			print "md5 mismatch:\n";
 			print "-$_";
