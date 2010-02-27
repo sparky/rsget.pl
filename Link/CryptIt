@@ -13,8 +13,6 @@ slots: max
 status: OK 2009-10-24
 
 pre:
-	use MIME::Base64;
-
 	# from jdownloader
 	my $key = pack "C*", (
 		0x73, 0x6f, 0x35, 0x73,  0x78, 0x4e, 0x73, 0x50,
