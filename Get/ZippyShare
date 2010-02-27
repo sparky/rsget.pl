@@ -1,0 +1,42 @@
+# $Id$
+# Get::ZippyShare - File getter plugin for rsget.pl
+#
+# 2009-2010 (c) Paweł Zuzelski <pawelz@pld-linux.org>
+#		This program is free software,
+# you may distribute it under GPL v2 or newer.
+
+name: ZippyShare
+short: ZipS
+web: "http://zippyshare.com/"
+tos: "http://www.zippyshare.com/terms.html"
+uri: qr{www[0-9]*\.zippyshare\.com/v/[0-9]+/file\.htm}
+cookie: zips
+slots: max
+status: OK 2010-02-27
+
+unify:
+    return "http://www.zippyshare.com/$1" if
+        m{www[0-9]*\.zippyshare\.com/(.*)};
+
+start:
+	GET( $-{_uri} );
+
+	ERROR( "file not found" ) if /The requsted file does not exist on this server/;
+
+	m#<strong>Name: </strong>([^<]+)<#s;
+	my $name = $1;
+	m#<strong>Size: </strong>($STDSIZE)<#s;
+	INFO( name => $name, asize => $1 );
+
+	m#var ziptime = ([0-9]+); tuw\(\);#s;
+	my $wait = $1;
+
+	m#var pong = '(.*?)';#;
+	$-{uri} = uri_unescape($1);
+	$-{uri} =~ s/\.[^.]+\./.zippyshare./g;
+
+	WAIT( $wait, "starting download" );
+
+	CLICK_DOWNLOAD( $-{uri} );
+
+# vim: filetype=perl:ts=4:sw=4
