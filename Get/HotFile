@@ -23,7 +23,7 @@ start:
 	ERROR( "file not found" ) unless length $_;
 	ERROR( "file not found" ) if /This file is either removed|File is removed/;
 
-	! m{<table class="downloading"><tr><td>.*?<b>(.*?)</b> <span class="size">\| ($STDSIZE)</span></td></tr></table>};
+	! m{<strong>Downloading:</strong> (.*?) <span>\|</span> <strong>($STDSIZE)</strong>};
 	INFO( name => $1, asize => $2 );
 
 	MULTI() if /You are currently downloading/;
