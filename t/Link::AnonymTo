@@ -1,0 +1,4 @@
+# src: http://anonym.to/http://rsget.pl/
+# invalid uri: http://rsget.pl/ 
+DONE:
++ http://anonym.to/http://rsget.pl/ getter=Link%3A%3AAnonymTo link1=http%3A%2F%2Frsget.pl%2F
