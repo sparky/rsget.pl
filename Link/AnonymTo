@@ -12,6 +12,9 @@ uri: qr{anonym\.to/}
 slots: max
 status: OK 2009-10-24
 
+unify:
+	return $_;
+
 start:
 	GET( $-{_uri} );
 	$_ = $-{_uri};
