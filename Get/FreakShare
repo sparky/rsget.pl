@@ -20,8 +20,8 @@ start:
 	RESTART( - irand( 60, 300 ), "free limit reached" )
 		if /Sorry, your Traffic is used up for today/;
 
-	! m#<h1 class="box_heading" style="text-align:center;">(.*)</h1>#;
-	INFO( name => $1, size => -1 );
+	! m#<h1 class="box_heading" style="text-align:center;">(.*?) - (\d+ MB)yte</h1>#;
+	INFO( name => $1, asize => $2 );
 
 	! $-{form} = $self->form( match => { body => qr/"Free Download"/ } );
 
