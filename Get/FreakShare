@@ -11,7 +11,7 @@ web: "http://freakshare.net/"
 tos: "http://freakshare.net/terms-of-service.html"
 uri: qr{freakshare\.net/files/}
 cookie: fs
-status: BROKEN 2010-02-28
+status: OK 2010-03-01
 
 start:
 	GET( $-{_uri} );
@@ -26,17 +26,36 @@ start:
 	! $-{form} = $self->form( match => { body => qr/"Free Download"/ } );
 
 	! m#var time = (\d+)(?:\.\d+);\s*var intervall;#;
-	WAIT( -$1, "starting" );
+	WAIT( -$1, "expecting recaptcha" );
 
+stage_getcaptcha:
 	CLICK( $-{form}->post() );
-	
-	! $-{dlform} = $self->form( match => { onsubmit => qr/^disableButton/ } );
 
-	! m#var time = (\d+)(?:\.\d+);\s*var intervall;#;
-	WAIT( $1, "starting download" );
+stage_solvecaptcha:
+	! $-{capform} = $self->form( match => { body => qr/recaptcha\.net/ } );
 
-	CLICK_DOWNLOAD( $-{dlform}->post() );
+	! m{ src="(http://api\.recaptcha\.net/challenge.*)"};
 
-	MULTI() if /Sorry, you cant  download more then 1 at time/;
+	GET( $1, keep_referer => 1 );
+
+	! m{challenge : '(\S+)',};
+	$-{capform}->set( recaptcha_challenge_field => $1 );
+
+	GET( "http://api.recaptcha.net/image?c=" . $1, keep_referer => 1 );
+
+	CAPTCHA(
+		qr/\S+ \S+/
+	);
+
+	GOTO stage_getcaptcha unless defined $_;
+	$-{capform}->set( recaptcha_response_field => $_ );
+
+	CLICK_DOWNLOAD( $-{capform}->post() );
+stage_download:
+
+	if ( m#recaptcha# ) {
+		CAPTCHA_RESULT( "FAIL" );
+		GOTO stage_solvecaptcha;
+	}
 
 # vim: filetype=perl:ts=4:sw=4
