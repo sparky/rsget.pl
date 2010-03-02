@@ -14,7 +14,7 @@ TODO:
 - Backoff if captcha fails too many times; lower uri prio.
 - If multi-download problem appears while checking files force check on
   another interface/ip.
-- Posibility to mark uri as "cannot continue".
+- Possibility to mark uri as "cannot continue".
 
 Planned features:
 - Multiuser support (may require major changes in the code).
