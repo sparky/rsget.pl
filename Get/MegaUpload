@@ -47,6 +47,8 @@ stage_init:
 	RESTART( 10 * 60, "temporarily blocked" )
 		if m{document\.location='http://www\.megaupload\.com/\?c=msg'};
 
+	# TODO: if file is unavailable temporarily try to download it
+	# later (lower uri priority)
 	ERROR( "file not found" ) if
 		/The file you are trying to access is temporarily unavailable/
 			or /Unfortunately, the link you have clicked is not available/
