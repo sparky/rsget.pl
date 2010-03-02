@@ -32,7 +32,10 @@ stage_getcaptcha:
 	CLICK( $-{form}->post() );
 
 stage_solvecaptcha:
-	! $-{capform} = $self->form( match => { body => qr/recaptcha\.net/ } );
+	unless ( $-{capform} = $self->form( match => { body => qr/recaptcha\.net/ } ) ) {
+		! $-{capform} = $self->form( match => { onsubmit => qr/^disableButton/ } );
+		GOTO stage_download;
+	}
 
 	! m{ src="(http://api\.recaptcha\.net/challenge.*)"};
 
@@ -50,12 +53,14 @@ stage_solvecaptcha:
 	GOTO stage_getcaptcha unless defined $_;
 	$-{capform}->set( recaptcha_response_field => $_ );
 
-	CLICK_DOWNLOAD( $-{capform}->post() );
 stage_download:
+	CLICK_DOWNLOAD( $-{capform}->post() );
 
-	if ( m#recaptcha# ) {
+	if ( m/recaptcha/ or /^bad try$/ ) {
 		CAPTCHA_RESULT( "FAIL" );
 		GOTO stage_solvecaptcha;
 	}
+
+	MULTI() if /Sorry, you cant download more then 1 files at time/;
 
 # vim: filetype=perl:ts=4:sw=4
