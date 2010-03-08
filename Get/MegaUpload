@@ -70,7 +70,7 @@ stage_init:
 	! $-{form} = $self->form( id => "captchaform" );
 
 stage_captcha:
-	! m{<img src="(http://.*?megaupload\.com/gencap\.php\?[0-9a-f]+\.gif)"};
+	! m{<img src="(http://.*?mega.*?\.com/gencap\.php\?[0-9a-f]+\.gif)"};
 
 	GET( $1, keep_referer => 1 );
 
