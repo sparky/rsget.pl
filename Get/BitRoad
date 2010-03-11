@@ -10,7 +10,7 @@ short: BR
 web: "http://bitroad.net/"
 tos: "http://bitroad.net/page/terms.php"
 uri: qr{bitroad\.net/}
-status: OK 2009-10-22
+status: OK 2010-03-11
 
 start:
 	GET( $-{_uri} );
@@ -18,7 +18,7 @@ start:
 	ERROR( "file not found" )
 		if /The requested file is not found/;
 
-	m#<div class="content_text"><h1>(.*?)\s*\[ ($STDSIZE) \]</h1>#;
+	m#<div class="content_text">\s*<h1>(.*?)\s*\[ ($STDSIZE) \]</h1>#;
 	INFO( name => $1, asize => $2 );
 
 	RESTART( - irand( 60, 300 ), "free limit reached" )
