@@ -10,7 +10,7 @@ short: V:XHamster
 web: "http://xhamster.com/"
 uri: qr{xhamster\.com/movies/\d+/}
 slots: max
-status: OK 2010-02-19
+status: OK 2010-03-11
 
 start:
 	GET( $-{_uri} );
