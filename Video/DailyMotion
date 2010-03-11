@@ -15,8 +15,7 @@ status: OK 2009-10-04
 start:
 	GET( $-{_uri} );
 
-	! m{<title>(.*?)</title>};
-	! m{<h1 class="dmco_title">(.*?)</h1>};
+	! m{<h1 class="dmco_title"><span class="title" title="(.*?)"};
 	my $name = de_ml( $1 );
 	$name =~ s{/}{_}g;
 
