@@ -8,8 +8,13 @@
 name: RapidShare
 short: RS
 web: "http://rapidshare.com/"
-uri: qr{(?:rs\d+\.)?rapidshare\.com/files/\d+/.+}
+uri: qr{(?:rs[a-z0-9]+\.)?rapidshare\.com/files/\d+/.+}
 status: OK 2010-01-11
+
+unify:
+	s/#.*//;
+	return "http://rapidshare.com/files/$1"
+		if m{rapidshare\.com/files/(\d+/.+)};
 
 pre:
 	my $match;
