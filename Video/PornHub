@@ -26,7 +26,7 @@ pre:
 start:
 	GET( $-{_uri} );
 
-	! m{<h1>\s*(.*?)\s*</h1>}s;
+	! m{<div class="video-title-nf".*><h1>\s*(.*?)\s*</h1></div>}s;
 	$-{fname} = de_ml( $1 );
 	$-{fname} =~ s{/}{_}g;
 	$-{fname} .= ".flv";
