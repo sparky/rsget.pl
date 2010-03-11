@@ -10,7 +10,7 @@ short: V:MySpace
 web: "http://vids.myspace.com/"
 uri: qr{vids\.myspace\.com/index\.cfm\?fuseaction=vids\.individual&VideoID=\d+(?:#.*)?}i;
 slots: max
-status: OK 2009-10-09
+status: BROKEN 2010-03-11
 
 unify:
 	return "http://vids.myspace.com/index.cfm?fuseaction=vids.individual&videoid=$1"
