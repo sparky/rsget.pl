@@ -8,7 +8,7 @@
 name: Delfi
 short: V:Delfi
 web: "http://tv.delfi.ee/"
-uri: qr{tv\.delfi\.ee/video/.*/}
+uri: qr{tv\.delfi\.ee/video/[a-zA-Z0-9]+}
 slots: max
 status: OK 2009-10-04
 
