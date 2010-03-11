@@ -19,11 +19,10 @@ unify:
 start:
 	GET( $-{_uri} );
 
-	! m{<param name="FlashVars" value="file=([0-9a-f]+)" />};
+	! m{<object.*?><embed src=".*?swf\?file=([0-9a-f]+)"};
 	my $id = $1;
-	my $first = substr $id, 0, 1;
 
-	GET( "/files/xmlfiles/$first/secm$id.xml" );
+	GET( "/localtrackhost.php?f=$id" );
 
 	! m{<song path="(.*?)" bild=".*?" artist="(.*?)" title="(.*?)"/>};
 	my ( $file_uri, $artist, $title ) = ( $1, $2, $3 );
