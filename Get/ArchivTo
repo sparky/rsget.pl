@@ -9,20 +9,20 @@ name: ArchivTo
 short: AT
 web: "http://archiv.to/"
 tos: "http://archiv.to/?Module=Policy"
-uri: qr{archiv\.to/}
+uri: qr{archiv\.to/\?.*?HashID=FILE[0-9A-F]+}
 slots: max
-status: OK 2009-10-21
+status: OK 2010-03-11
 
 start:
 	GET( $-{_uri} );
 
 	ERROR( "file not found" )
-		if /Datei wurde entfernt/;
+		if /The desired file could not be found/;
 
-	! m#<td width="23%">Originaldatei</td>\s*<td width="77%">: <a href="(.*?)" .*?>(.*?)</a></td></tr>#s;
+	! m#>Originaldatei</td>\s*<td class="V">: <a href="(.*?)">(.*?)</a></td>#s;
 	my ( $file_uri, $name ) = ( $1, $2 );
 
-	m#<td width="23%">Dateigröße</td>\s*<td width="77%">: (\d+) Bytes#s;
+	! m#>Dateigröße</td>\s*<td class="V">: (\d+) Bytes #s;
 	my $size = $1;
 
 	INFO( name => $name, size => $size );
