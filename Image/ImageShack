@@ -21,7 +21,7 @@ unify:
 start:
 	GET( $-{_uri} );
 
-	! m{<a href="(.*?)" target="_blank" class="last">Full Size</a>};
+	! m{<a href="(.*?)" target="_blank".*class="last">\s*<img title="Zoom"};
 	my $file_uri = de_ml( $1 );
 	( my $fname = $file_uri ) =~ s{.*/}{};
 
