@@ -11,7 +11,7 @@ web: "http://www.4shared.com/"
 tos: "http://www.4shared.com/terms.jsp"
 uri: qr{4shared\.com/(account/)?file/}
 slots: max
-status: OK 2009-10-21
+status: OK 2010-03-11
 
 unify:
 	return "http://www.4shared.com/file/$1/$2"
