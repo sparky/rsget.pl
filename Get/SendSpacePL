@@ -11,7 +11,7 @@ web: "http://www.sendspace.pl/"
 tos: "http://www.sendspace.pl/informacje/regulamin"
 uri: qr{sendspace\.pl/file/[a-zA-Z0-9]{8}}
 cookie: ss.pl
-status: OK 2009-10-23
+status: OK 2010-03-12
 
 start:
 	GET( $-{_uri} );
