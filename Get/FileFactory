@@ -9,8 +9,8 @@ name: FileFactory
 short: FF
 web: "http://filefactory.com/"
 tos: "http://filefactory.com/legal/terms.php"
-uri: qr{filefactory\.com/}
-status: BROKEN 2010-03-11
+uri: qr{filefactory\.com/file/[0-9a-f]{6}}
+status: OK 2010-03-12
 
 start:
 	GET( $-{_uri} );
@@ -33,7 +33,7 @@ start:
 	! m#<a href="(http.*?)"><strong>Download with FileFactory Basic</strong></a>#;
 	$-{file_uri} = $1;
 
-	! m#<span id="countdown".*?>(\d+)</span>#;
+	! m#<span class="countdown".*?>(\d+)</span>#;
 	my $wait = $1;
 	RESTART( $wait, "free limit reached" ) if $wait > 30;
 
