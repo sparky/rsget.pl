@@ -9,11 +9,15 @@ name: TurboBit
 short: TB
 web: "http://turbobit.net/"
 tos: "http://turbobit.net/rules"
-uri: qr{turbobit\.net/}
-uri: qr{turbobit\.ru/}
+uri: qr{turbobit\.net/[a-z0-9]+\.html}
+uri: qr{turbobit\.ru/[a-z0-9]+\.html}
 cookie: tb
 slots: max
-status: OK 2009-10-24
+status: BROKEN 2010-03-12
+
+unify:
+	return "http://turbobit.net/$1"
+		if m{turbobit\.[a-z]{2,3}/([a-z0-9]+\.html)};
 
 start:
 	GET( $-{_uri} );

@@ -10,7 +10,8 @@ short: TU
 web: "http://www.turboupload.com/"
 tos: "http://www.turboupload.com/tos.html"
 uri: qr{turboupload\.com/(../)?files/get/.+?/.+}
-status: OK 2009-10-23
+#uri: qr{turboupload\.com/[a-z0-9]{12}/.+?\.html}
+status: BROKEN 2010-03-12
 
 start:
 	GET( $-{_uri} );

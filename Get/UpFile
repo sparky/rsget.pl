@@ -11,7 +11,7 @@ web: "http://up-file.com/"
 tos: "http://up-file.com/page/terms.php"
 uri: qr{up-file\.com/download/}
 cookie: uf
-status: OK 2009-10-22
+status: BROKEN 2010-03-12
 
 start:
 	GET( $-{_uri} );
