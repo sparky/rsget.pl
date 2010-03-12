@@ -11,8 +11,8 @@ web: "http://uploading.com/"
 tos: "http://uploading.com/terms/"
 uri: qr{uploading\.com/(../)?files/(get/)?[A-Za-z0-9]{8}}
 cookie: !uc
-slots: !1
-status: OK 2009-12-11
+slots: 1
+status: OK 2010-03-12
 
 unify:
 	return "http://uploading.com/files/$1/"
@@ -23,6 +23,8 @@ start:
 
 	GET( $-{_uri} );
 
+	RESTART( -irand( 60, 300 ), "free limit reached: $1" )
+		if /(Sorry, you can download only one file per \d+ minutes)/;
 	RESTART( -irand( 60, 300 ), "temporarily unavailable" )
 		if m{<h1>Service Not Available</h1>};
 	ERROR( "file not found" ) if /Requested file not found/;
