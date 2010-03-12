@@ -11,7 +11,7 @@ web: "http://www.rapidshark.pl/"
 tos: "http://www.rapidshark.pl/tos.html"
 uri: qr{rapidshark\.pl/[a-z0-9]{12}/}
 slots: max
-status: OK 2010-12-10
+status: BROKEN 2010-03-12
 
 start:
 	GET( $-{_uri} );
