@@ -11,7 +11,7 @@ web: "http://netload.in/"
 tos: "http://netload.in/index.php?id=13"
 uri: qr{netload\.in/datei}
 cookie: nl
-status: OK 2009-10-22
+status: OK 2010-03-12
 
 start:
 	GET( $-{_uri} );
