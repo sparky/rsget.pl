@@ -20,7 +20,7 @@ unify:
 start:
 	GET( $-{_uri} );
 
-	ERROR( "file not found" ) if /File does not exist on this server/;
+	ERROR( "file not found" ) if m{<title>.*?- File does not exist</title>};
 
 	! m#<strong>Name: </strong>(.+?)<#;
 	my $name = $1;
