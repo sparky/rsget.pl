@@ -7,14 +7,15 @@
 
 name: SharePlace
 short: SP
-web: "http://www.sharespace.com/"
-tos: "http://www.sharespace.com/legal.php"
+web: "http://shareplace.com/"
+tos: "http://shareplace.com/rules.php"
 uri: qr{shareplace\.com/\?[0-9A-F]+(/.*)?}
+uri: qr{shareplace\.org/\?[0-9A-F]+(/.*)?}
 slots: max
-status: OK 2009-10-23
+status: BROKEN 2010-03-12
 
 unify:
-	return "http://shareplace.com/?$1"
+	return "http://shareplace.org/?$1"
 		if m{shareplace\.com/\?([0-9A-F]+)(/.*)?};
 
 start:
@@ -23,7 +24,7 @@ start:
 	ERROR( "file not found" )
 		if /Your requested file is not found/;
 
-	! m#<b>Filename: </b>(.*)<b><br>\s*File size: </b>($STDSIZE)<b><br>#s;
+	! m#Filename:</font></b>\s*(.*?)<b><br>\s*Filesize:</font></b>\s*($STDSIZE)<b>#s;
 	INFO( name => $1, asize => $2 );
 
 	RESTART( - irand( 60, 300 ), "limit reached" )
