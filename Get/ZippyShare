@@ -12,7 +12,7 @@ tos: "http://www.zippyshare.com/terms.html"
 uri: qr{www\d*\.zippyshare\.com/v/\d+/file\.}
 cookie: zips
 slots: max
-status: OK 2010-02-27
+status: OK 2010-03-12
 
 unify:
 	return "$1/file.html" if m{^(.*?)/file};
@@ -20,7 +20,7 @@ unify:
 start:
 	GET( $-{_uri} );
 
-	ERROR( "file not found" ) if /The requsted file does not exist on this server/;
+	ERROR( "file not found" ) if /File does not exist on this server/;
 
 	! m#<strong>Name: </strong>(.+?)<#;
 	my $name = $1;
