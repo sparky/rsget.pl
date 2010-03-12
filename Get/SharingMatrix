@@ -9,9 +9,13 @@ name: SharingMatrix
 short: SM
 web: "http://sharingmatrix.com/"
 tos: "http://sharingmatrix.com/user_agreement"
-uri: qr{sharingmatrix\.com/}
+uri: qr{(?:www\d+\.)?sharingmatrix\.com/file/\d+}
 cookie: sm
-status: OK 2009-12-13
+status: OK 2010-03-12
+
+unify:
+	return "http://sharingmatrix.com/file/$1"
+		if m{/file/(\d+)};
 
 start:
 	GET( $-{_uri} );
