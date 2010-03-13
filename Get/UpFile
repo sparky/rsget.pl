@@ -9,7 +9,7 @@ name: UpFile
 short: UF
 web: "http://up-file.com/"
 tos: "http://up-file.com/page/terms.php"
-uri: qr{up-file\.com/download/}
+uri: qr{up-file\.com/download/\d{4}\.[0-9a-f]+}
 cookie: uf
 status: BROKEN 2010-03-12
 
