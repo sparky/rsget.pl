@@ -13,7 +13,7 @@ uri: qr{turbobit\.net/[a-z0-9]+\.html}
 uri: qr{turbobit\.ru/[a-z0-9]+\.html}
 cookie: tb
 slots: max
-status: BROKEN 2010-03-12
+status: OK 2010-03-13
 
 unify:
 	return "http://turbobit.net/$1"
@@ -25,11 +25,10 @@ start:
 	ERROR( "file not found" ) if m#<div class="code-404">404</div>#;
 	ERROR( "file not found" ) if m#Файл не найден. Возможно он был удален|File was not found. It could possibly be deleted#;
 
-	! m#<h1 class="download-file">.*?<span.*?>&nbsp;</span><b>(.*?)</b></h1>#;
+	! m#<h1 class="download-file">.*?<span.*?>&nbsp;(.*?)</b></h1>#;
 	my $name = $1;
-	! m#<div class="download-file">\s*<div><b>.*?</b> ([\d,\.]+ .)#;
-	my $size = $1. "B";
-	$size =~ tr/Мк,/Mk./;
+	! m#<br><b>File size:</b> ([\d,\.]+ .b)</div>#;
+	( my $size = $1 ) =~ tr/,/./;
 	INFO( name => $name, asize => $size );
 
 	! m#<td><a class="free" href="(.*?)" onclick#;
@@ -49,7 +48,6 @@ stage_getimg:
 
 	CAPTCHA(
 		qr/[A-Z0-9]{4}/i,
-		process => \&tb_decaptcha,
 	);
 
 	GOTO stage_getimg unless defined $_;
@@ -75,23 +73,5 @@ stage_getimg:
 	! m#<a href='(.*?)'>#;
 
 	CLICK_DOWNLOAD( $1 );
-
-perl:
-
-sub tb_color_select
-{
-	my @s = sort { $a <=> $b } @_;
-	return $s[2];
-}
-
-sub tb_decaptcha
-{
-	my $img = shift;
-	$img->color_filter( \&tb_color_select );
-	$img->luma_emphasize( 200, 160 );
-	local $_ = $img->ocr();
-	s/\s+//g;
-	return $_;
-}
 
 # vim: filetype=perl:ts=4:sw=4
