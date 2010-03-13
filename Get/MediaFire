@@ -12,10 +12,7 @@ tos: "http://www.mediafire.com/terms_of_service.php"
 uri: qr{mediafire\.com/(file/|\?)[a-z0-9]+}
 cookie: mf
 slots: max
-status: BROKEN 2010-03-11
-
-# BROKEN Note: A lot of work must be done to retrieve download link.
-# I hope using SpiderMonkey or other JS engine won't be necessary.
+status: OK 2010-03-13
 
 unify:
 	return "http://www.mediafire.com/?$1" if
@@ -26,27 +23,63 @@ start:
 
 stage_init:
 	if ( $-{_referer} =~ /error\.php/ ) {
-		ERROR( "file not found" ) if /Invalid File/;
+		ERROR( "file not found" ) if /Invalid or Deleted File/;
 		ERROR( "some error" );
 	}
 
 	! m{<div class="download_file_title".*> (.+?) <div.*>\(($STDSIZE)\)</div> </div>}o;
 	INFO( name => $1, asize => $2 );
 
-	! /cu\('(.*?)','(.*?)','(.*?)'\);/;
-	GET( "/dynamic/download.php?qk=$1&pk=$2&r=$3", keep_referer => 1 );
+	my %func = m/function (\S+)\(qk,pk,r\)\{.*?io=document\.getElementById\('([0-9a-f]+)'\)/g;
+
+	! m/(\S+=unescape.*?eval|eval\(".*?"\))/;
+	! $_ = jseval( $1 );
+
+	! /^(\S+)\('(.*?)','(.*?)','(.*?)'\)$/;
+	$-{func_id} = $func{ $1 };
+
+	GET( "/dynamic/download.php?qk=$2&pk=$3&r=$4", keep_referer => 1 );
 
 	! /^\s*(var.*var.*var.*)\s*function/m;
 	my $vars = $1;
 	my %vars = map { /var (.*?)='(.*?)'/ } split /;/, $vars;
 
-	! m{href=\\"http://"\s*\+\s*(.*?)\s*\+'"};
-	my $order = $1;
+	my @esc = m/(\S+=unescape.*?eval|eval\(".*?"\))/g;
+	! scalar @esc;
+	foreach my $e ( @esc ) {
+		$_ = jseval( $e );
+		if ( /getElementById\('([0-9a-f]+)'\)/ ) {
+			last if $-{func_id} eq $1;
+		}
+	}
+
+	! m{href=\\"http://"\s*\+\s*(.*?)\s*\+'(.*?)">};
+	my $order = $1; my $name = $2;
 	my $code = join "", map { /'(.*)'/ ? $1 : $vars{ $_ } } split /\s*\+\s*/, $order;
-	my $uri = "http://" . $code;
+	my $uri = "http://" . $code . $name;
 
 	DOWNLOAD( $uri );
 
 	GOTO stage_init;
+
+perl:
+
+sub jseval
+{
+	local $_ = shift;
+	while ( /eval/ ) {
+		if ( m/=unescape\('(.*?)'\);.*?fromCharCode\(\S+?\.charCodeAt\(\S+?\)\^([0-9\^]+)\)\);eval/ ) {
+			my $c = chr eval $2;
+			my $u = uri_unescape( $1 );
+			$_ = $u ^ ($c x length $u);
+		} elsif ( m/eval\("(.*?)"\)/ ) {
+			$_ = $1;
+			$_ =~ s/\\'/'/g;
+		} else {
+			last;
+		}
+	}
+	return $_;
+}
 
 # vim: filetype=perl:ts=4:sw=4
