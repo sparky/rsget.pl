@@ -12,7 +12,7 @@ tos: "http://shareplace.com/rules.php"
 uri: qr{shareplace\.com/\?[0-9A-F]+(/.*)?}
 uri: qr{shareplace\.org/\?[0-9A-F]+(/.*)?}
 slots: max
-status: BROKEN 2010-03-12
+status: OK 2010-03-13
 
 unify:
 	return "http://shareplace.org/?$1"
@@ -30,14 +30,16 @@ start:
 	RESTART( - irand( 60, 300 ), "limit reached" )
 		if /You have got max allowed download sessions from the same IP/;
 
-	! m#var cgcsccccsccrctcc = unescape\(\s*([a-zA-Z0-9_]+?)\s*\);#;
-	my $varname = $1;
+	! m#var beer = '(.*?)';#;
+	my $beer = $1;
+	$beer =~ s/vvvvvvvvv//;
+	$beer =~ s/lllllllll//;
+	my $sinep = uri_unescape( $beer );
+	$sinep =~ s/teletubbies//;
 
-	! m#var $varname = '(.+?)';#;
-	$-{file_uri} = uri_unescape( $1 );
-	$-{file_uri} =~ s/^.{3}//;
+	$-{file_uri} = substr uri_unescape( $sinep ), 13;
 
-	! m#var zziptimme = (\d+);#;
+	! m#var zzipitime = (\d+);#;
 	WAIT( $1, "starting download" );
 
 	CLICK_DOWNLOAD( $-{file_uri} );
