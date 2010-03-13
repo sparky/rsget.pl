@@ -246,7 +246,7 @@ var finder = { /* {{{ */
 		ev.preventDefault();
 
 		var get = server + "add?links=" + escape( this.getAttribute( 'href' ) )
-			+ "&comment=" + escape( "source: " + document.location.href );
+			+ ";comment=" + escape( "source: " + document.location.href );
 		try {
 			GM_openInTab( get );
 		} catch ( e ) {

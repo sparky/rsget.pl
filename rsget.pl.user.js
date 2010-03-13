@@ -269,7 +269,7 @@ function send_text( text )
 	} catch (e) {
 		GM_log( "Error: " + e );
 		var get = uri + "?links=" + escape( text )
-			+ "&comment=" + escape( "source: " + document.location.href );
+			+ ";comment=" + escape( "source: " + document.location.href );
 		GM_openInTab( get );
 	}
 }
