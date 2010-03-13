@@ -13,6 +13,9 @@ uri: qr{turboupload\.com/(../)?files/get/.+?/.+}
 #uri: qr{turboupload\.com/[a-z0-9]{12}/.+?\.html}
 status: BROKEN 2010-03-12
 
+# BROKEN Note: Page requires to do some stupid thing to download a file.
+# In Spain it asks you to enter a web page which asks for cell phone number.
+
 start:
 	GET( $-{_uri} );
 

@@ -14,6 +14,9 @@ cookie: mf
 slots: max
 status: BROKEN 2010-03-11
 
+# BROKEN Note: A lot of work must be done to retrieve download link.
+# I hope using SpiderMonkey or other JS engine won't be necessary.
+
 unify:
 	return "http://www.mediafire.com/?$1" if
 		m{mediafire\.com/(?:file/|\?)([a-z0-9]+)};

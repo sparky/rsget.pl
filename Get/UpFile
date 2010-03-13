@@ -13,6 +13,9 @@ uri: qr{up-file\.com/download/\d{4}\.[0-9a-f]+}
 cookie: uf
 status: BROKEN 2010-03-12
 
+# BROKEN Note: Page is blocked ? Download button is disabled in the "free"
+# form.
+
 start:
 	GET( $-{_uri} );
 
