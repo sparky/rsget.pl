@@ -7,9 +7,9 @@
 
 name: ZippyShare
 short: ZipS
-web: "http://zippyshare.com/"
+web: "http://www.zippyshare.com/"
 tos: "http://www.zippyshare.com/terms.html"
-uri: qr{www\d*\.zippyshare\.com/v/\d+/file\.}
+uri: qr{(?:www\d*\.)?zippyshare\.com/v/\d+/file\.}
 cookie: zips
 slots: max
 status: OK 2010-03-12
