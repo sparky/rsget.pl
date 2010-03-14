@@ -10,6 +10,12 @@
 var server = 'http://localhost:5666/';
 
 /* supported links {{{ */
+/* update supported lists:
+awk '/}/ { p = 0 } { if ( p ) { sub(/\t"/, ""); sub( /".+/, "" ); print } } /supported[23] =/ { p = 1 }' < rsget_pl.user.js > l.old
+grep uri: {Audio,Get,Image,Link,Video}/* | sed 's/.*qr{//; s#/.*##; s/\\\././g; s/(?.\+)?\?//; /\..*\./d' | sort -u > l.new
+grep uri: {Audio,Get,Image,Link,Video}/* | sed 's/.*qr{//; s#/.*##; s/\\\././g; s/(?.\+)?\?//; /\..*\./!d' | sort -u >> l.new
+diff -u l.old l.new
+ */
 var supported2 = {
 	"4gk.com":	1,
 	"4shared.com":	1,
