@@ -7,7 +7,7 @@
 // @include		file://*
 // ==/UserScript==
 
-var server = 'http://localhost:5666/';
+var server = 'http://localhost:7666/';
 
 /* supported links {{{ */
 /* update supported lists:

@@ -278,7 +278,7 @@ function send_text( text )
  {
 	server = GM_getValue( "server" );
 	if ( server == null ) {
-		server = prompt( get_text( "specify_location" ), "http://localhost:5666/" );
+		server = prompt( get_text( "specify_location" ), "http://localhost:7666/" );
 		GM_setValue( "server", server );
 	}
 
