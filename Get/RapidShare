@@ -53,6 +53,8 @@ start:
 		if match "download of this file is currently not possible";
 	ERROR( "file removed: $_" )
 		if match "This limit is reached";
+	ERROR( "not allowed: $_" )
+		if m#<h1>Error</h1># and match qr/This file is larger than /;
 
 	! m#<p class="downloadlink">.*/(.+?) <font style=".*?">\| (\d+ KB)</font></p>#;
 	INFO( name => $1, asize => $2, kilo => 1000 );
