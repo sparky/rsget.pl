@@ -35,7 +35,7 @@ start:
 	my $name = de_ml( de_ml( $1 ) );
 	$name =~ s{/}{_}g;
 
-	! /"fmt_map"\s*:\s*"(.*?)"/ or m{&fmt_map=\S+?&};
+	! /"fmt_map"\s*:\s*"(.*?)"/ or m{&fmt_map=(\S+?)&};
 	my %fmts = map { m{(\d+)/}; $1 => $_ } split ",", uri_unescape( $1 );
 
 	my $fmt = $fmt[ $#fmt ];
