@@ -28,14 +28,14 @@ pre:
 start:
 	GET( $-{_uri} );
 
-	! m{"video_id": "(.*?)"};
+	! m{"video_id": "(.*?)"} or m{'VIDEO_ID': '(.*?)'};
 	my $id = $1;
 
 	! m{<meta name="title" content="(.*?)">};
 	my $name = de_ml( de_ml( $1 ) );
 	$name =~ s{/}{_}g;
 
-	! /"fmt_map"\s*:\s*"(.*?)"/;
+	! /"fmt_map"\s*:\s*"(.*?)"/ or m{&fmt_map=\S+?&};
 	my %fmts = map { m{(\d+)/}; $1 => $_ } split ",", uri_unescape( $1 );
 
 	my $fmt = $fmt[ $#fmt ];
@@ -46,7 +46,7 @@ start:
 		}
 	}
 
-	! /"t"\s*:\s*"(.*?)"/;
+	! /"t"\s*:\s*"(.*?)"/ or m{&t=(\S+?)&};
 	my $t = $1;
 
 	my $fname = $name . "." . $fmt->[1];
