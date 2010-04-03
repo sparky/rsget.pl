@@ -1,6 +1,0 @@
-# src: http://crypt-it.com/c/ZKB9MC
-# invalid uri: http://rsget.pl/ 
-# invalid uri: http://rsget.pl/about/ 
-# invalid uri: http://www.pld-linux.org/ 
-DONE:
-+ http://crypt-it.com/c/ZKB9MC getter=Link%3A%3ACryptIt link1=http%3A%2F%2Frsget.pl%2F link2=http%3A%2F%2Frsget.pl%2Fabout%2F link3=http%3A%2F%2Fwww.pld-linux.org%2F
