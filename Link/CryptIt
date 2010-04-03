@@ -10,7 +10,7 @@ short: L:CryptIt
 web: "http://crypt-it.com/"
 uri: qr{crypt-it\.com/}
 slots: max
-status: OK 2009-10-24
+status: OK 2010-04-03
 
 pre:
 	# from jdownloader

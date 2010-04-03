@@ -9,7 +9,7 @@ name: RapidShare
 short: RS
 web: "http://rapidshare.com/"
 uri: qr{(?:rs[a-z0-9]+\.)?rapidshare\.com/files/\d+/.+}
-status: OK 2010-03-12
+status: OK 2010-04-03
 
 unify:
 	s/#.*//;
