@@ -1,24 +1,8 @@
+  rsget.pl is a powerful perl application designed to retrieve files from
+download services (like RapidShare, MegaUpload and many more).
+It has a long list of features implemented already and even longer TODO list.
 
-TODO:
-- Write more documentation
-- When continuing partially downloaded data start few kb before the end and
-  compare old with new.
-- Add commands: pause downloads, allow/don't allow captcha, clean done
-  downloads, and more
-- File group support (first step for multiuser support)
-- File priorities and group priorities.
-- Selectable temporary directory.
-- Fix freezing http server - move to separate thread/process ?
-- Fix bugs in http server, and speed it up.
-- Better file writing methods, to allow downloading from multiple sources.
-- Backoff if captcha fails too many times; lower uri prio.
-- If multi-download problem appears while checking files force check on
-  another interface/ip.
-- Possibility to mark uri as "cannot continue".
-
-Planned features:
-- Multiuser support (may require major changes in the code).
-- XML-RPC (or similar) to allow writing GUIs.
+You can find more details on http://rsget.pl/ web page.
 
 Features:
 - Perfect for screen session
@@ -29,6 +13,25 @@ Features:
 - Incorporates small HTTP server allowing to check the status of downloads,
   and add new links.
 - Automatically updates itself from SVN.
+
+TODO:
+- Write more documentation
+- When continuing partially downloaded data start few kb before the end and
+  compare old with new.
+- Add commands: pause downloads, allow/don't allow captcha, and more
+- File group support (first step for multiuser support)
+- File priorities and group priorities.
+- Selectable temporary directory.
+- Fix bugs in http server, and speed it up.
+- Better file writing methods, to allow downloading from multiple sources.
+- Backoff if captcha fails too many times; lower uri prio.
+- If multi-download problem appears while checking files force check on
+  another interface/ip.
+- Possibility to mark uri as "cannot continue".
+
+Planned features:
+- Multiuser support (may require major changes in the code).
+- XML-RPC (or similar) to allow writing GUIs.
 
 For full list of command-line options check: rsget.pl --help. All those options
 may also be set in config file ( $HOME/.rsget.pl/config ). Check 'README.config'
