@@ -11,7 +11,7 @@ web: "http://sharingmatrix.com/"
 tos: "http://sharingmatrix.com/user_agreement"
 uri: qr{(?:www\d+\.)?sharingmatrix\.com/file/\d+}
 cookie: sm
-status: BROKEN 2010-04-08
+status: OK 2010-04-08
 
 unify:
 	return "http://sharingmatrix.com/file/$1"
@@ -49,11 +49,20 @@ start:
 	! m#sid='(.*?)';#;
 	$-{sid} = $1;
 
-	! m#onclick="javascript:document\.images\.cryptogram\.src='(.*?)'#;
+	! m#CAPTCHA_IMAGE_URL = '(.*?)';#;
 	$-{img_base} = $1;
 
 stage_captcha:
-	$-{img} = $-{img_base} . (irand 1000) . 1;
+	GET( "/ajax_scripts/check_timer.php?tmp=" . (irand 1000) . 1, keep_referer => 1 );
+
+	if ( m{^(\d+)$} ) {
+		WAIT( $1, "expecting captcha" );
+		GOTO stage_captcha;
+	}
+
+	! m{img:(\S+)};
+	$-{img} = $-{img_base} . $1 . ".jpg";
+
 	GET( $-{img}, keep_referer => 1 );
 
 	CAPTCHA(
