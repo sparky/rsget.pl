@@ -5,8 +5,6 @@
 #		This program is free software,
 # you may distribute it under GPL v2 or newer.
 
-# TODO: some links have problems
-
 name: MediaFire
 short: MF
 web: "http://www.mediafire.com/"
@@ -48,7 +46,6 @@ stage_init:
 
 	my @esc = m/(\S+=unescape.*?eval|eval\(".*?"\))/g;
 	if ( scalar @esc ) {
-		warn "Has escapes\n";
 		foreach my $e ( @esc ) {
 			$_ = jseval( $e );
 			if ( /getElementById\('([0-9a-f]+)'\)/ ) {
@@ -56,7 +53,6 @@ stage_init:
 			}
 		}
 	} else {
-		warn "Old style\n";
 		while ( s/^.*?getElementById\('([0-9a-f]+)'\)//s ) {
 			last if $-{func_id} eq $1;
 		}
