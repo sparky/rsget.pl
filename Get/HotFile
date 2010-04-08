@@ -11,7 +11,7 @@ web: "http://hotfile.com/"
 tos: "http://hotfile.com/terms-of-service.html"
 uri: qr{hotfile\.com/dl/\d+/[0-9a-f]+/.+}
 uri: qr{pl\.hotfile\.com/dl/\d+/[0-9a-f]+/.+}
-status: OK 2010-04-03
+status: OK 2010-04-08
 
 unify:
 	return "http://hotfile.com/dl/$1"

@@ -11,7 +11,7 @@ web: "http://megashares.com/"
 tos: "http://megashares.com/tos.php"
 uri: qr{d01\.megashares\.com/(\?d01=|dl/)}
 cookie: !ms
-status: OK 2010-03-12
+status: OK 2010-04-08
 
 unify:
 	return "http://d01.megashares.com/?d01=$1" if m#(?:\?d01=|/dl/)([0-9a-f]{7})#;

@@ -11,7 +11,7 @@ web: "http://freakshare.net/"
 tos: "http://freakshare.net/terms-of-service.html"
 uri: qr{freakshare\.net/files/}
 cookie: fs
-status: OK 2010-04-03
+status: OK 2010-04-08
 
 start:
 	GET( $-{_uri} );

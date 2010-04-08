@@ -14,7 +14,7 @@ uri: qr{megaporn\.com/(../)?\?d=}
 uri: qr{megarotic\.com/(../)?\?d=}
 uri: qr{sexuploader\.com/(../)?\?d=}
 uri: qr{megavideo\.com/\?d=}
-status: OK 2010-04-03
+status: OK 2010-04-08
 
 pre:
 	my @captcha_solver;

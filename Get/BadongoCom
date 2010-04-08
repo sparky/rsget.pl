@@ -10,7 +10,7 @@ short: BC
 web: "http://www.badongo.com/"
 uri: qr{badongo\.com/}
 cookie: !badongo
-status: OK 2010-03-11
+status: OK 2010-04-08
 
 unify:
 	s/#.*//; s{/$}{};
