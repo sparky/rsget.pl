@@ -33,7 +33,7 @@ start:
 	! m#var dlID = '([a-z0-9]{6})';#;
 	$-{id} = $1;
 
-	CLICK( "/james/ticket/dl/$-{id}" );
+	CLICK( "/james/ticket/dl/$-{id}", post => "" );
 
 	RESTART( - irand( 60, 300 ), "free limit reached" )
 		if /{err:"limit-dl"}/;
