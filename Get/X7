@@ -5,12 +5,14 @@
 #		This program is free software,
 # you may distribute it under GPL v2 or newer.
 
+# TODO: try to act more like web browser
+
 name: X7
 short: X7
 web: "http://x7.to/"
 tos: "http://x7.to/legal"
 uri: qr{x7\.to/[a-z0-9]{6}}
-status: BROKEN 2010-04-08
+status: OK 2010-04-09
 
 unify:
 	return "http://x7.to/$1"
