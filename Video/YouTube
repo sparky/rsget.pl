@@ -69,7 +69,7 @@ stage_got_format:
 
 	my $fmt = $-{fmt};
 	my $fmtstr = $fmt ? "&fmt=$fmt->[0]" : "";
-	$fmt //= [ 5, "flv", "vLQ" ];
+	$fmt ||= [ 5, "flv", "vLQ" ];
 
 	my $fname = $name . "." . $fmt->[1];
 	INFO( name => $fname, fmt => $fmt->[0], quality => $fmt->[2] );
