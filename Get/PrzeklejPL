@@ -17,7 +17,7 @@ start:
 	GET( $-{_uri} );
 
 	ERROR( "file not found" )
-		if /Plik nie istnieje/;
+		if /Plik nie istnieje|Plik został usunięty/;
 
 	! m{<h1><a href="(/download/.*?)" title="Pobierz plik">(.*?)</a></h1><span class="size".*?> \(($STDSIZE)\)</span>};
 	my ( $file_uri, $name, $size ) = ( $1, $2, $3 );
