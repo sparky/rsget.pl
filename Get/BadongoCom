@@ -10,7 +10,7 @@ short: BC
 web: "http://www.badongo.com/"
 uri: qr{badongo\.com/}
 cookie: !badongo
-status: OK 2010-04-08
+status: FAIL 2010-04-29
 
 unify:
 	s/#.*//; s{/$}{};
@@ -64,7 +64,7 @@ stage_getcaptcha:
 
 	CAPTCHA(
 		qr/[A-Z]{4}/,
-		process => \&bc_decaptcha
+		#	process => \&bc_decaptcha
 	);
 
 	GOTO stage_getcaptcha unless defined $_;
