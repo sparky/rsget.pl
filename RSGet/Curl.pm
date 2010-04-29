@@ -16,6 +16,7 @@ use MIME::Base64;
 use File::Copy;
 use File::Path;
 use Fcntl qw(SEEK_SET);
+use Encode;
 set_rev qq$Id$;
 
 def_settings(
@@ -297,6 +298,7 @@ sub file_init
 		$eurl =~ s/\?.*$//;
 		$fname = de_ml( uri_unescape( $eurl ) );
 	}
+	$fname = encode_utf8( decode_utf8( $fname ) );
 
 	if ( my $fn = $supercurl->{fname} ) {
 		if ( $fname ne $fn ) {
