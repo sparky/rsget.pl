@@ -41,10 +41,13 @@ stage_solvecaptcha:
 
 	GET( $1, keep_referer => 1 );
 
-	! m{challenge : '(\S+)',};
+	! m{server\s*:\s*'(\S+?)'};
+	my $server = $1;
+	
+	! m{challenge\s*:\s*'(\S+?)',};
 	$-{capform}->set( recaptcha_challenge_field => $1 );
 
-	GET( "http://api.recaptcha.net/image?c=" . $1, keep_referer => 1 );
+	GET( $server . "image?c=" . $1, keep_referer => 1 );
 
 	CAPTCHA(
 		qr/\S+ \S+/
