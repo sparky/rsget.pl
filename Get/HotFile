@@ -11,7 +11,7 @@ web: "http://hotfile.com/"
 tos: "http://hotfile.com/terms-of-service.html"
 uri: qr{hotfile\.com/dl/\d+/[0-9a-f]+/.+}
 uri: qr{pl\.hotfile\.com/dl/\d+/[0-9a-f]+/.+}
-status: OK 2010-04-08
+status: OK 2010-05-04
 
 unify:
 	return "http://hotfile.com/dl/$1"
@@ -49,10 +49,13 @@ stage_getcaptcha:
 
 	GET( $1, keep_referer => 1 );
 
-	! m{challenge : '(\S+)',};
+	! m{server\s*:\s*'(\S+?)'};
+	my $server = $1;
+	
+	! m{challenge\s*:\s*'(\S+?)',};
 	$-{capform}->set( recaptcha_challenge_field => $1 );
 
-	GET( "http://api.recaptcha.net/image?c=" . $1, keep_referer => 1 );
+	GET( $server . "image?c=" . $1, keep_referer => 1 );
 
 	CAPTCHA(
 		qr/\S+ \S+/
