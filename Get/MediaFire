@@ -58,7 +58,7 @@ stage_init:
 		}
 	}
 
-	! m{href=\\"http://"\s*\+\s*(.*?)\s*\+'(.*?)">};
+	! m{href=\\"http://"\s*\+\s*(.*)\s*\+\s*'(/.*?)">};
 	my $order = $1; my $name = $2;
 	my $code = join "", map { /'(.*)'/ ? $1 : $vars{ $_ } } split /\s*\+\s*/, $order;
 	my $uri = "http://" . $code . $name;
