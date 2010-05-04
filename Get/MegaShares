@@ -57,7 +57,7 @@ start:
 		! m{.*<a href="(.+?)">\s*<img.*src="images/download_file\.png" alt="download file"}s;
 		$-{file_uri} = $1;
 
-		m{You have ([\d\.]+ .*?) left that you can download with this passport.};
+		m{You have.*\s+([\d\.]+)\s+.*?left that you can download with this passport.}s;
 		my $left = $1;
 		m{Your download passport will renew in\s*<strong>0</strong>:<strong>(\d+)</strong>:<strong>(\d+)</strong>}s;
 		my $time = s2string( $1 * 60 + $2 );
