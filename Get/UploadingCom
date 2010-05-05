@@ -50,7 +50,7 @@ start:
 	! /CONF\s*=\s*{\s*host:\s*'(.*?)'/;
 	$-{host} = $1;
 
-	! m{timer_count\s*=\s(\d+);};
+	! m{timer_count\s*=\s*(\d+);};
 	WAIT( -$1, "expecting download link" );
 
 	GET( $-{host} . "files/get/?JsHttpRequest=" . jstime() . "-xml",
