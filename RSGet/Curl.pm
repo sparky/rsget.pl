@@ -100,6 +100,7 @@ sub new
 					socks4 => 4, #CURLPROXY_SOCKS4,
 					socks4a => 6, #CURLPROXY_SOCKS4a,
 					socks5 => 5, #CURLPROXY_SOCKS5,
+					socks => 5, #CURLPROXY_SOCKS5,
 					socks5host => 7, #CURLPROXY_SOCKS5_HOSTNAME,
 				);
 				if ( my $type = $proxytype{ $tn } ) {
