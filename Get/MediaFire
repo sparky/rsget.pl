@@ -12,7 +12,7 @@ tos: "http://www.mediafire.com/terms_of_service.php"
 uri: qr{mediafire\.com/(file/|\?|download\.php\?)[a-z0-9]+}
 cookie: mf
 slots: max
-status: OK 2010-04-08
+status: OK 2010-05-05
 
 unify:
 	return "http://www.mediafire.com/?$1" if
