@@ -8,12 +8,13 @@
 name: Vimeo
 short: V:Vimeo
 web: "http://vimeo.com/"
-uri: qr{vimeo\.com/\d+([/#].*)?$}
+uri: qr{vimeo\.com/\d+([/#?].*)?$}
 slots: max
 status: OK 2010-04-08
 
 unify:
 	s/#.*//;
+	s/\?.*//;
 	return "http://vimeo.com/$1" if m{/(\d+)(?:/.*)?$};
 
 start:
