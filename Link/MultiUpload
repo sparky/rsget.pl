@@ -1,0 +1,37 @@
+# $Id$
+# Link::MultiUpload - Link retriever plugin for rsget.pl
+#
+# 2010 (c) Przemysław Iskra <sparky@pld-linux.org>
+#		This program is free software,
+# you may distribute it under GPL v2 or newer.
+
+name: MultiUpload
+short: L:MultiUpload
+web: "http://multiupload.com/"
+tos: "http://multiupload.com/terms"
+uri: qr{multiupload\.com/[A-Z0-9]{10}}
+slots: max
+status: OK 2010-05-08
+
+start:
+	GET( $-{_uri} );
+
+	my @list;
+	push @list, $1 while s/<div .*?id="url_\d+"><a href="(.+?)"//;
+
+	ERROR( "no links" ) unless @list;
+
+	$-{list} = \@list;
+	$-{outlist} = [];
+	$-{referer} = $-{_referer};
+
+stage_get_link:
+	$-{_referer} = $-{referer};
+	GET( shift @{$-{list}} );
+
+	push @{$-{outlist}}, $-{_referer};
+	GOTO stage_get_link if @{$-{list}};
+
+	LINK( @{$-{outlist}} );
+
+# vim: filetype=perl:ts=4:sw=4
