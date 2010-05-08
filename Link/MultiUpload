@@ -9,9 +9,12 @@ name: MultiUpload
 short: L:MultiUpload
 web: "http://multiupload.com/"
 tos: "http://multiupload.com/terms"
-uri: qr{multiupload\.com/[A-Z0-9]{10}}
+uri: qr{(?:www\d*\.)?multiupload\.com/[A-Z0-9]{10}}
 slots: max
 status: OK 2010-05-08
+
+# TODO: there sometimes is "Direct download" link, allowing to download
+# directly from multiupload servers; but I don't know how to trigger it
 
 start:
 	GET( $-{_uri} );
