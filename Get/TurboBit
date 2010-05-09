@@ -25,9 +25,9 @@ start:
 	ERROR( "file not found" ) if m#<div class="code-404">404</div>#;
 	ERROR( "file not found" ) if m#Файл не найден. Возможно он был удален|File was not found. It could possibly be deleted#;
 
-	! m#<h1 class="download-file">.*?<span.*?>&nbsp;(.*?)</b></h1>#;
+	! m#<h1 class="download-file">.*?<span.*?>(.*?)</span></h1>#;
 	my $name = $1;
-	! m#<br><b>File size:</b> ([\d,\.]+ .b)</div>#;
+	! m#<b>File size:</b> ([\d,\.]+ .b)</div>#;
 	( my $size = $1 ) =~ tr/,/./;
 	INFO( name => $name, asize => $size );
 
