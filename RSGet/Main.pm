@@ -54,6 +54,11 @@ def_settings(
 
 our %usettings;
 
+our $sig_pipe;
+$SIG{PIPE} = sub {
+	$sig_pipe = 1;
+};
+
 my $http = undef;
 sub init
 {

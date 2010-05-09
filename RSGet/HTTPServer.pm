@@ -136,19 +136,13 @@ sub request
 		$print .= "\r\n";
 	}
 
-	my $kid = fork();
-	unless ( $kid ) {
-		# XXX: this is stupid, but I don't know what
-		# else to do if $client is closed already
-		print $client $print;
-		close $client;
-
-		# make sure no DESTROY blocks are called
-		require POSIX;
-		POSIX::_exit( 0 );
-	};
-
+	$RSGet::Main::sig_pipe = 0;
+	print $client $print;
+	if ( $RSGet::Main::sig_pipe ) {
+		warn "HTTP client closed on us !\n";
+	}
 	close $client;
+
 	return 1;
 }
 
