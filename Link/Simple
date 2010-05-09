@@ -12,8 +12,9 @@ uri: qr{4gk\.com/}
 uri: qr{xurl\.jp/}
 uri: qr{tinyurl\.com/}
 uri: qr{linkhider\.com/}
+uri: qr{to\./}
 slots: max
-status: OK 2009-10-24
+status: OK 2010-05-09
 
 start:
 	my $uri = $-{_uri};
