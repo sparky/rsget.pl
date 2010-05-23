@@ -312,6 +312,7 @@ sub command
 		my $target = $self->find_uri( $data );
 		if ( $cmd eq "CLEAR ERROR" ) {
 			delete $target->{uris}->{ $data }->[1]->{error};
+			$target->{cmd} = "ADD";
 		} elsif ( $cmd eq "DISABLE" ) {
 			$target->{uris}->{ $data }->[1]->{error} = "disabled";
 		} elsif ( $cmd eq "REMOVE" ) {
