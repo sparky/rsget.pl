@@ -18,7 +18,7 @@ unify:
 		if m{hotfile\.com/dl/(\d+/[0-9a-f]+/.+?)(?:\.html)?$};
 
 start:
-	GET( $-{_uri} );
+	GET( $-{_uri} . "?lang=en" );
 
 	ERROR( "file not found" ) unless length $_;
 	ERROR( "file not found" ) if /This file is either removed|File is removed/;
