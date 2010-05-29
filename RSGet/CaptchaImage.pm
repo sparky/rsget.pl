@@ -19,6 +19,7 @@ sub new # {{{
 	require GD;
 	GD::Image->trueColor( 1 );
 	my $img = GD::Image->new( $$imgdata );
+	die "Cannot open captcha image\n" unless $img;
 
 	my $w = $img->width;
 	my $h = $img->height;
