@@ -22,7 +22,7 @@ start:
 	! m{<object.*?><embed src=".*?swf\?file=([0-9a-f]+)"};
 	my $id = $1;
 
-	GET( "/localtrackhost.php?f=$id" );
+	GET( "/tracker758.php?f=$id" );
 
 	! m{<song path="(.*?)" bild=".*?" artist="(.*?)" title="(.*?)"/>};
 	my ( $file_uri, $artist, $title ) = ( $1, $2, $3 );
