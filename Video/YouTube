@@ -10,7 +10,7 @@ short: V:YouTube
 web: "http://www.youtube.com/"
 uri: qr{youtube\.com/watch\?v=.*}
 slots: max
-status: OK 2010-04-08
+status: BROKEN 2010-06-04
 
 unify:
 	s/#.*//;
