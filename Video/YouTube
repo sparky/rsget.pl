@@ -10,7 +10,7 @@ short: V:YouTube
 web: "http://www.youtube.com/"
 uri: qr{youtube\.com/watch\?v=.*}
 slots: max
-status: BROKEN 2010-06-04
+status: OK 2010-06-04
 
 unify:
 	s/#.*//;
@@ -41,8 +41,8 @@ pre:
 start:
 	GET( $-{_uri} );
 
-	ERROR( "file cannot be accessed" )
-		if /<div id="" class="yt-alert-content">/;
+	ERROR( "file not found: $1" )
+		if /<div id="" class="yt-alert-content">\s*(Th.*?)\s*</s;
 
 	# try to find best format
 	$-{fmt} = best_format();
