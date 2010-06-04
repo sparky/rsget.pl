@@ -14,7 +14,7 @@ tos: "http://archiv.to/?Module=Policy"
 uri: qr{archiv\.to/\?.*?HashID=FILE[0-9A-F]+}
 uri: qr{archiv\.to/GET/FILE[0-9A-F]+}
 slots: max
-status: OK 2010-04-05
+status: BROKEN 2010-06-04
 
 unify:
 	return "http://archiv.to/GET/$1"
