@@ -12,7 +12,7 @@ tos: "http://www.zippyshare.com/terms.html"
 uri: qr{(?:www\d*\.)?zippyshare\.com/v/\d+/file\.}
 cookie: zips
 slots: max
-status: OK 2010-04-03
+status: OK 2010-06-04
 
 unify:
 	return "$1/file.html" if m{^(.*?)/file};

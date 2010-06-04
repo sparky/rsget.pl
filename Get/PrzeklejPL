@@ -11,7 +11,7 @@ web: "http://www.przeklej.pl/"
 tos: "http://www.przeklej.pl/regulamin"
 uri: qr{przeklej\.pl/plik/}
 slots: max
-status: OK 2010-03-12
+status: OK 2010-06-04
 
 start:
 	GET( $-{_uri} );
