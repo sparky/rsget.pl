@@ -11,7 +11,7 @@ web: "http://www.dailymotion.com/"
 uri: qr{dailymotion\.com/(.*?/)?video/[a-z0-9]+}
 uri: qr{dailymotion\.pl/(.*?/)?video/[a-z0-9]+}
 slots: max
-status: OK 2010-04-08
+status: BROKEN 2010-06-04
 
 start:
 	GET( $-{_uri} );
