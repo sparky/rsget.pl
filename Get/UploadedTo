@@ -20,8 +20,8 @@ unify:
 start:
 	GET( $-{_uri} );
 
-	RESTART( $1 * 60, "free limit reached" )
-		if /Or wait (\d+) minutes/;
+	RESTART( ( $1 > 0 ? $1 * 60 : irand 60 ), "free limit reached" )
+		if /Or wait (-?\d+) minutes/;
 
 	if ( $-{_referer} =~ m#/\?view=# ) {
 		ERROR( "file not found" ) if $-{_referer} =~ /fileremoved/;
