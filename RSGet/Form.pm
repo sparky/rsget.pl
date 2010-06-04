@@ -121,21 +121,20 @@ sub split_attributes
 {
 	local $_ = shift;
 	my %attr;
-	while ( s/^\s*([a-z0-9_]+)([=\s])//i ) {
+	while ( s/^\s*([a-z0-9_]+)//i ) {
 		my $name = lc $1;
-		my $eq = $2;
-		if ( $eq eq "=" ) {
+		if ( s/^\s*=// ) {
 			my $value;
-			if ( s/^(["'])// ) {
+			if ( s/^\s*(["'])// ) {
 				my $quot = $1;
 				s/^(.*?)$quot//;
 				$value = $1;
 			} else {
-				s/(\S+)//;
+				s/^\s*(\S+)//;
 				$value = $1;
 			}
 			$attr{ $name } = defined $value ? de_ml( $value ) : "";
-		} else {
+		} elsif ( s/^\s+// ) {
 			$attr{ $name } = $name;
 		}
 	}
