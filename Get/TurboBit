@@ -13,7 +13,7 @@ uri: qr{turbobit\.net/[a-z0-9]+\.html}
 uri: qr{turbobit\.ru/[a-z0-9]+\.html}
 cookie: tb
 slots: max
-status: OK 2010-03-13
+status: BROKEN 2010-06-04
 
 unify:
 	return "http://turbobit.net/$1"
