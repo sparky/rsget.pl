@@ -12,7 +12,7 @@ tos: "http://www.4shared.com/terms.jsp"
 uri: qr{4shared\.com/dir/}
 slots: max
 cookie: !4sh
-status: BROKEN 2010-06-04
+status: OK 2010-06-04
 
 unify:
 	return "http://www.4shared.com/dir/$1/$2"
@@ -30,7 +30,7 @@ start:
 	$-{dirs} = [ @dirs ];
 
 stage_morelinks:
-	my @links =m{<a id="ml_file_\d+"\s+href="/account(/file/\d+/[0-9a-f]+)(?:/.*?)?"}g;
+	my @links =m{<a id="ml_file_\d+"\s+href="(/account/.*?)"}sg;
 	push @{$-{links}}, @links;
 
 	if ( @{ $-{dirs} } ) {
