@@ -5,6 +5,9 @@
 #		This program is free software,
 # you may distribute it under GPL v2 or newer.
 
+# TODO: there are two captcha methods: their own (kohana) and recaptcha
+# the latter is not supported, but it doesn't seem to be a big problem
+
 name: TurboBit
 short: TB
 web: "http://turbobit.net/"
@@ -13,7 +16,7 @@ uri: qr{turbobit\.net/[a-z0-9]+\.html}
 uri: qr{turbobit\.ru/[a-z0-9]+\.html}
 cookie: tb
 slots: max
-status: BROKEN 2010-06-04
+status: OK 2010-06-04
 
 unify:
 	return "http://turbobit.net/$1"
@@ -41,6 +44,7 @@ stage_captcha:
 		! m#var Timeout = {\s*limit: (\d+),#s;
 		RESTART( $1, "free limit reached" );
 	}
+
 	! $-{form} = $self->form( match => { body => qr#<img alt="Captcha"# } );
 
 stage_getimg:
