@@ -10,7 +10,7 @@ short: L:CryptedBiz
 web: "http://crypted.biz/"
 uri: qr{crypted\.biz/}
 slots: max
-status: OK 2009-10-24
+status: BROKEN 2010-06-04
 
 pre:
 	use MIME::Base64;
