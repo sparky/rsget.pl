@@ -10,7 +10,7 @@ short: L:RSProtect
 web: "http://www.rsprotect.com/"
 uri: qr{rsprotect\.com/rc-.*?/}
 slots: max
-status: OK 2009-10-24
+status: OK 2010-06-04
 
 unify:
 	s/#.*//;

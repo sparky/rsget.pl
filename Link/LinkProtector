@@ -10,7 +10,7 @@ short: L:LinkProtector
 web: "http://link-protector.com/"
 uri: qr{link-protector\.com/}
 slots: max
-status: OK 2009-10-24
+status: OK 2010-06-04
 
 start:
 	GET( $-{_uri} );
