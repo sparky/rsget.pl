@@ -10,7 +10,7 @@ short: L:RaidRush
 web: "http://save.raidrush.ws/"
 uri: qr{save\.raidrush\.ws/}
 slots: max
-status: OK 2009-10-24
+status: BROKEN 2010-06-04
 
 start:
 	GET( $-{_uri} );
