@@ -10,7 +10,7 @@ short: V:Vimeo
 web: "http://vimeo.com/"
 uri: qr{vimeo\.com/\d+([/#?].*)?$}
 slots: max
-status: OK 2010-04-08
+status: OK 2010-06-04
 
 unify:
 	s/#.*//;
