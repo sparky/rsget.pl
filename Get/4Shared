@@ -13,7 +13,7 @@ web: "http://www.4shared.com/"
 tos: "http://www.4shared.com/terms.jsp"
 uri: qr{4shared\.com/(account/)?file/}
 slots: max
-status: OK 2010-04-05
+status: BROKEN 2010-06-04
 
 unify:
 	return "http://www.4shared.com/file/$1/$2"

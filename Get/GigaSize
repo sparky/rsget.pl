@@ -11,7 +11,7 @@ web: "http://gigasize.com/"
 tos: "http://www.gigasize.com/page.php?p=terms"
 uri: qr{gigasize\.com/get\.php\?d=}
 cookie: gs
-status: OK 2010-03-12
+status: BROKEN 2010-06-04
 
 start:
 	GET( $-{_uri} );
