@@ -12,7 +12,7 @@ tos: "http://megavideo.com/?c=terms"
 uri: qr{megavideo\.com/\?v=}
 uri: qr{megaporn\.com/(.*?/)?\?v=}
 slots: max
-status: OK 2010-04-08
+status: OK 2010-06-04
 
 start:
 	GET( $-{_uri} );

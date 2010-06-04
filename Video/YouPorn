@@ -11,7 +11,7 @@ web: "http://youporn.com/"
 uri: qr{youporn\.com/watch/\d+(/.*)?$}
 slots: max
 cookie: !v_yp
-status: OK 2010-04-08
+status: OK 2010-06-04
 
 unify:
 	return "http://youporn.com/watch/$1"
