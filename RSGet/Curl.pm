@@ -13,7 +13,7 @@ use WWW::Curl::Easy 4.00;
 use WWW::Curl::Multi;
 use URI::Escape;
 use MIME::Base64;
-use File::Copy;
+use File::Copy ();
 use File::Path;
 use Fcntl qw(SEEK_SET);
 use Encode;
@@ -318,7 +318,8 @@ sub file_init
 			my $old_msg = "";
 			if ( $old ) {
 				rename $fp, $old;
-				copy( $old, $fp ) || die "Cannot create backup file: $!";
+				File::Copy::copy( $old, $fp )
+					or die "Cannot create backup file: $!";
 				$old =~ s#.*/##;
 				$old_msg = ", backup saved as '$old'";
 			}
@@ -463,10 +464,11 @@ sub finish
 			$! = undef;
 			rename $infile, $outfile;
 			if ( $! ) {
-				warn "Cannot rename $infile to $outfile ($!), copying instead\n"
+				warn "Cannot rename $infile to $outfile ($!), unsing File::Copy instead\n"
 					if verbose( 1 );
-				copy( $infile, $outfile ) || die "Cannot copy $infile to $outfile: $!";
-				unlink $infile;
+				$! = undef;
+				File::Copy::move( $infile, $outfile )
+					or warn "Cannot move $infile to $outfile: $!";
 			}
 		}
 
