@@ -11,7 +11,7 @@ web: "http://www.sendspace.pl/"
 tos: "http://www.sendspace.pl/informacje/regulamin"
 uri: qr{sendspace\.pl/file/[a-zA-Z0-9]{8}}
 cookie: ss.pl
-status: BROKEN 2010-06-04
+status: OK 2010-06-05
 
 start:
 	GET( $-{_uri} );
@@ -19,8 +19,9 @@ start:
 	ERROR( "file not found" )
 		if /Podany plik nie istnieje lub został usunięty./;
 
-	! m#<div class="text"><span class="black3">Nazwa pliku:</span></div>\s*<div class="info"><span class="black3".*?><b>(.*?)</b></span></div>#s;
-	my $name = $1;
+	! m#<div class="text"><span class="black3">Nazwa pliku:</span></div>\s*<div class="info"><a href="(.*?)".*?><b>(.*?)</b></a></div>#s;
+	my $file_uri = $1;
+	my $name = $2;
 	$name =~ s/\.\.\.$/\0/;
 
 	! m#<div class="text"><span class="black3">Rozmiar pliku:</span></div>\s*<div class="info"><span class="blue4">([\d,]+ MB)</span></div>#s;
@@ -29,11 +30,9 @@ start:
 
 	INFO( name => $name, asize => $size );
 
-	! m#<a href="(http://www.sendspace.pl/download/.*?)"><img src=".*?" alt="Pobierz plik" title="Pobierz plik" /></a>#;
-	my $file_uri = $1;
-
 	CLICK_DOWNLOAD( $file_uri );
 
+	ERROR( "temporarily unavailable" ) if /jest chwilowo niedostępny/;
 	RESTART( $1, "free limit reached" ) if /setDownloadTimeOut\('(\d+)'\);/;
 
 # vim: filetype=perl:ts=4:sw=4
