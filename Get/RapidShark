@@ -35,6 +35,8 @@ start:
 
 	CLICK( $form->post() );
 
+	RESTART( -irand( 60, 600 ), "free limit reached" )
+		if /<p class="err">Wykorzystałeś dzienny limit pobierania/;
 	if ( /Muszisz poczekać (.*) aby pobrać następny plik/ ) {
 		$_ = $1;
 		my $wait = 0;
