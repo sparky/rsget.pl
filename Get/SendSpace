@@ -11,7 +11,7 @@ web: "http://sendspace.com/"
 tos: "http://sendspace.com/terms.html"
 uri: qr{sendspace\.com/file/}
 cookie: ss
-status: BROKEN 2010-06-04
+status: OK 2010-06-05
 
 start:
 	GET( $-{_uri} );
@@ -19,7 +19,7 @@ start:
 	ERROR( "file not found" )
 		if /Sorry, the file you requested is not available/;
 
-	! m#<b>Name:</b>\s*(.*?)\s*<br><b>Size:</b>\s*(\d+MB)\s*<br>#;
+	! m#<b>Name:</b>\s*(.*?)\s*<br><b>Size:</b>\s*([\d\.]+MB)\s*<br>#;
 	INFO( name => $1, asize => $2 );
 
 	! my $form = $self->form( match => { body => qr/"download"/ } );
