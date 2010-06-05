@@ -10,7 +10,7 @@ short: V:Break
 web: "http://www.break.com/"
 uri: qr{break\.com/.+?/.+}
 slots: max
-status: BROKEN 2010-06-04
+status: OK 2010-06-05
 
 # TODO: support pictures
 
@@ -18,19 +18,24 @@ start:
 	GET( $-{_uri} );
 
 	ERROR( "file not found" )
-		if m{404 Page Not Found};
+		if m{404 Page Not Found} or $-{_referer} eq "http://www.break.com/";
 
-	! m{sGlobalFileName='(.*?)'};
-	my $name = $1;
+	! m{<meta name="title" content="(.*?)"};
+	my $name = de_ml( $1 );
+	$name =~ s{/}{_}g;
 	$name .= ".flv";
-	# there are .mp4 files as well, but seem to have lower quality
 	INFO( name => $name, quality => "flv" );
 
 	! m{sGlobalContentFilePath='(.*?)'};
 	my $fp = $1;
-	! m{\s+videoPath\s*=\s*"(.*?)"};
+	! m{sGlobalFileName='(.*?)'};
+	my $fn = $1;
+	! m{var\s+videoPath\s*=\s*"(.*?)"};
 	my $vp = $1;
 
-	DOWNLOAD( "$vp/$fp/$name" );
+	! m{\s+flashVars\.icon\s*=\s*"(.*?)"};
+	my $icon = $1;
+
+	DOWNLOAD( "$vp$fp/$fn.flv?$icon", fname => $name );
 
 # vim: filetype=perl:ts=4:sw=4
