@@ -12,7 +12,7 @@ short: BR
 web: "http://bitroad.net/"
 tos: "http://bitroad.net/page/terms.php"
 uri: qr{bitroad\.net/}
-status: BROKEN 2010-06-05
+status: NON_FREE 2010-06-05
 
 start:
 	GET( $-{_uri} );
