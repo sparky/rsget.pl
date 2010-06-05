@@ -28,6 +28,7 @@ start:
 	RESTART( -irand( 30, 120 ), "temporarily unavailable" )
 		if m{<h1>Service Not Available</h1>};
 	ERROR( "file not found" ) if />The requested file is not found</;
+	MULTI() if />Parallel Download</;
 
 	! m{.*<h2>(.+?)</h2><br/>\s*File size: <b>($STDSIZE)</b>}so;
 	my $name = $1; my $size = $2;
