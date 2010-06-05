@@ -11,7 +11,7 @@ web: "http://www.rapidshark.pl/"
 tos: "http://www.rapidshark.pl/tos.html"
 uri: qr{rapidshark\.pl/[a-z0-9]{12}}
 slots: max
-status: BROKEN 2010-06-04
+status: OK 2010-06-05
 
 unify:
 	return "http://www.rapidshark.pl/$1"
@@ -23,7 +23,9 @@ start:
 	ERROR( "file not found" )
 		if m{<b>(Plik nie został odnaleziony|File Not Found|Datei nicht gefunden)</b>};
 	ERROR( "file not found" )
-		if m{<font class="err">No such file};
+		if m{<font class="err">(Brak|No such file)};
+	ERROR( "file not found" )
+		if m{<font style="font-size:12px;">Probujesz otworzyć adres <font color="red">.*//</font> \(\)</font>};
 
 	! m{<font style="font-size:12px;">Probujesz otworzyć adres <font color="red">.*/(.*?)</font> \(($STDSIZE)\)</font>};
 	INFO( name => $1, asize => $2 );
