@@ -13,7 +13,7 @@ web: "http://www.4shared.com/"
 tos: "http://www.4shared.com/terms.jsp"
 uri: qr{4shared\.com/(account/)?file/}
 slots: max
-status: BROKEN 2010-06-04
+status: OK 2010-06-05
 
 unify:
 	return "http://www.4shared.com/file/$1/$2"
@@ -36,7 +36,7 @@ start:
 	! m{<a href="(.*?)" class="dbtn" tabindex="1">};
 	CLICK( $1 );
 
-	! m{id='divDLStart' >\s*<a href='(.*?)'>};
+	! m{id='divDLStart'>\s*<a href='(.*?)'>};
 	$-{file_uri} = $1;
 
 	! /var c = (\d+);/;
