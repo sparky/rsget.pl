@@ -131,12 +131,13 @@ sub get_slots
 	$suggested = "1" unless defined $suggested;
 	if ( $cmd eq "check" ) {
 		my $max = setting( "max_slots_check" );
-		if ( $suggested =~ s/^!(\d+)// ) {
+		if ( $suggested =~ /^!(\d+)/ ) {
 			return $max < $1 ? $max : $1;
 		}
 		return $max;
 	} else {
 		my $max = setting( "max_slots" );
+		$suggested =~ s/^!//;
 		if ( $suggested =~ /^\d+$/ ) {
 			return $max < $suggested ? $max : $suggested;
 		}
