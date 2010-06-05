@@ -10,7 +10,7 @@ short: EgoShare
 web: "http://www.egoshare.com/"
 tos: "http://www.egoshare.com/rules.php"
 uri: qr{egoshare.com/download\.php\?id=[A-Z0-9]+}
-status: OK 2010-05-09
+status: OK 2010-06-05
 
 start:
 	ERROR( "Service not supported. Check http://rsget.pl/getters/" );

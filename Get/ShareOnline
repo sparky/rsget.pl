@@ -10,7 +10,7 @@ short: ShareOnline
 web: "http://www.share-online.biz/"
 tos: "http://www.share-online.biz/rules.php"
 uri: qr{share-online\.biz/download\.php\?id=[A-Z0-9]+}
-status: OK 2010-05-09
+status: OK 2010-06-05
 
 start:
 	ERROR( "Service not supported. Check http://rsget.pl/getters/" );

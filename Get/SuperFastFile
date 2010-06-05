@@ -10,7 +10,7 @@ short: SuperFastFile
 web: "http://www.superfastfile.com/"
 tos: "http://www.superfastfile.com/tos.html"
 uri: qr{superfastfile.com/[0-9a-z]+}
-status: OK 2010-05-09
+status: OK 2010-06-05
 
 start:
 	ERROR( "Service not supported. Check http://rsget.pl/getters/" );

@@ -11,7 +11,7 @@ web: "http://bigandfree.com/"
 tos: "http://bigandfree.com/tos"
 uri: qr{bigandfree\.com/\d+}
 uri: qr{BigAndFree\.com/\d+}
-status: OK 2010-05-09
+status: OK 2010-06-05
 
 start:
 	ERROR( "Service not supported. Check http://rsget.pl/getters/" );
