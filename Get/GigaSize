@@ -11,12 +11,12 @@ web: "http://gigasize.com/"
 tos: "http://www.gigasize.com/page.php?p=terms"
 uri: qr{gigasize\.com/get\.php\?d=}
 cookie: gs
-status: BROKEN 2010-06-04
+status: OK 2010-06-05
 
 start:
 	GET( $-{_uri} );
 
-	ERROR( "file not found" ) if /The file has been deleted/;
+	ERROR( "file not found" ) if /The file\s+has been deleted/;
 
 	! m{<strong>Name</strong>:\s*<b>(.*?)</b></p>\s*<p>Size:\s*<span>($STDSIZE)</span>};
 	my ( $name, $size ) = ( $1, $2 );
