@@ -5,12 +5,14 @@
 #		This program is free software,
 # you may distribute it under GPL v2 or newer.
 
+# BROKEN: There is no "free service" anymore
+
 name: BitRoad
 short: BR
 web: "http://bitroad.net/"
 tos: "http://bitroad.net/page/terms.php"
 uri: qr{bitroad\.net/}
-status: BROKEN 2010-06-04
+status: BROKEN 2010-06-05
 
 start:
 	GET( $-{_uri} );
