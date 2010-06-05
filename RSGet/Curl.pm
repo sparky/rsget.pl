@@ -281,7 +281,7 @@ sub file_init
 	if ( my $f_len = $curl->getinfo( CURLINFO_CONTENT_LENGTH_DOWNLOAD ) ) {
 		$supercurl->{size_total} = $f_len;
 	}
-	if ( $supercurl->{size_total} <= 0 and $supercurl->{force_size} ) {
+	if ( ( $supercurl->{size_total} || 0 ) <= 0 and $supercurl->{force_size} ) {
 		$supercurl->{size_total} = $supercurl->{force_size};
 	}
 
