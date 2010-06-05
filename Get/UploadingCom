@@ -11,8 +11,8 @@ web: "http://uploading.com/"
 tos: "http://uploading.com/terms/"
 uri: qr{uploading\.com/(../)?files/(get/)?[A-Za-z0-9]{8}}
 cookie: !uc
-slots: 1
-status: BROKEN 2010-06-04
+slots: !1
+status: OK 2010-06-05
 
 unify:
 	return "http://uploading.com/files/$1/"
@@ -25,9 +25,9 @@ start:
 
 	RESTART( -irand( 60, 300 ), "free limit reached: $1" )
 		if /(Sorry, you can download only one file per \d+ minutes)/;
-	RESTART( -irand( 60, 300 ), "temporarily unavailable" )
+	RESTART( -irand( 30, 120 ), "temporarily unavailable" )
 		if m{<h1>Service Not Available</h1>};
-	ERROR( "file not found" ) if /Requested file not found/;
+	ERROR( "file not found" ) if />The requested file is not found</;
 
 	! m{.*<h2>(.+?)</h2><br/>\s*File size: <b>($STDSIZE)</b>}so;
 	my $name = $1; my $size = $2;
