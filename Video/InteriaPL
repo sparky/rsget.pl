@@ -10,7 +10,7 @@ short: V:InteriaPL
 web: "http://video.interia.pl/"
 uri: qr{video\.interia\.pl/obejrzyj,film,\d+}
 slots: max
-status: BROKEN 2010-06-04
+status: OK 2010-06-05
 
 start:
 	GET( $-{_uri} );
@@ -18,13 +18,14 @@ start:
 	! m{<h2>(.*?)</h2>};
 	my $fname = de_ml( $1 );
 	$fname =~ s{/}{_}g;
-	$fname .= ".flv";
+	$-{fname} = $fname . ".flv";
 
 	INFO( name => $fname, quality => "flv" );
 
 	! m{so\.addVariable\("vid", "(\d+)"\);};
-	my $id = $1;
+	GET( "/vurl,id,$1?" );
 
-	DOWNLOAD( "http://flv.interia.pl/l/$id.flv", fname => $fname );
+	! m{videoID=(.*?)&};
+	DOWNLOAD( $1, fname => $-{fname} );
 
 # vim: filetype=perl:ts=4:sw=4
