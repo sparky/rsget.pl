@@ -12,6 +12,7 @@ short: 4S
 web: "http://www.4shared.com/"
 tos: "http://www.4shared.com/terms.jsp"
 uri: qr{4shared\.com/(account/)?file/}
+cookie: 4s
 slots: max
 status: OK 2010-06-05
 
