@@ -153,6 +153,16 @@ our %processors = (
 		}
 	},
 );
+our %processors_title = (
+	"Remove all DONE" => 'Remove from download list all files with DONE status',
+	"Remove all STOP" => 'Remove from download list all files with STOP status',
+	"Start all STOP" => 'Restart all files with STOP status (must not have error)',
+	"Stop all GET" => 'Stop all active files (including active downloads)',
+	"Stop inactive GET" => 'Stop files with GET status which are not being downloaded',
+	"Restart errors" => 'Clear error messages and restart if status is STOP',
+	"Clear errors" => 'Clear all error messages (but not "disabled")',
+	"Clear disabled" => 'Clear all "disabled" errors',
+);
 
 my $process = undef;
 sub process
