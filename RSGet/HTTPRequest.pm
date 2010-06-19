@@ -220,7 +220,8 @@ sub f_dllist
 
 	my @tools = sort keys %RSGet::FileList::processors;
 
-	$r .= '<div class="tools">' . (join " | ", map "<span>$_</span>", @tools) .
+	$r .= '<div class="tools">Actions on multiple entries: ' .
+		(join " | ", map "<span>$_</span>", @tools) .
 		'</div></div>';
 
 	my %cmd_to_color = (
