@@ -222,7 +222,7 @@ sub f_dllist
 
 	$r .= '<div class="tools">Actions on multiple entries: ' .
 		(join " | ", map { my $t = $RSGet::FileList::processors_title{$_};
-				$t ? "<span title='$t'>$_</span>" : "<span>$_</span>" }, @tools) .
+				$t ? "<span title='$t'>$_</span>" : "<span>$_</span>" } @tools) .
 		'</div></div>';
 
 	my %cmd_to_color = (
