@@ -130,9 +130,26 @@ our %processors = (
 		$_[0] = "STOP" if $_[0] eq "GET";
 	},
 	"Stop inactive GET" => \&proc_stop_inactive_get,
-	"Remove all error" => sub {
+	"Restart errors" => sub {
+		my $cleared = 0;
 		foreach my $data ( values %{$_[2]} ) {
-			delete $data->[1]->{error};
+			if ( $data->[1]->{error} and $data->[1]->{error} ne "disabled" ) {
+				delete $data->[1]->{error};
+				$cleared = 1;
+			}
+		}
+		$_[0] = "GET" if $cleared and $_[0] eq "STOP";
+	},
+	"Clear errors" => sub {
+		foreach my $data ( values %{$_[2]} ) {
+			delete $data->[1]->{error}
+				if ( $data->[1]->{error} || "" ) ne "disabled"
+		}
+	},
+	"Clear disabled" => sub {
+		foreach my $data ( values %{$_[2]} ) {
+			delete $data->[1]->{error}
+				if ( $data->[1]->{error} || "" ) eq "disabled"
 		}
 	},
 );
