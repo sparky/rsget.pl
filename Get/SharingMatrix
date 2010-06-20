@@ -21,6 +21,8 @@ start:
 	GET( $-{_uri} );
 
 	ERROR( "file not found" ) if m#File has been deleted#;
+	LOG( "WARNING: Daily limit reached, download will most likely fail" )
+		if /Your daily download limit is over/;
 
 	if ( /You are already downloading file/ ) {
 		! m#link_name = '(.*?)';#;
@@ -95,6 +97,8 @@ stage_captcha:
 	my %js = map { /^(.*?)\s*:\s*"(.*?)"/ } split /\s*,\s*/, $_;
 
 	CLICK_DOWNLOAD( "$js{serv}/download/$js{hash}/$-{dl_id}/" );
+
+	RESTART( -irand( 60, 300 ), "download limit reached" ) if /REMOVED/;
 
 	# most likely multi-download
 	RESTART( 0, "download error" ) if /Download Error/;
