@@ -184,7 +184,8 @@ sub compile
 	my $self = shift;
 	$self->{compiled} = 1;
 	return if $self->{error};
-	p "Compiling $self->{pkg} plugin ($self->{web})";
+	my $web = defined $self->{web} ? " ($self->{web})" : "";
+	p "Compiling $self->{pkg} plugin $web";
 	p "$self->{pkg}: make sure you agree with $self->{tos}" if $self->{tos};
 
 	my $parts = $self->read_file();
