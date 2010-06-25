@@ -48,11 +48,10 @@ stage_init:
 	RESTART( 10 * 60, "temporarily blocked" )
 		if m{document\.location='http://www\.megaupload\.com/\?c=msg'};
 
-	# TODO: if file is unavailable temporarily try to download it
-	# later (lower uri priority)
-	ERROR( "file not found" ) if
-		/The file you are trying to access is temporarily unavailable/
-			or /Unfortunately, the link you have clicked is not available/
+	DELAY( 600, "temporarily unavailable" )
+		if /The file you are trying to access is temporarily unavailable/;
+	ERROR( "file not found" )
+		if /Unfortunately, the link you have clicked is not available/
 			or /This file has expired due to inactivity/;
 	m{<TD valign="middle" align="left" .*?width="500">(.*?)</TD>}s;
 	my @f = map m#<font.*?>\s*(.*?)\s*</font>#g, $1;
