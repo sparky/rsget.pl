@@ -344,7 +344,7 @@ sub readlist
 		my $all_error = 1;
 		foreach my $uri ( keys %decoded ) {
 			my $options = $decoded{ $uri }->[1];
-			unless ( $options->{error} ) {
+			if ( not $options->{error} or $options->{delay} ) {
 				$all_error = 0;
 				last;
 			}

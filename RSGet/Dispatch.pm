@@ -152,6 +152,14 @@ sub run
 	my ( $cmd, $uri, $getter, $options ) = @_;
 	my $class = $getter->{class};
 
+	if ( $options->{delay} ) {
+		if ( not $options->{error} or not $options->{error} =~ /^Delayed until/ ) {
+			delete $options->{delay};
+		} elsif ( $options->{delay} < time ) {
+			delete $options->{delay};
+			delete $options->{error};
+		}
+	}
 	return if $options->{error};
 
 	my $working = $working{ $cmd };
@@ -191,6 +199,7 @@ sub process
 {
 	my $getlist = shift;
 
+	my $time = shift;
 	my %num_by_pkg;
 	my %all_uris;
 	my $to_dl = 0;
@@ -216,7 +225,7 @@ sub process
 				if ( my $obj = $downloading{$uri} ) {
 					$obj->{_abort} = "Stopped";
 				}
-				next;
+				next unless $opts->{delay};
 			}
 			$all_uris{ $uri } = 1;
 			my $pkg = $getter->{pkg};

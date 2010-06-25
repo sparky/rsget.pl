@@ -263,6 +263,20 @@ sub multi
 	return $self->wait( \&start, - irand( 60, 300 ), $msg, "multi" );
 }
 
+sub delay
+{
+	my $self = shift;
+	my $time = shift;
+	my $msg = shift;
+	$time = abs $time;
+	my $until = $time + time;
+	$msg = "Delayed until " . localtime( $until ) . ": " . $msg;
+
+	$self->print( $msg ) || $self->log( $msg );
+	RSGet::FileList::save( $self->{_uri}, options => { delay => $until, error => $msg } );
+	RSGet::Dispatch::finished( $self );
+}
+
 sub finish
 {
 	my $self = shift;

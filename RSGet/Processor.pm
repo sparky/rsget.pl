@@ -136,7 +136,7 @@ EOF
 			p_sub( $next_stage );
 			$_ = $left;
 			redo if /\S/;
-		} elsif ( s/^(ERROR|RESTART|LINK|MULTI)\s*\(// ) {
+		} elsif ( s/^(ERROR|RESTART|LINK|MULTI|DELAY)\s*\(// ) {
 			p_ret( lc $1 );
 			p_line();
 		} elsif ( s/^INFO\s*\(// ) {
