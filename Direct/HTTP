@@ -15,7 +15,10 @@ status: OK 2010-06-26
 start:
 	GET( $-{_uri}, headonly => 1 );
 
-	! my ( $type ) = /^Content-Type:\s*(\S+?)(;.*?)\r?$/mi;
+	ERROR( "file not found" ) if /^HTTP\S+ 404/s;
+
+	my @type = /^Content-Type:\s*(\S+?)(?:;.*?)?\r?$/mig;
+	! my $type = pop @type;
 	my ( $len ) = /^Content-Length:\s*(\d+)\r?$/mi;
 	$len ||= -1;
 
@@ -23,7 +26,7 @@ start:
 	ERROR( "file is a small image ($type, $len)" )
 		if $type =~ m#^image/# and $len < 100 * 1024;
 
-	my ( $name ) = $-{_uri} =~ m{.*/(.*)$};
+	my ( $name ) = $-{_referer} =~ m{.*/(.*)$};
 	if ( /^Content-Disposition:(.+?)\r?$/mi ) {
 		$name = RSGet::Curl::content_filename( $1 );
 	}
