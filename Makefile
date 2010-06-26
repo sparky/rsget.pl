@@ -9,8 +9,8 @@ ifneq ($(PERL),)
 SETINTERPRETER = 1s|^\(..\).*|\1$(PERL)|;
 endif
 
-PLUGIN_DIRS = Get Video Audio Image Link
-DIRS = RSGet,Get,Video,Audio,Image,Link,data
+PLUGIN_DIRS = Get Video Audio Image Link Direct
+DIRS = RSGet,Get,Video,Audio,Image,Link,Direct,data
 
 export LC_ALL=C
 
