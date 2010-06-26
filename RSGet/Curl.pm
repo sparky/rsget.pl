@@ -632,12 +632,19 @@ sub donemsg
 	return bignum( $supercurl->{size_got} ) . "; ${speed}KB/s $eta";
 }
 
+sub shquote
+{
+	local $_ = shift;
+	s/'/'"'"'/g;
+	return "'$_'";
+}
+
 sub callback
 {
 	my $hook = shift;
 	my %opts = @_;
 
-	$hook =~ s/(\@{([a-z]*)})/$opts{ $2 } || $1/eg;
+	$hook =~ s/(\@{([a-z]*)})/shquote( $opts{ $2 } || $1 )/eg;
 
 	my $pid = fork;
 	unless ( defined $pid ) {
