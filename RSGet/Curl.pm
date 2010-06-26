@@ -644,7 +644,7 @@ sub callback
 	my $hook = shift;
 	my %opts = @_;
 
-	$hook =~ s/(\@{([a-z]*)})/shquote( $opts{ $2 } || $1 )/eg;
+	$hook =~ s/(\$\(([a-z]*)\))/shquote( $opts{ $2 } || $1 )/eg;
 
 	my $pid = fork;
 	unless ( defined $pid ) {
