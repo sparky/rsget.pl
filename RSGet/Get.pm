@@ -263,6 +263,7 @@ sub multi
 	return $self->wait( \&start, - irand( 60, 300 ), $msg, "multi" );
 }
 
+# TODO: make delay interface-aware
 sub delay
 {
 	my $self = shift;
