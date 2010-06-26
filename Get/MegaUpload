@@ -48,8 +48,6 @@ stage_init:
 	RESTART( 10 * 60, "temporarily blocked" )
 		if m{document\.location='http://www\.megaupload\.com/\?c=msg'};
 
-	DELAY( 600, "temporarily unavailable" )
-		if /The file you are trying to access is temporarily unavailable/;
 	ERROR( "file not found" )
 		if /Unfortunately, the link you have clicked is not available/
 			or /This file has expired due to inactivity/;
@@ -58,6 +56,9 @@ stage_init:
 	my $name = $f[1];
 	$name =~ s/(.*)\.(\..{1,5})$/$1\0$2/; # mark truncated name
 	INFO( iname => $name, asize => $f[5] );
+
+	DELAY( 600, "temporarily unavailable" )
+		if /The file you are trying to access is temporarily unavailable/;
 
 	if ( /The file you're trying to download is password protected/ ) {
 		ERROR( "password required" ) unless exists $-{_opts}->{pass};
