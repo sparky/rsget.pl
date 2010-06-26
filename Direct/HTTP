@@ -15,7 +15,7 @@ status: OK 2010-06-26
 start:
 	GET( $-{_uri}, headonly => 1 );
 
-	my ( $type ) = /^Content-Type:\s*(\S+)\r?$/mi;
+	! my ( $type ) = /^Content-Type:\s*(\S+?)(;.*?)\r?$/mi;
 	my ( $len ) = /^Content-Length:\s*(\d+)\r?$/mi;
 	$len ||= -1;
 
