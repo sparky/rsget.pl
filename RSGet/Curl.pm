@@ -164,7 +164,10 @@ sub new
 		$get_obj->log( "GET( $uri )\n" ) if verbose( 4 );
 	}
 
-	if ( $opts{save} ) {
+	if ( $opts{headonly} ) {
+		$curl->setopt( CURLOPT_NOBODY, 1 );
+		$supercurl->{headonly} = 1;
+	} elsif ( $opts{save} ) {
 		$curl->setopt( CURLOPT_WRITEFUNCTION, \&body_file );
 		$curl->setopt( CURLOPT_WRITEDATA, $supercurl );
 
@@ -195,6 +198,7 @@ sub new
 		$curl->setopt( CURLOPT_WRITEFUNCTION, \&body_scalar );
 		$curl->setopt( CURLOPT_WRITEDATA, \$supercurl->{body} );
 	}
+
 	if ( $opts{keep_referer} or $opts{keep_ref} ) {
 		$supercurl->{keep_referer} = 1;
 	}
@@ -496,7 +500,7 @@ sub finish
 			bignum( $supercurl->{size_got} ),
 			bignum( $supercurl->{size_total} );
 	} else {
-		$get_obj->{body} = $supercurl->{body};
+		$get_obj->{body} = $supercurl->{ $supercurl->{headonly} ? "head" : "body" };
 	}
 
 	$get_obj->get_finish( $eurl, $supercurl->{keep_referer} || 0 );
