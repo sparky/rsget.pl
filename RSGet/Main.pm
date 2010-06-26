@@ -260,7 +260,7 @@ sub find_getters
 		unshift @paths, $main::local_path;
 	}
 	foreach my $path ( @paths ) {
-		foreach my $type ( qw(Get Video Audio Image Link) ) {
+		foreach my $type ( qw(Get Video Audio Image Link Direct) ) {
 			my $dir = "$path/$type";
 			next unless -d $dir;
 			my $count = 0;

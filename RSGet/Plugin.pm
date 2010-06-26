@@ -210,8 +210,14 @@ sub can_do
 	my $self = shift;
 	my $uri = shift;
 
-	foreach my $re ( @{ $self->{urire} } ) {
-		return 1 if $uri =~ m{^http://(?:www\.)?$re};
+	if ( $self->{class} eq "Direct" ) {
+		foreach my $re ( @{ $self->{urire} } ) {
+			return 1 if $uri =~ m{^$re$};
+		}
+	} else {
+		foreach my $re ( @{ $self->{urire} } ) {
+			return 1 if $uri =~ m{^http://(?:www\.)?$re};
+		}
 	}
 	return 0;
 }
@@ -271,13 +277,18 @@ sub from_uri
 	if ( $from_uri_last ) {
 		return $from_uri_last if $from_uri_last->can_do( $uri );
 	}
+	my $direct = undef;
 	foreach my $getter ( values %getters ) {
 		if ( $getter->can_do( $uri ) ) {
-			$from_uri_last = $getter;
-			return $getter;
+			if ( $getter->{class} eq "Direct" ) {
+				$direct = $getter;
+			} else {
+				$from_uri_last = $getter;
+				return $getter;
+			}
 		}
 	}
-	return undef;
+	return $direct;
 }
 
 sub from_pkg
