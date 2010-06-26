@@ -56,7 +56,7 @@ sub add_links
 	my $u = qr/[a-z0-9_-]+/;
 	my $tld = qr/[a-z]{2,8}/;
 	foreach ( split /\s+/s, $text ) {
-		next unless m{^(.*?)(https?://)?((?:$u\.)*$u\.$tld/.+)$};
+		next unless m{^(.*?)(https?://||ftp://)?((?:$u\.)*$u\.$tld/.+)$};
 		my $pre = $1;
 		my $proto = $2 || "http://";
 		my $uri = $proto . $3;
