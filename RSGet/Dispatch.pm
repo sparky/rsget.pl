@@ -163,9 +163,11 @@ sub run
 	if ( $options->{delay} ) {
 		if ( not $options->{error} or not $options->{error} =~ /^Delayed until/ ) {
 			delete $options->{delay};
+			RSGet::FileList::save( $uri, options => { delay => undef } );
 		} elsif ( $options->{delay} < time ) {
 			delete $options->{delay};
 			delete $options->{error};
+			RSGet::FileList::save( $uri, options => { delay => undef, error => undef } );
 		} else {
 			$delay_check = $options->{delay}
 				if not $delay_check or $delay_check > $options->{delay};
