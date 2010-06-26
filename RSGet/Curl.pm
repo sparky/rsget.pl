@@ -50,6 +50,10 @@ def_settings(
 		type => "PATH",
 		user => 1,
 	},
+	postdownload => {
+		desc => "Command executed after finishing download.",
+		type => "COMMAND",
+	},
 );
 
 
@@ -467,16 +471,17 @@ sub finish
 	}
 
 	if ( $supercurl->{file} ) {
-		rename_done: {
+		my $outfile;
+		do_rename: {
 			my $infile = $supercurl->{filepath};
-			my $outfile = filepath( setting("outdir"), $get_obj->{_opts}->{dir}, $supercurl->{fname} );
+			$outfile = filepath( setting("outdir"), $get_obj->{_opts}->{dir}, $supercurl->{fname} );
 			if ( -e $outfile ) {
 				my @si = stat $infile;
 				my @so = stat $outfile;
 				if ( $si[0] == $so[0] and $si[1] == $so[1] ) {
 					p "$infile and $outfile are the same file, not renaming"
 						if verbose( 2 );
-					last rename_done;
+					last do_rename;
 				}
 
 				my $out_rename = file_backup( $outfile, "done" );
@@ -499,6 +504,15 @@ sub finish
 			$supercurl->{fname},
 			bignum( $supercurl->{size_got} ),
 			bignum( $supercurl->{size_total} );
+
+		if ( my $post = setting( "postdownload" ) ) {
+			callback( $post,
+				file => $outfile,
+				name => $supercurl->{fname},
+				size => $supercurl->{size_total},
+				source => $get_obj->{_uri},
+			);
+		}
 	} else {
 		$get_obj->{body} = $supercurl->{ $supercurl->{headonly} ? "head" : "body" };
 	}
@@ -616,6 +630,28 @@ sub donemsg
 	my $speed = sprintf "%.2f", $size_diff / ( $time_diff * 1024 );
 
 	return bignum( $supercurl->{size_got} ) . "; ${speed}KB/s $eta";
+}
+
+sub callback
+{
+	my $hook = shift;
+	my %opts = @_;
+
+	$hook =~ s/(\@{([a-z]*)})/$opts{ $2 } || $1/eg;
+
+	my $pid = fork;
+	unless ( defined $pid ) {
+		warn "Fork failed\n";
+	}
+	if ( $pid ) {
+		p "Executing '$hook'\n" if verbose( 1 );
+	} else {
+		close STDIN;
+		close STDOUT;
+		close STDERR;
+		exec $hook;
+		die "Exec failed: $@\n";
+	}
 }
 
 
