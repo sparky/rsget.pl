@@ -292,6 +292,7 @@ sub iteration_short
 
 sub iteration_long
 {
+	RSGet::Dispatch::delay_check();
 	RSGet::Wait::wait_update();
 	RSGet::MortalObject::update();
 	RSGet::Captcha::captcha_update();

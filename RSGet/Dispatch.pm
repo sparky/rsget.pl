@@ -63,6 +63,14 @@ sub remove_interface
 	die "No working interfaces left\n" unless @interfaces;
 }
 
+my $delay_check;
+sub delay_check
+{
+	return unless $delay_check and $delay_check <= time;
+	RSGet::FileList::update();
+	$delay_check = undef;
+}
+
 my %last_used;
 
 sub find_free_if
@@ -158,6 +166,9 @@ sub run
 		} elsif ( $options->{delay} < time ) {
 			delete $options->{delay};
 			delete $options->{error};
+		} else {
+			$delay_check = $options->{delay}
+				if not $delay_check or $delay_check > $options->{delay};
 		}
 	}
 	return if $options->{error};
