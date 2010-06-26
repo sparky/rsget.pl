@@ -282,7 +282,7 @@ sub file_init
 		size_got => 0;
 
 	{
-		my $mime = $curl->getinfo( CURLINFO_CONTENT_TYPE );
+		my $mime = $curl->getinfo( CURLINFO_CONTENT_TYPE ) || "unknown";
 		if ( $mime =~ m#^text/html# ) {
 			$get_obj->{is_html} = 1;
 			$supercurl->{size_total} = 0;
