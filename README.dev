@@ -1,0 +1,33 @@
+=============================================================================
+= captcha -- external captcha solver
+=============================================================================
+
+# host must be configurable
+HOST=http://localhost:7666
+
+In an infinite loop:
+
+# infinite loop
+while true; do
+
+	# get list of captchas to solve
+	LIST=$(wget -q ${HOST}/captcha -O -)
+
+	# download/display/ask all captchas, if any
+	for MD5 in $LIST; do
+		# download
+		wget -q ${HOST}/captcha?md5=${MD5} -O img-${MD5}
+
+		# display
+		display img-${MD5}
+
+		# solve or ask
+		SOLVE=$(solve img-${MD5})
+
+		# respond
+		wget -q ${HOST}/captcha?md5=${MD5}&solve=${SOLVE} -O -
+	done
+
+	# sleep at least 2 seconds
+	sleep 10
+done
