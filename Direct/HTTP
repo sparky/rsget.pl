@@ -25,7 +25,13 @@ start:
 		LINK( $-{_referer} );
 	}
 	ERROR( "file not found" ) unless m{^HTTP/1\.\d 200}m;
-	ERROR( "file is text ($type)" ) if $type =~ m#^text/#;
+	if ( $type =~ m#^text/# ) {
+		if ( /^Refresh:\s*.*?url=("|'|)(.*?)\1\s*\r$/mi ) {
+			require URI;
+			LINK( URI->new( $2 )->abs( $-{_referer} )->as_string );
+		}
+		ERROR( "file is text ($type)" );
+	}
 	ERROR( "file is a small image ($type, $len)" )
 		if $type =~ m#^image/# and $len < 100 * 1024;
 
