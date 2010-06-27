@@ -690,7 +690,7 @@ sub captcha
 
 	my $ct;
 	my $data;
-	my $md5 = $post->{md5};
+	my $md5 = $post->{md5} || "";
 	if ( $post->{solve} ) {
 		delete $RSGet::Captcha::needed{ $md5 };
 		$RSGet::Captcha::solved{ $md5 } = $post->{solve};
@@ -700,11 +700,8 @@ sub captcha
 		( $ct, my $dataref ) = @$n;
 		$data = $$dataref;
 	} else {
-		$ct = "image/png";
-		local $/ = undef;
-		open F_IN, '<', data_file( "error.png" );
-		$data = <F_IN>;
-		close F_IN;
+		$headers->{Content_Type} = "text/plain";
+		return join "\n", keys %RSGet::Captcha::needed, '';
 	}
 
 	$headers->{Content_Type} = $ct;
