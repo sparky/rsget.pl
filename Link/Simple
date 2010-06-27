@@ -11,7 +11,6 @@ web: "http://rsget.pl/getters/Link/Simple/"
 uri: qr{4gk\.com/}
 uri: qr{xurl\.jp/}
 uri: qr{tinyurl\.com/}
-uri: qr{linkhider\.com/}
 uri: qr{to\./}
 uri: qr{anonym-to\.com/\?}
 slots: max
@@ -26,10 +25,10 @@ start:
 
 	my $link;
 	if ( $-{_referer} =~ m#^$serv# ) {
-		if ( m#<meta http-equiv="refresh" content="\d+;\s*url='?(.*?)'?">#i ) {
-			$link = $1;
-		} elsif ( m#<i?frame\s+.*?src="(http://.*?)">#i ) {
-			$link = $1;
+		if ( m#<meta\s+http-equiv=("|')refresh\1\s+content=("|')\s*\d+;\s*url=("|'|)(.*?)\3\s*\2\s*>#si ) {
+			$link = $4;
+		} elsif ( m#<i?frame\s+.*?src=("|')(http://.*?)\1>#si ) {
+			$link = $2;
 		} else {
 			ERROR( "can't find link" );
 		}
