@@ -13,6 +13,7 @@ uri: qr{xurl\.jp/}
 uri: qr{tinyurl\.com/}
 uri: qr{linkhider\.com/}
 uri: qr{to\./}
+uri: qr{anonym-to\.com/\?}
 slots: max
 status: OK 2010-06-04
 
@@ -25,7 +26,7 @@ start:
 
 	my $link;
 	if ( $-{_referer} =~ m#^$serv# ) {
-		if ( m#<meta http-equiv="refresh" content="\d+;url='(.*?)'">#i ) {
+		if ( m#<meta http-equiv="refresh" content="\d+;\s*url='?(.*?)'?">#i ) {
 			$link = $1;
 		} elsif ( m#<i?frame\s+.*?src="(http://.*?)">#i ) {
 			$link = $1;
