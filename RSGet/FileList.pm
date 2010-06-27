@@ -240,7 +240,7 @@ sub readlist
 			if ( /^([a-z0-9_]+)=(.*)$/ ) {
 				$options->{$1} = uri_unescape( $2 );
 				next;
-			} elsif ( m{^((?:http|https|ftp)://)?(.*?\..*?/.*)$} ) {
+			} elsif ( m{^((?:http|https|ftp|rtmp|rtmpt?(?:|e|s)|rtspu?)://)?(.*?\..*?/.*)$} ) {
 				my $proto = $1 || "http://";
 				my $uri = $proto . $2;
 				$options = {};
