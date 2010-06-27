@@ -9,6 +9,7 @@ name: HTTP
 short: Direct::HTTP
 web: "http://rsget.pl/getters/Direct/HTTP/"
 uri: qr{http://.*[^/]}
+uri: qr{https://.*[^/]}
 slots: max
 status: OK 2010-06-26
 
