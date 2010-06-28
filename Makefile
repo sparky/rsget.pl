@@ -10,7 +10,7 @@ SETINTERPRETER = 1s|^\(..\).*|\1$(PERL)|;
 endif
 
 PLUGIN_DIRS = Get Video Audio Image Link Direct
-DIRS = RSGet Get Video Audio Image Link Direct data
+DIRS = RSGet $(PLUGIN_DIRS) data
 
 export LC_ALL=C
 
@@ -53,12 +53,9 @@ install: clean
 
 .PHONY: clean
 clean:
-	for DIR in $(DIRS); do \
+	for DIR in $(DIRS) .; do \
 		rm -fv $$DIR/*~; \
 		rm -fv $$DIR/.*~; \
 		rm -fv $$DIR/svn-commit.tmp*; \
 	done
-	rm -fv ./*~ \
-	rm -fv ./.*~ \
-	rm -fv ./svn-commit.tmp* \
 	rm -fv rsget.pl.datadir
