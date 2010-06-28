@@ -60,7 +60,7 @@ def_settings(
 my $curl_multi = new WWW::Curl::Multi;
 
 my $curl_headers = [
-	'User-Agent: Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.9.0.10) Gecko/2009042316 Firefox/3.0.10',
+	'User-Agent: Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10_6_2; en-US) AppleWebKit/532.9 (KHTML, like Gecko) Chrome/5.0.307.9 Safari/532.9',
 	'Accept: text/xml,application/xml,application/xhtml+xml,text/html;q=0.9,text/plain;q=0.8,image/png,*/*;q=0.5',
 	'Accept-Charset: ISO-8859-1,utf-8;q=0.7,*;q=0.7',
 	'Accept-Language: en-us,en;q=0.5',

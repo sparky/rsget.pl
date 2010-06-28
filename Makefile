@@ -10,7 +10,7 @@ SETINTERPRETER = 1s|^\(..\).*|\1$(PERL)|;
 endif
 
 PLUGIN_DIRS = Get Video Audio Image Link Direct
-DIRS = RSGet,Get,Video,Audio,Image,Link,Direct,data
+DIRS = RSGet Get Video Audio Image Link Direct data
 
 export LC_ALL=C
 
@@ -22,7 +22,9 @@ pkg:
 else
 pkg: clean
 	rm -rf $(PKGDIR)
-	install -d $(PKGDIR)/{$(DIRS)}
+	for DIR in $(DIRS); do \
+		install -d $(PKGDIR)/$$DIRS; \
+	done
 	install rsget.pl $(PKGDIR)
 	cp Makefile README README.config README.requirements $(PKGDIR)
 	cp RSGet/*.pm $(PKGDIR)/RSGet
@@ -35,7 +37,10 @@ pkg: clean
 endif
 
 install: clean
-	install -d $(DESTDIR)$(DATADIR)/{$(DIRS)} $(DESTDIR)$(BINDIR)
+	for DIR in $(DIRS); do \
+		install -d $(DESTDIR)$(DATADIR)/$$DIR; \
+	done
+	install -d $(DESTDIR)$(BINDIR)
 	sed '$(SETINTERPRETER) s#\($$install_path\) =.*;#\1 = "$(DATADIR)";#' \
 		< rsget.pl > rsget.pl.datadir
 	install rsget.pl.datadir $(DESTDIR)$(BINDIR)/rsget.pl
@@ -48,7 +53,12 @@ install: clean
 
 .PHONY: clean
 clean:
-	rm -fv {$(DIRS),.}/*~
-	rm -fv {$(DIRS),.}/.*~
-	rm -fv {$(DIRS),.}/svn-commit.tmp*
+	for DIR in $(DIRS); do \
+		rm -fv $$DIR/*~; \
+		rm -fv $$DIR/.*~; \
+		rm -fv $$DIR/svn-commit.tmp*; \
+	done
+	rm -fv ./*~ \
+	rm -fv ./.*~ \
+	rm -fv ./svn-commit.tmp* \
 	rm -fv rsget.pl.datadir
