@@ -260,11 +260,11 @@ sub readlist
 
 		foreach my $uri ( keys %decoded ) {
 			my $opt = $decoded{ $uri };
-			if ( $opt->{getter} ) {
-				$decoded{ $uri } = [ RSGet::Plugin::from_pkg( $opt->{getter} ),
-					$opt ];
+			my $getter;
+			if ( $opt->{getter} and $getter = RSGet::Plugin::from_pkg( $opt->{getter} ) ) {
+				$decoded{ $uri } = [ $getter, $opt ];
 			} else {
-				my $getter = RSGet::Plugin::from_uri( $uri );
+				$getter = RSGet::Plugin::from_uri( $uri );
 				if ( $getter ) {
 					my $newuri = $getter->unify( $uri );
 					$opt->{getter} = $getter->{pkg};
