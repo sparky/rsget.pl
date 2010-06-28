@@ -1,6 +1,7 @@
 
-DATADIR = /usr/share/rsget.pl
-BINDIR = /usr/bin
+# PREFIX should be set manually or will be selected during make install
+DATADIR = $(PREFIX)/share/rsget.pl
+BINDIR = $(PREFIX)/bin
 VER =
 PKGDIR = rsget.pl-$(VER)
 
@@ -12,13 +13,15 @@ endif
 PLUGIN_DIRS = Get Video Audio Image Link Direct
 DIRS = RSGet $(PLUGIN_DIRS) data
 
+Q = @
+
 export LC_ALL=C
 
 all: rsget.pl
 
 ifeq ($(VER),)
 pkg:
-	make VER="$$(svn up | sed '/At revision /!d; s/At revision //; s/\.//')" pkg
+	$(MAKE) VER="$$(svn up | sed '/At revision /!d; s/At revision //; s/\.//')" pkg
 else
 pkg: clean
 	rm -rf $(PKGDIR)
@@ -36,7 +39,18 @@ pkg: clean
 	tar -cjf $(PKGDIR).tar.bz2 $(PKGDIR)
 endif
 
+ifeq ($(PREFIX),)
+install:
+	$(Q)if [ -r /usr/bin/rsget.pl ]; then \
+		echo "*** Current rsget.pl instalation found in /usr/bin, using /usr as PREFIX"; \
+		$(MAKE) PREFIX="/usr" install; \
+	else \
+		$(MAKE) PREFIX="/usr/local" install; \
+	fi
+
+else
 install: clean
+	$(Q)echo "*** Installing in $(PREFIX)"
 	for DIR in $(DIRS); do \
 		install -d $(DESTDIR)$(DATADIR)/$$DIR; \
 	done
@@ -50,10 +64,11 @@ install: clean
 		cp $$DIR/* $(DESTDIR)$(DATADIR)/$$DIR || exit 1; \
 		grep -l "status:\s*BROKEN" $(DESTDIR)$(DATADIR)/$$DIR/* | xargs -r rm -v; \
 	done
+endif
 
 .PHONY: clean
 clean:
-	for DIR in $(DIRS) .; do \
+	$(Q)for DIR in $(DIRS) .; do \
 		rm -fv $$DIR/*~; \
 		rm -fv $$DIR/.*~; \
 		rm -fv $$DIR/svn-commit.tmp*; \
