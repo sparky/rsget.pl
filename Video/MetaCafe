@@ -10,7 +10,7 @@ short: V:MetaCafe
 web: "http://www.metacafe.com/"
 uri: qr{metacafe\.com/watch/}
 slots: max
-status: BROKEN 2010-06-04
+status: OK 2010-06-28
 
 start:
 	GET( $-{_uri} );
@@ -18,14 +18,22 @@ start:
 	LINK( "http://youtube.com/watch?v=$1" )
 		if $-{_referer} =~ m{/watch/yt-(.*?)/};
 
-	! m{mediaURL=(.*?)&};
-	my $file_uri = uri_unescape( $1 );
+	! m{mediaData=(.*?)&};
+	my $file_info = uri_unescape( $1 );
+	$file_info =~ /"mediaURL":"(.*?)","key":"(.*?)"/;
+	my ( $uri, $key ) = ( $1, $2 );
+	$uri =~ s#\\/#/#g;
+
 	! m{<title>(.*?) - Video</title>};
 	my $fname = de_ml( $1 );
 	$fname =~ s{/}{_}g;
-	$fname .= ".flv";
-	INFO( name => $fname, quality => "flv" );
 
-	DOWNLOAD( $file_uri, fname => $fname );
+	$uri =~ m/(\.[^\.]+)$/;
+	$fname .= $1;
+
+	$file_info =~ m/{"(.*?)"/;
+	INFO( name => $fname, quality => $1 );
+
+	DOWNLOAD( "$uri?__gda__=$key", fname => $fname );
 
 # vim: filetype=perl:ts=4:sw=4
