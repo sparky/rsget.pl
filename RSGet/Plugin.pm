@@ -106,11 +106,11 @@ sub check_opts
 		return "Name field: '$self->{name}' differs from file name\n";
 	}
 
-	if ( $self->{status} and $self->{status} =~ /^OK(\s+.*)?$/ ) {
-		return "";
-	}
+	return "Cannot find plugin status" unless $self->{status};
 
-	return "Incorrect status\n";
+	return "" if $self->{status} =~ /^OK(\s+.*)?$/;
+
+	return "Plugin is marked as $self->{status}";
 }
 
 sub check_parts
