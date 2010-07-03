@@ -8,12 +8,18 @@
 name: XVideos
 short: V:XVideos
 web: "http://xvideos.com/"
-uri: qr{xvideos\.com/video\d+/}
+uri: qr{xvideos\.com/video\d+}
 slots: max
 status: OK 2010-07-03
 
+unify:
+	return "http://www.xvideos.com/video$1/"
+		if m{xvideos\.com/video(\d+)};
+
 start:
 	GET( $-{_uri} );
+
+	ERROR( "file not found" ) if m{<h2>Page not found</h2>};
 
 	! m{<meta name=description content="XVIDEOS (.*?)">};
 	my $fname = de_ml( $1 );
