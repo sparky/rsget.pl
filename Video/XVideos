@@ -1,0 +1,29 @@
+# $Id$
+# Video::XVideos - Video getter plugin for rsget.pl
+#
+# 2010 (c) Przemysław Iskra <sparky@pld-linux.org>
+#		This program is free software,
+# you may distribute it under GPL v2 or newer.
+
+name: XVideos
+short: V:XVideos
+web: "http://xvideos.com/"
+uri: qr{xvideos\.com/video\d+/}
+slots: max
+status: OK 2010-07-03
+
+start:
+	GET( $-{_uri} );
+
+	! m{<meta name=description content="XVIDEOS (.*?)">};
+	my $fname = de_ml( $1 );
+	$fname =~ s{/}{_}g;
+	$fname .= ".flv";
+
+	INFO( name => $fname, quality => "flv" );
+
+	! m/flashvars.*&amp;flv_url=(http.*)&amp/;
+	my $file_uri = uri_unescape( $1 );
+	DOWNLOAD( $file_uri, fname => $fname );
+
+# vim: filetype=perl:ts=4:sw=4
