@@ -188,6 +188,7 @@ sub new
 				$curl->setopt( CURLOPT_RANGE, "$got-" );
 
 				$get_obj->log( "trying to continue at $got\n" ) if verbose( 4 );
+				$supercurl->{continue_at} = $got;
 				$supercurl->{fname} = $fn;
 				$supercurl->{filepath} = $fp
 			}
@@ -333,13 +334,20 @@ sub file_init
 			$get_obj->log( "WARNING: Name mismatch, shoud be '$fname'" );
 		}
 		$fname = $supercurl->{fname};
+
+		my $start;
 		if ( $supercurl->{head} =~ m{^Content-Range:\s*bytes\s*(\d+)-(\d+)(/(\d+))?\s*$}im ) {
-			my ( $start, $stop ) = ( +$1, +$2 );
+			$start = +$1;
 			$supercurl->{size_total} = +$4 if $3;
 
 			$get_obj->log( "ERROR: Size mismatch: $supercurl->{fsize} != $supercurl->{size_total}" )
 				if $supercurl->{fsize} != $supercurl->{size_total};
+		} elsif ( $supercurl->{head} =~ m{^350\s}m ) {
+			$start = $supercurl->{continue_at};
+			$supercurl->{size_total} = $start + $curl->getinfo( CURLINFO_CONTENT_LENGTH_DOWNLOAD );
+		}
 
+		if ( defined $start ) {
 			my $fp = $supercurl->{filepath};
 			my $old = file_backup( $fp, "continue" );
 			my $old_msg = "";
