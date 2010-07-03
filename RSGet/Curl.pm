@@ -21,7 +21,7 @@ set_rev qq$Id$;
 def_settings(
 	backup => {
 		desc => "Make backups if downloaded file exists.",
-		default => "done,continue,scratch",
+		default => "done,scratch",
 		allowed => qr/(no|(done|continue|scratch)(?:,(done|continue|scratch))*)/,
 		dynamic => {
 			'done,continue,scratch' => "Always.",
