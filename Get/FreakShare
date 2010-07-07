@@ -16,7 +16,8 @@ status: OK 2010-06-04
 start:
 	GET( $-{_uri} );
 
-	ERROR( "file not found" ) if /Sorry, this Download doesnt exist anymore/;
+	ERROR( "file not found: $1" )
+		if m#<h1 .*?>Error</h1>\s+<div.*?>\s*(.*?)\s+<#s;
 	RESTART( - irand( 60, 300 ), "free limit reached" )
 		if /Sorry, your Traffic is used up for today/;
 
