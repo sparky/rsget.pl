@@ -43,7 +43,7 @@ start:
 	GET( $-{_uri} );
 
 	ERROR( "file not found: $1" )
-		if /<div id="" class="yt-alert-content">\s*(Th.*?)\s*</s;
+		if /<div\s[^>]+class="yt-alert-content">\s*(Th.*?)\s*</s;
 	ERROR( "age verification required" )
 		if $-{_referer} =~ m#/verify_age#;
 
