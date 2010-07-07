@@ -36,7 +36,7 @@ start:
 
 	! $-{form} = $self->form( name => "f" );
 
-	WAIT( $wait, "starting download" );
+	WAIT( $wait + irand( 2, 10 ), "expecting captcha" );
 
 stage_getcaptcha:
 	CLICK( $-{form}->post() );
