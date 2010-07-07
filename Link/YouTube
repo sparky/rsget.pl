@@ -20,9 +20,9 @@ start:
 	GET( $-{_uri} );
 
 stage_morelinks:
-	push @{$-{list}}, $1 while s# href="(/watch\?v=.*?)\&feature=PlayList##;
+	push @{$-{list}}, $1 while s# href="(/watch\?v=.*?)\&##;
 
-	if ( m{class="pagerCurrent".*<a href='(.*/view_play_list\?p=.{16}&page=\d+)' class="pagerNotCurrent" >}s ) {
+	if ( m{<a href="(http://.*?view_play_list.*?page=.*?)" class="yt-uix-pager-link" data-page="\d+" >Next</a>} ) {
 		GET_NEXT( stage_morelinks, $1 );
 	}
 
