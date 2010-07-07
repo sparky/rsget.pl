@@ -85,7 +85,7 @@ sub captcha
 	}
 
 	# add to ask list
-	$needed{ $md5 } = [ $self->{content_type}, $self->{captcha_data} ];
+	$needed{ $md5 } = [ $self->{content_type}, $self->{captcha_data}, $self->{captcha_until} ];
 	$self->linedata( captcha => $md5 );
 }
 

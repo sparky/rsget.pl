@@ -697,11 +697,17 @@ sub captcha
 		$headers->{Content_Type} = "text/plain";
 		return $post->{solve};
 	} elsif ( my $n = $RSGet::Captcha::needed{ $md5 } ) {
-		( $ct, my $dataref ) = @$n;
+		( $ct, my $dataref, my $until ) = @$n;
 		$data = $$dataref;
 	} else {
-		$headers->{Content_Type} = "text/plain";
-		return join "\n", keys %RSGet::Captcha::needed, '';
+		$ct = "text/plain";
+		$data = "";
+		my $time = time;
+		foreach my $md5 ( sort {
+				$RSGet::Captcha::needed{ $a }->[2] <=> $RSGet::Captcha::needed{ $b }->[2]
+					or $a cmp $b } keys %RSGet::Captcha::needed ) {
+			$data .= $md5 . "\t" . ( $RSGet::Captcha::needed{ $md5 }->[2] - $time ) . "\n";
+		}
 	}
 
 	$headers->{Content_Type} = $ct;
