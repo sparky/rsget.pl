@@ -20,7 +20,8 @@ unify:
 start:
 	GET( $-{_uri} );
 
-	ERROR( "file not found" ) if m#File has been deleted#;
+	ERROR( "file not found" )
+		if m#<h1><span>The file has been deleted</span></h1>#;
 
 	if ( $self->{_cmd} ne "check" ) {
 		DELAY( 600, "free limit reached" )
