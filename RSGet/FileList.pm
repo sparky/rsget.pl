@@ -9,6 +9,7 @@ use strict;
 use warnings;
 use URI::Escape;
 use Fcntl qw(:DEFAULT :flock SEEK_SET);
+use IO::Handle;
 use RSGet::Tools;
 set_rev qq$Id$;
 
