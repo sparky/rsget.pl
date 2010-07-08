@@ -8,6 +8,7 @@ package RSGet::FileList;
 use strict;
 use warnings;
 use URI::Escape;
+use Fcntl qw(:DEFAULT :flock SEEK_SET);
 use RSGet::Tools;
 set_rev qq$Id$;
 
@@ -29,6 +30,7 @@ def_settings(
 
 my $file;
 my $file_swp;
+my $list_fh;
 
 my $update = 1;
 # $uri => { cmd => "CMD", globals => {...}, options => {...} }
@@ -42,21 +44,40 @@ my $update = 1;
 our @actual;
 our @added;
 
+sub list_open
+{
+	my $file = shift;
+	sysopen my $fh, $file, O_RDWR | O_CREAT or die "Cannot open $file: $!\n";
+	flock $fh, LOCK_EX | LOCK_NB or die "Cannot lock $file: $!\n";
+	seek $fh, 0, SEEK_SET;
+	return $fh;
+}
+
+sub list_close
+{
+	my $fh = shift;
+	flock $fh, LOCK_UN;
+	return close $fh;
+}
+
+END {
+	list_close $list_fh if $list_fh;
+}
+
 sub set_file
 {
 	$file = setting( "list_file" );
 	unless ( defined $file ) {
 		$file = 'get.list';
-		if ( -r $file ) {
-			p "Using '$file' file list\n";
-		} else {
+		unless ( -r $file ) {
 			p "Creating empty file list '$file'";
-			open F_OUT, '>', $file;
-			print F_OUT "# empty list\n";
-			close F_OUT;
+			$list_fh = list_open $file;
+			print $list_fh "# empty list\n";
 		}
-	} else {
+	}
+	unless ( $list_fh ) {
 		p "Using '$file' file list\n";
+		$list_fh = list_open $file;
 	}
 	die "Can't read '$file'\n" unless -r $file;
 
@@ -187,11 +208,10 @@ sub readlist
 	return unless -r $file;
 	my $mtime = (stat _)[9];
 	return unless $update or $mtime != $listmtime;
-	#p "readlist()";
 
-	open my $list, '<', $file;
-	my @list = <$list>;
-	close $list;
+	list_close $list_fh;
+	$list_fh = list_open $file;
+	my @list = <$list_fh>;
 
 	push @list, @added;
 
@@ -371,11 +391,13 @@ sub readlist
 	unlink $file_swp if @added or $update == 2;
 
 	unless ( -e $file_swp ) {
-		open my $newlist, '>', $file . ".tmp";
-		print $newlist @new;
-		close $newlist || die "\nCannot update $file file: $!\n";
+		my $fh = list_open $file . ".tmp";
+		print $fh @new;
+		$fh->flush() or die "Cannot write data to file: $!\n";
+		list_close $list_fh;
 		unlink $file;
 		rename $file . ".tmp", $file;
+		$list_fh = $fh;
 		@added = ();
 		$process = undef;
 		foreach my $uri ( @used_save ) {
