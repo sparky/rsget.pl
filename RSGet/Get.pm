@@ -319,12 +319,14 @@ sub problem
 	my $self = shift;
 	my $line = shift;
 	my $msg = $line ? "problem at line: $line" : "unknown problem";
-	my $retry = 8;
+	my $retry = 6;
 	$retry = 3 if $self->{_cmd} eq "check";
 	if ( ++$self->{_try} < $retry ) {
 		return $self->wait( \&start, -2 ** $self->{_try}, $msg, "problem" );
-	} else {
+	} elsif ( $self->{_cmd} eq "check" ) {
 		return $self->error( $msg . ", aborting" );
+	} else {
+		return $self->delay( 15 * 60, $msg );
 	}
 }
 
