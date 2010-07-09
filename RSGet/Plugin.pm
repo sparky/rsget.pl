@@ -185,23 +185,23 @@ sub compile
 	$self->{compiled} = 1;
 	return if $self->{error};
 	my $web = defined $self->{web} ? " ($self->{web})" : "";
-	p "Compiling $self->{pkg} plugin $web";
+	p "$self->{pkg}: Compiling plugin $web";
 	p "$self->{pkg}: make sure you agree with $self->{tos}" if $self->{tos};
 
 	my $parts = $self->read_file();
 	unless ( $parts ) {
 		$self->{error} = "$self->{pkg} compilation error: cannot read file $self->{file}";
-		p "Compilation failed";
+		p "$self->{pkg}: Compilation failed";
 	}
 
 	my $unify = RSGet::Processor::compile( $self, $parts );
 
 	if ( ref $unify and ref $unify eq "CODE" ) {
 		$self->{unify} = $unify;
-		p "Compilation successful";
+		p "$self->{pkg}: Compilation successful";
 	} else {
 		$self->{error} = "$self->{pkg} compilation error";
-		p "Compilation failed";
+		p "$self->{pkg}: Compilation failed";
 	}
 }
 
@@ -260,7 +260,7 @@ sub add
 	if ( $plugin ) {
 		my $pkg = $plugin->{pkg};
 		$getters{ $pkg } = $plugin;
-		new RSGet::Line( "INIT: ", "$pkg: added" )
+		new RSGet::Line( "INIT: ", "$pkg: Added" )
 			if verbose( 1 );
 		return 1;
 	} else {
