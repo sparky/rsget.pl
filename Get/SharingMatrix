@@ -97,8 +97,7 @@ stage_captcha:
 	GET( "/ajax_scripts/_get.php?link_id=$-{link_id}&link_name=$-{link_name}&dl_id=$-{dl_id}&password=",
 		keep_referer => 1 );
 
-	DELAY( 600, "free limit reached" )
-		if /"You can not download now/;
+	! !/"You can not download now/;
 
 	s/^{//; s/}$//;
 	my %js = map { /^(.*?)\s*:\s*"(.*?)"/ } split /\s*,\s*/, $_;
