@@ -269,12 +269,12 @@ sub delay
 	my $self = shift;
 	my $time = shift;
 	my $msg = shift;
-	$time = abs $time;
+	$time = ( $self->{_opts}->{delay_last} || 0 ) + abs $time;
 	my $until = $time + time;
 	$msg = "Delayed until " . localtime( $until ) . ": " . $msg;
 
 	$self->print( $msg ) || $self->log( $msg );
-	RSGet::FileList::save( $self->{_uri}, options => { delay => $until, error => $msg } );
+	RSGet::FileList::save( $self->{_uri}, options => { delay => $until, error => $msg, delay_last => $time } );
 	RSGet::Dispatch::finished( $self );
 }
 
@@ -290,7 +290,7 @@ sub finish
 	}
 
 	RSGet::Dispatch::mark_used( $self );
-	RSGet::FileList::save( $self->{_uri}, cmd => "DONE" );
+	RSGet::FileList::save( $self->{_uri}, cmd => "DONE", options => { delay_last => undef } );
 	RSGet::Dispatch::finished( $self );
 }
 
@@ -326,7 +326,7 @@ sub problem
 	} elsif ( $self->{_cmd} eq "check" ) {
 		return $self->error( $msg . ", aborting" );
 	} else {
-		return $self->delay( 15 * 60, $msg );
+		return $self->delay( 10 * 60, $msg );
 	}
 }
 
