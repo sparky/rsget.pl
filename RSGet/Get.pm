@@ -21,6 +21,10 @@ def_settings(
 		allowed => qr/\d/,
 		type => "NUMBER",
 	},
+	tmpdir => {
+		desc => "Directory where temporary files (cookies and dumps) are stored.",
+		type => "PATH",
+	},
 );
 
 BEGIN {
@@ -41,6 +45,9 @@ sub make_cookie
 	my $n = $cookies{ $c }++;
 
 	local $_ = ".cookie.$c.$n.txt";
+	if ( my $dir = setting( "tmpdir" ) ) {
+		$_ = $dir . "/" . $_;
+	}
 	unlink $_ if -e $_;
 	return _cookie => $_;
 }
@@ -356,7 +363,10 @@ sub dump
 		return;
 	}
 
-	my $file = sprintf "dump.$self->{_id}.%.4d.$ext",
+	my $dir = setting( "tmpdir" ) || "";
+	$dir .= "/" if $dir;
+
+	my $file = sprintf "${dir}dump.$self->{_id}.%.4d.$ext",
 		++$self->{_last_dump};
 
 	open my $f_out, '>', $file;
