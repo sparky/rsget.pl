@@ -10,13 +10,15 @@ short: FF
 web: "http://filefactory.com/"
 tos: "http://filefactory.com/legal/terms.php"
 uri: qr{filefactory\.com/file/[0-9a-z]{6}}
-status: OK 2010-06-04
+status: BROKEN 2010-07-11
 
 start:
 	GET( $-{_uri} );
 
 	RESTART( -2 * 60, "no slots for free users" )
 		if /there are currently no free download slots available/;
+	DELAY( 2 * 60, "server overloaded" )
+		if /All of the available .*download slots on this server are in use/;
 	ERROR( "file not found" ) if /File Not Found|This file has been deleted/;
 	! m{<title>(.*?) - download now for free};
 	my $name = $1;
