@@ -19,7 +19,10 @@ our %settings;
 unshift @INC, $install_path;
 
 my $cdir = "$ENV{HOME}/.rsget.pl";
+my $xdgdir = ( $ENV{XDG_CONFIG_HOME} || "$ENV{HOME}/.config" ) . "/rsget.pl";
+$cdir = $xdgdir if -d $xdgdir;
 $cdir = $ENV{RSGET_DIR} if $ENV{RSGET_DIR};
+
 $ENV{RSGET_DIR} = $cdir;
 read_config( "$cdir/config" );
 
