@@ -10,6 +10,12 @@ use warnings;
 use RSGet::Tools;
 set_rev qq$Id$;
 
+def_settings(
+	logfile => {
+		desc => "Select log file, empty value disables logging.",
+		type => "PATH",
+	},
+);
 my $term_size_columns;
 my $term_size_rows;
 
@@ -33,6 +39,7 @@ my %dead;
 our @dead;
 our $dead_change = 0;
 our %status;
+my $log_fh;
 my $last_line = 0;
 
 my $last_day = -1;
@@ -60,6 +67,8 @@ sub print_dead_lines
 	}
 
 	print @print unless $nooutput;
+	print $log_fh join "\n", @newdead, ''
+		if $log_fh;
 	if ( @newdead ) {
 		push @dead, @newdead;
 		$dead_change++;
@@ -196,10 +205,20 @@ sub status
 	hadd( \%status, @_ );
 }
 
+END {
+	close $log_fh if $log_fh;
+}
+
 sub init
 {
 	$nooutput = shift;
 	$| = 1;
+
+	if ( my $file = setting( "logfile" ) ) {
+		$log_fh = undef;
+		open $log_fh, ">>", $file
+			or die "Cannot open log file $file: $!\n";
+	}
 
 	$SIG{__WARN__} = sub {
 		new RSGet::Line( "WARNING: ", shift );
