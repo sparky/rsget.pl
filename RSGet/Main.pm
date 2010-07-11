@@ -40,11 +40,11 @@ def_settings(
 		default => 0,
 		allowed => qr/\d+/,
 	},
-	userconfig => {
-		desc => "User configuration file.",
-		allowed => qr/.+/,
-		type => "PATH",
-	},
+	#userconfig => {
+	#	desc => "User configuration file.",
+	#	allowed => qr/.+/,
+	#	type => "PATH",
+	#},
 	daemon => {
 		desc => "Enter daemon mode. 1 - disable console output, 2 - also fork",
 		default => 0,
@@ -74,7 +74,7 @@ sub init
 	maybe_update( $argv );
 
 	check_settings( \%main::settings );
-	read_userconfig();
+	#read_userconfig();
 	my $daemon = setting( "daemon" );
 	RSGet::Line::init( $daemon );
 	print_settings() if verbose( 1 );
