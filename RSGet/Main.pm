@@ -98,7 +98,7 @@ sub init
 
 	maybe_start_http();
 	new RSGet::Line();
-	new RSGet::Line( "rsget.pl started successfully" );
+	new RSGet::Line( "rsget.pl started successfully on pid $$" );
 	new RSGet::Line();
 	RSGet::Line::update();
 
