@@ -44,7 +44,7 @@ sub make_cookie
 	$cookies{ $c } = 1 unless $cookies{ $c };
 	my $n = $cookies{ $c }++;
 
-	local $_ = ".cookie.$c.$n.txt";
+	local $_ = "cookie.$c.$n.txt";
 	if ( my $dir = setting( "tmpdir" ) ) {
 		$_ = $dir . "/" . $_;
 	}
