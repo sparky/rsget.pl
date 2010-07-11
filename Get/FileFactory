@@ -10,7 +10,7 @@ short: FF
 web: "http://filefactory.com/"
 tos: "http://filefactory.com/legal/terms.php"
 uri: qr{filefactory\.com/file/[0-9a-z]{6}}
-status: BROKEN 2010-07-11
+status: OK 2010-07-11
 
 start:
 	GET( $-{_uri} );
@@ -31,31 +31,43 @@ start:
 		RESTART( $1 / 1000, "free limit reached" ) if $1 > 0;
 	}
 
-	! m#var.*?eval.*?fromCharCode.*?"(\?key=.*?)"#;
-	GET( "/file/getLink.js" . $1, keep_referer => 1 );
+	$-{post} = {
+		recaptcha_shortencode_field => "undefined",
+	};
+	! m#(check):'([0-9a-f]{32})'#;
+	$-{post}->{$1} = $2;
 
-	! s/^(.*)var \S+=function\(\){ var \S+=(.*?);.*//m;
-	my ($vars, $toeval) = ($1, $2);
+	! m#Recaptcha\.create\("([a-zA-Z0-9]{40})"#;
+	CLICK( "http://www.google.com/recaptcha/api/challenge?k=$1&ajax=1&cachestop=" . rand, keep_referer => 1 );
 
-	my %vars = map { /var\s+(\S+?)\s*=\s*'(.*?)'/ } split /;/, $vars;
-	my $code = join "", map { /'(.*)'/ ? $1 : $vars{ $_ } } split /\s*\+\s*/, $toeval;
+	! m{challenge : '(\S+?)',};
+	$-{post}->{recaptcha_challenge_field} = $1;
+	GET( "http://www.google.com/recaptcha/api/image?c=$1", keep_referer => 1 );
 
-	CLICK( $code );
+	CAPTCHA(
+		qr/\S+ \S+/
+	);
 
-	! m#<span class="countdown".*?>(\d+)</span>#;
-	$-{wait} = $1;
-	RESTART( $-{wait}, "free limit reached" ) if $-{wait} > 120;
+	RESTART( 0, "Captcha not solved" ) unless $_;
 
-	! m#var.*?eval.*?fromCharCode.*?"(\?key=.*?)"#;
-	GET( "/file/getLink.js" . $1, keep_referer => 1 );
+	$-{post}->{recaptcha_response_field} = $_;
+	GET( "http://www.filefactory.com/file/checkCaptcha.php", post => $-{post}, keep_referer => 1 );
 
-	! s/^(.*)var \S+=function\(\){ var \S+=(.*?);.*//m;
-	my ($vars, $toeval) = ($1, $2);
+	if ( /{status:"fail",message:"Entered code was incorrect\."}/ ) {
+		CAPTCHA_RESULT( "FAIL" );
+		RESTART( 0, "Captcha failed" );
+	} else {
+		CAPTCHA_RESULT( "OK" );
+	}
 
-	my %vars = map { /var\s+(\S+?)\s*=\s*'(.*?)'/ } split /;/, $vars;
-	$-{file_uri} = join "", map { /'(.*)'/ ? $1 : $vars{ $_ } } split /\s*\+\s*/, $toeval;
+	! m#{status:"ok",path:"(.*?)"}#;
+	GET( $1 );
 
-	WAIT( $-{wait}, "starting download" );
+	! m#<a href="(\S+)" id="downloadLinkTarget">#;
+	$-{file_uri} = $1;
+
+	! m#<input type="hidden" id="startWait" value="(\d+)"#;
+	WAIT( $1, "starting download" );
 
 	CLICK_DOWNLOAD( $-{file_uri} );
 
