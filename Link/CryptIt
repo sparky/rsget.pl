@@ -40,11 +40,11 @@ start:
 		unless $-{_referer} =~ m{^http://crypt-it\.com/(.*?)/(.*?)$};
 	$-{dir} = $2;
 
-	ERROR( "password required" )
-		if />Acces denied! Password required</;
-
 	my $pass = $-{_opts}->{pass} || "";
 	my $post = $post_header . $-{dir} . $post_separator . ( chr length $pass ) . $pass;
+
+	ERROR( "password required" )
+		if />Acces denied! Password required</ and not $pass;
 
 	GET( "http://crypt-it.com/engine/",
 		post => $post,
