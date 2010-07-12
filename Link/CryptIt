@@ -10,7 +10,7 @@ short: L:CryptIt
 web: "http://crypt-it.com/"
 uri: qr{crypt-it\.com/}
 slots: max
-status: OK 2010-06-04
+status: OK 2010-07-12
 
 pre:
 	# from jdownloader
@@ -30,11 +30,18 @@ pre:
 	use Crypt::Rijndael;
 	my $cipher = new Crypt::Rijndael $key;
 
+unify:
+	return "http://crypt-it.com/$1/$2"
+		if m{^http://crypt-it\.com/(.*?)/(.*?)(/.*)?$};
+
 start:
-	! $-{_uri} =~ m{^http://crypt-it\.com/(.*?)/(.*?)(/.*)?$};
-	my $mode = $1;
+	GET( $-{_uri} );
+	ERROR( "links not found" )
+		unless $-{_referer} =~ m{^http://crypt-it\.com/(.*?)/(.*?)$};
 	$-{dir} = $2;
-	GET( "http://crypt-it.com/$mode/$-{dir}/" );
+
+	ERROR( "password required" )
+		if />Acces denied! Password required</;
 
 	my $pass = $-{_opts}->{pass} || "";
 	my $post = $post_header . $-{dir} . $post_separator . ( chr length $pass ) . $pass;
