@@ -11,7 +11,7 @@ web: "http://rsget.pl/getters/Direct/HTTP/"
 uri: qr{http://.*[^/]}
 uri: qr{https://.*[^/]}
 slots: max
-status: OK 2010-06-26
+status: OK 2010-07-12
 
 start:
 	GET( $-{_uri}, headonly => 1 );
@@ -33,7 +33,7 @@ start:
 		ERROR( "file is text ($type)" );
 	}
 	ERROR( "file is a small image ($type, $len)" )
-		if $type =~ m#^image/# and $len < 100 * 1024;
+		if $type =~ m#^image/# and $len < 32 * 1024;
 
 	my ( $name ) = $-{_referer} =~ m{.*/(.*)$};
 	if ( /^Content-Disposition:(.+?)\r?$/mi ) {
