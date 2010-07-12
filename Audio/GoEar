@@ -10,7 +10,7 @@ short: A:GoEar
 web: "http://goear.com/"
 uri: qr{goear\.com/listen/[0-9a-f]+/}
 slots: max
-status: OK 2010-06-04
+status: OK 2010-07-12
 
 unify:
 	my ( $id ) = m{/listen/([0-9a-f]+)/};
