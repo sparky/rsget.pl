@@ -5,10 +5,13 @@
 #		This program is free software,
 # you may distribute it under GPL v2 or newer.
 
+# TODO: support new-type links links (dedicated subdomain)
+
 name: LinkProtector
 short: L:LinkProtector
 web: "http://link-protector.com/"
 uri: qr{link-protector\.com/}
+uri: qr{[a-z]{6}\.link-protector\.com}
 slots: max
 status: OK 2010-06-04
 
