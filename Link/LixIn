@@ -11,7 +11,7 @@ web: "http://lix.in/"
 uri: qr{lix\.in/-?[0-9a-f]+(#.*)?$}
 slots: !1
 cookie: !lix
-status: OK 2010-06-04
+status: OK 2010-07-12
 
 start:
 	GET( $-{_uri} );

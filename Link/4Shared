@@ -12,7 +12,7 @@ tos: "http://www.4shared.com/terms.jsp"
 uri: qr{4shared\.com/dir/}
 slots: max
 cookie: !4sh
-status: OK 2010-06-04
+status: OK 2010-07-12
 
 unify:
 	return "http://www.4shared.com/dir/$1/$2"

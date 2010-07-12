@@ -10,7 +10,7 @@ short: L:SecuredIn
 web: "http://secured.in/"
 uri: qr{secured\.in/download-\d+-[0-9a-f]+\.html$}
 slots: max
-status: OK 2010-06-04
+status: OK 2010-07-12
 
 pre:
 	use MIME::Base64;

@@ -11,7 +11,7 @@ web: "http://www.sharebee.com/"
 tos: "http://www.sharebee.com/tos"
 uri: qr{sharebee\.com/}
 slots: max
-status: OK 2010-06-04
+status: OK 2010-07-12
 
 start:
 	GET( $-{_uri} );

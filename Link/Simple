@@ -14,7 +14,7 @@ uri: qr{tinyurl\.com/}
 uri: qr{to\./}
 uri: qr{anonym-to\.com/\?}
 slots: max
-status: OK 2010-06-04
+status: OK 2010-07-12
 
 start:
 	my $uri = $-{_uri};
