@@ -10,7 +10,7 @@ short: FF
 web: "http://filefactory.com/"
 tos: "http://filefactory.com/legal/terms.php"
 uri: qr{filefactory\.com/file/[0-9a-z]{6}}
-status: OK 2010-07-11
+status: OK 2010-07-12
 
 start:
 	GET( $-{_uri} );
