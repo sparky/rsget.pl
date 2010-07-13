@@ -26,7 +26,7 @@ else
 pkg: clean
 	rm -rf $(PKGDIR)
 	for DIR in $(DIRS); do \
-		install -d $(PKGDIR)/$$DIRS; \
+		install -d $(PKGDIR)/$$DIR; \
 	done
 	install rsget.pl $(PKGDIR)
 	cp Makefile README README.config README.requirements $(PKGDIR)
