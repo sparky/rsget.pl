@@ -23,6 +23,8 @@ start:
 
 	ERROR( "file not found" )
 		if /<title>File not found/;
+	ERROR( "not allowed: $1" )
+		if /(The requested file is larger.*only premium.*?)</;
 
 	! m#<b>Download</b>\s+\((\d+(?:,\d+)?\s*[KMG]?B)\)#s;
 	my $asize = $1;

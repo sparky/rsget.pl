@@ -9,7 +9,7 @@ name: StorageTo
 short: ST
 web: "http://storage.to/"
 uri: qr{storage\.to/get/[a-zA-Z0-9]{8}([\?/].*?)?$}
-status: OK 2010-06-04
+status: OK 2010-07-13
 
 start:
 	GET( $-{_uri} );
@@ -24,7 +24,7 @@ start:
 	! s/^.*?{\s+//;
 	! s/\s+}.*?$//;
 
-	ERROR( "download failed" ) if /'state'\s*:\s*'failed'/;
+	DELAY( 5 * 60, "download failed" ) if /'state'\s*:\s*'failed'/;
 
 	! /'countdown'\s*:\s*(\d+)/;
 	my $wait = $1;
