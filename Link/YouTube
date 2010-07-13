@@ -10,7 +10,7 @@ short: L:YouTube
 web: "http://www.youtube.com/"
 uri: qr{youtube\.com/view_play_list\?p=([A-F0-9]{16})}
 slots: max
-status: OK 2010-06-04
+status: OK 2010-07-12
 
 unify:
 	return "http://www.youtube.com/view_play_list?p=$1"

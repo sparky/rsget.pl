@@ -10,7 +10,7 @@ short: V:MetaCafe
 web: "http://www.metacafe.com/"
 uri: qr{metacafe\.com/watch/}
 slots: max
-status: OK 2010-06-28
+status: OK 2010-07-13
 
 start:
 	GET( $-{_uri} );

@@ -10,7 +10,7 @@ short: V:PornHub
 web: "http://www.pornhub.com/"
 uri: qr{pornhub\.com/view_video.php\?viewkey=}
 slots: max
-status: OK 2010-06-04
+status: OK 2010-07-13
 
 pre:
 	my $amf_pre = pack "C*", (

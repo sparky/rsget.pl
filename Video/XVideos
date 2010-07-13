@@ -10,7 +10,7 @@ short: V:XVideos
 web: "http://xvideos.com/"
 uri: qr{xvideos\.com/video\d+}
 slots: max
-status: OK 2010-07-03
+status: OK 2010-07-13
 
 unify:
 	return "http://www.xvideos.com/video$1/"

@@ -10,7 +10,7 @@ short: V:InteriaPL
 web: "http://video.interia.pl/"
 uri: qr{video\.interia\.pl/obejrzyj,film,\d+}
 slots: max
-status: OK 2010-06-05
+status: OK 2010-07-13
 
 start:
 	GET( $-{_uri} );

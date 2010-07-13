@@ -10,7 +10,7 @@ short: V:SpankWire
 web: "http://www.spankwire.com/"
 uri: qr{spankwire\.com/[^/]+/video\d+}
 slots: max
-status: OK 2010-06-04
+status: OK 2010-07-13
 
 start:
 	GET( $-{_uri} );
