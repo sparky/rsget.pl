@@ -9,7 +9,7 @@ name: DepositFiles
 short: DF
 web: "http://depositfiles.com/"
 uri: qr{depositfiles\.com/(../)?files/[0-9a-z]+}
-status: OK 2010-07-12
+status: OK 2010-07-13
 
 unify:
 	return "http://depositfiles.com/files/$1" if m#/files/([0-9a-z]+)#;
