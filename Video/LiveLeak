@@ -10,10 +10,13 @@ short: V:LiveLeak
 web: "http://liveleak.com/"
 uri: qr{liveleak\.com/view\?i=}
 slots: max
-status: OK 2010-06-04
+status: OK 2010-07-13
 
 start:
 	GET( $-{_uri} );
+
+	ERROR( "file not found: $1" )
+		if m#<h4><font color="FF0000">(.*?)<#;
 
 	! m{<h4 id="s_hd">(.*?)</h4>};
 	$-{fname} = de_ml( $1 );
