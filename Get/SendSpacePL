@@ -11,7 +11,7 @@ web: "http://www.sendspace.pl/"
 tos: "http://www.sendspace.pl/informacje/regulamin"
 uri: qr{sendspace\.pl/file/[a-zA-Z0-9]{8}}
 cookie: ss.pl
-status: OK 2010-06-05
+status: OK 2010-07-14
 
 start:
 	GET( $-{_uri} );
@@ -32,7 +32,7 @@ start:
 
 	CLICK_DOWNLOAD( $file_uri );
 
-	ERROR( "temporarily unavailable" ) if /jest chwilowo niedostępny/;
+	DELAY( 5 * 60, "temporarily unavailable" ) if /jest chwilowo niedostępny/;
 	RESTART( $1, "free limit reached" ) if /setDownloadTimeOut\('(\d+)'\);/;
 
 # vim: filetype=perl:ts=4:sw=4
