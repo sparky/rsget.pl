@@ -257,11 +257,12 @@ sub readlist
 
 		my %decoded;
 		my @invalid;
+		my $protos = qr{(?:http|https|ftp|rtmp|rtmpt?(?:|e|s)|rtspu?)://}o;
 		foreach ( @words ) {
 			if ( /^([a-z0-9_]+)=(.*)$/ ) {
 				$options->{$1} = uri_unescape( $2 );
 				next;
-			} elsif ( m{^((?:http|https|ftp|rtmp|rtmpt?(?:|e|s)|rtspu?)://)?(.*?\..*?/.*)$} ) {
+			} elsif ( m{^($protos)?(.*?\..*?/.*)$}o or m{^($protos)(\S+?\.\S+)$}o ) {
 				my $proto = $1 || "http://";
 				my $uri = $proto . $2;
 				$options = {};

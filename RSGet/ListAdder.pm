@@ -53,10 +53,12 @@ sub add_links
 		}
 	}
 
-	my $u = qr/[a-z0-9_-]+/;
-	my $tld = qr/[a-z]{2,8}/;
+	my $u = qr/[a-z0-9_-]+/o;
+	my $tld = qr/[a-z]{2,8}/o;
+	my $protos = qr{(?:http|https|ftp|rtmp|rtmpt?(?:|e|s)|rtspu?)://}o;
 	foreach ( split /\s+/s, $text ) {
-		next unless m{^(.*?)(https?://||ftp://)?((?:$u\.)*$u\.$tld/.+)$};
+		next unless m{^(.*?)($protos)?((?:$u\.)*$u\.$tld/.+)$}o
+			or m{^(.*?)($protos)((?:$u\.)*$u\.$tld)$}o;
 		my $pre = $1;
 		my $proto = $2 || "http://";
 		my $uri = $proto . $3;
