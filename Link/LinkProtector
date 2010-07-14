@@ -5,19 +5,25 @@
 #		This program is free software,
 # you may distribute it under GPL v2 or newer.
 
-# TODO: support new-type links links (dedicated subdomain)
-
 name: LinkProtector
 short: L:LinkProtector
 web: "http://link-protector.com/"
-uri: qr{link-protector\.com/}
+uri: qr{link-protector\.com/\d+}
 uri: qr{[a-z]{6}\.link-protector\.com}
 slots: max
 status: OK 2010-06-04
 
+unify:
+	return "http://$1.link-protector.com/"
+		if m{([a-z]{6})\.link-protector\.com};
+
 start:
+	$-{_referer} = $-{_uri};
+
 	GET( $-{_uri} );
-	! m#<INPUT type="button" value="CONTINUE ..." name="Continue" onClick="window.location='(.*?)'"#;
+
+	! m#<INPUT type="button" value="CONTINUE ..." name="Continue" onClick="window.location='(.*?)'"#
+		or m#<frame name="protected" src="(.*?)">#;
 
 	LINK( $1 );
 
