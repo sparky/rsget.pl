@@ -5,8 +5,6 @@
 #		This program is free software,
 # you may distribute it under GPL v2 or newer.
 
-# TODO: support images, and probably other content
-
 name: 4Shared
 short: 4S
 web: "http://www.4shared.com/"
@@ -14,7 +12,7 @@ tos: "http://www.4shared.com/terms.jsp"
 uri: qr{4shared\.com/(account/)?file/}
 cookie: 4s
 slots: max
-status: OK 2010-06-05
+status: OK 2010-07-14
 
 unify:
 	return "http://www.4shared.com/file/$1/$2"
@@ -26,7 +24,7 @@ start:
 	ERROR( "file not found" )
 		if m{^\s*<img alt="" src="/images/spacer\.gif" class="warn" hspace="3" align="left" />\s*$}m;
 
-	! m{window\.location = ".*/(.*?)\?tsid=.*";};
+	! m{window\.location = ".*/(.*?)\?tsid=.*";} or m{doFullImgExpand\(this, '[^'?]+/(.*?)\?};
 	my $name = uri_unescape( $1 );
 
 	! m{<td class="finforight">(\d+(?:,\d+)? KB)</td>}s;
@@ -35,7 +33,14 @@ start:
 	INFO( name => $name, asize => $size );
 
 	! m{<a href="(.*?)" class="dbtn" tabindex="1">};
-	CLICK( $1 );
+	my $btn_uri = $1;
+
+	if ( m{doFullImgExpand\(this,} ) {
+		$-{file_uri} = $btn_uri;
+		GOTO stage_download;
+	}
+
+	CLICK( $btn_uri );
 
 	! m{id='divDLStart'>\s*<a href='(.*?)'>};
 	$-{file_uri} = $1;
@@ -43,6 +48,7 @@ start:
 	! /var c = (\d+);/;
 	WAIT( $1, "starting download" );
 
+stage_download:
 	CLICK_DOWNLOAD( $-{file_uri} );
 
 # vim: filetype=perl:ts=4:sw=4
