@@ -12,7 +12,7 @@ tos: "http://shareplace.com/rules.php"
 uri: qr{shareplace\.com/\?[0-9A-F]+(/.*)?}
 uri: qr{shareplace\.org/\?[0-9A-F]+(/.*)?}
 slots: max
-status: OK 2010-06-04
+status: OK 2010-07-14
 
 unify:
 	return "http://shareplace.org/?$1"
