@@ -35,12 +35,13 @@ sub p_subend
 	return unless $is_sub;
 	$is_sub--;
 
-	my $error = 'unexpected end of script';
 	if ( $last_cmd and $last_cmd =~ /(?:click_)?download/ ) {
-		$error = 'download is a HTML page';
+		$last_cmd = undef;
+		pr "\treturn \${self}->delay( 15 * 60, 'download is a HTML page' );\n}\n";
+		return;
 	}
 	$last_cmd = undef;
-	pr "\treturn \${self}->error( '$error' );\n}\n";
+	pr "\treturn \${self}->error( 'unexpected end of script' );\n}\n";
 }
 
 my $space;
