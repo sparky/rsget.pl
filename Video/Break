@@ -10,7 +10,7 @@ short: V:Break
 web: "http://www.break.com/"
 uri: qr{break\.com/.+?/.+}
 slots: max
-status: BROKEN 2010-07-13
+status: OK 2010-07-15
 
 # TODO: support pictures
 
@@ -20,22 +20,18 @@ start:
 	ERROR( "file not found" )
 		if m{404 Page Not Found} or $-{_referer} eq "http://www.break.com/";
 
-	! m{<meta name="title" content="(.*?)"};
-	my $name = de_ml( $1 );
-	$name =~ s{/}{_}g;
-	$name .= ".flv";
-	INFO( name => $name, quality => "flv" );
-
-	! m{sGlobalContentFilePath='(.*?)'};
-	my $fp = $1;
 	! m{sGlobalFileName='(.*?)'};
-	my $fn = $1;
-	! m{var\s+videoPath\s*=\s*"(.*?)"};
-	my $vp = $1;
+	my $uri = $1;
+	! m{var\s+videoPath\s*=\s*sGlobalFileName\s*\+\s*'(.*?)';};
+	$uri .= $1;
 
-	! m{\s+flashVars\.icon\s*=\s*"(.*?)"};
-	my $icon = $1;
+	! $uri =~ m#.*/(.+)#;
+	INFO( name => $1, quality => "flv" );
 
-	DOWNLOAD( "$vp$fp/$fn.flv?$icon", fname => $name );
+	! m{sGlobalToken='([0-9A-F]+)'};
+	my $token = $1;
+
+
+	DOWNLOAD( "$uri?$token" );
 
 # vim: filetype=perl:ts=4:sw=4
