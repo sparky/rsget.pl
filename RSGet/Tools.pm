@@ -57,9 +57,7 @@ sub hadd(%@)
 {
 	my $h = shift;
 	my %new = @_;
-	foreach ( keys %new ) {
-		$h->{$_} = $new{$_};
-	}
+	@$h{ keys %new } = values %new;
 }
 
 
