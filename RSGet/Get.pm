@@ -405,7 +405,7 @@ sub info
 	$info{asize} =~ s/\s+//g if $info{asize};
 	RSGet::FileList::save( $self->{_uri}, options => \%info );
 
-	@{$self->{_opts}->{ keys %info }} = values %info;
+	hadd( $self->{_opts}, %info );
 	$self->bestinfo();
 
 	return 0 unless $self->{_cmd} eq "check";
