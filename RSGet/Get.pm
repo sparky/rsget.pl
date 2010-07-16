@@ -380,11 +380,8 @@ sub bestinfo
 {
 	my $self = shift;
 	my $o = $self->{_opts};
-	my $i = $self->{info};
 
 	my $bestname = $o->{fname}
-		|| $i->{name} || $i->{iname}
-		|| $i->{aname} || $i->{ainame}
 		|| $o->{name} || $o->{iname}
 		|| $o->{aname} || $o->{ainame};
 	unless ( $bestname ) {
@@ -396,7 +393,6 @@ sub bestinfo
 	$self->{_name} = $bestname;
 
 	my $bestsize = $o->{fsize}
-		|| $i->{size} || $i->{asize}
 		|| $o->{size} || $o->{asize}
 		|| "?";
 	$self->{bestsize} = $bestsize;
@@ -406,10 +402,10 @@ sub info
 {
 	my $self = shift;
 	my %info = @_;
-	$info{asize} =~ s/ //g if $info{asize};
+	$info{asize} =~ s/\s+//g if $info{asize};
 	RSGet::FileList::save( $self->{_uri}, options => \%info );
 
-	$self->{info} = \%info;
+	@{$self->{_opts}->{ keys %info }} = values %info;
 	$self->bestinfo();
 
 	return 0 unless $self->{_cmd} eq "check";
