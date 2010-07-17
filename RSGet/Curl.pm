@@ -57,7 +57,7 @@ def_settings(
 );
 
 
-my $curl_multi = new WWW::Curl::Multi;
+my $curl_multi;
 
 my $curl_headers = [
 	'User-Agent: Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.9.0.10) Gecko/2009042316 Firefox/3.0.10',
@@ -106,6 +106,21 @@ my %active_curl;
 	}
 }
 
+sub init
+{
+	$curl_multi = new WWW::Curl::Multi;
+	require Cwd;
+
+	if ( verbose( 1 ) ) {
+		p "Using paths:";
+		foreach ( qw(workdir outdir) ) {
+			my $dir = Cwd::abs_path( setting( $_ ) );
+			my $mkdir = "";
+			$mkdir = " (will be created)" unless -d $dir;
+			p "  $_ => $dir$mkdir";
+		}
+	}
+}
 
 sub new
 {

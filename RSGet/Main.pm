@@ -20,7 +20,6 @@ use RSGet::Plugin;
 use RSGet::Tools;
 use RSGet::Wait;
 use Time::HiRes;
-use Cwd;
 set_rev qq$Id$;
 
 def_settings(
@@ -78,6 +77,7 @@ sub init
 	my $daemon = setting( "daemon" );
 	RSGet::Line::init( $daemon );
 	print_settings() if verbose( 1 );
+	RSGet::Curl::init();
 	RSGet::FileList::set_file();
 	set_interfaces( $ifs );
 
@@ -87,7 +87,8 @@ sub init
 
 
 	if ( $daemon == 2 ) {
-		my $start_dir = getcwd();
+		require Cwd;
+		my $start_dir = Cwd::getcwd();
 		require Proc::Daemon;
 		print "starting rsget.pl daemon\n" if verbose( 1 );
 		Proc::Daemon::Init();
