@@ -109,10 +109,10 @@ my %active_curl;
 sub init
 {
 	$curl_multi = new WWW::Curl::Multi;
-	require Cwd;
 
 	if ( verbose( 1 ) ) {
 		p "Using paths:";
+		require Cwd;
 		foreach ( qw(workdir outdir) ) {
 			my $dir = Cwd::abs_path( setting( $_ ) );
 			my $mkdir = "";
