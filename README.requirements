@@ -49,7 +49,7 @@
    Optional
 
               * perl-Term-Size
-              * ImageMagick-perl
+              * perl-ImageMagick (or ImageMagick-perl in older versions)
               * perl-Crypt-Blowfish
               * perl-Crypt-Rijndael
 
@@ -73,24 +73,41 @@
               * libcrypt-blowfish-perl
               * libcrypt-rijndael-perl
 
-  [5]OpenWRT
+  [5]Fedora 13
+
+   Required
+
+              * perl
+              * perl-WWW-Curl
+              * perl-URI
+
+   Recommended
+
+              * perl-GD, tesseract
+              * subversion
+
+   Optional
+
+              * perl-Term-Size
+              * ImageMagick-perl
+              * perl-Crypt-Blowfish
+              * perl-Crypt-Rijndael
+
+  [6]OpenWRT
 
    Required
 
               * perl perlbase-autoloader perlbase-base perlbase-bytes
                 perlbase-config perlbase-cwd perlbase-digest
-                perlbase-dynaloader perlbase-encode perlbase-errno
-                perlbase-essential perlbase-fcntl perlbase-file perlbase-io
-                perlbase-mime perlbase-posix perlbase-selectsaver
-                perlbase-socket perlbase-symbol perlbase-tie perlbase-time
-                perlbase-xsloader
-                NOTE: perlbase-encode may not be required for current svn
-                version
-                NOTE2: those requirements may expand some day
+                perlbase-dynaloader perlbase-errno perlbase-essential
+                perlbase-fcntl perlbase-file perlbase-io perlbase-mime
+                perlbase-posix perlbase-selectsaver perlbase-socket
+                perlbase-symbol perlbase-tie perlbase-time perlbase-xsloader
+                NOTE: those requirements may expand some day
               * perl-www-curl
               * perl-uri
 
-  [6]OpenSolaris
+  [7]OpenSolaris
 
    Required
 
@@ -110,7 +127,7 @@
               * (?)/Crypt-Blowfish
               * pending/Crypt-Rijndael
 
-  [7]FreeBSD
+  [8]FreeBSD
 
    Required
 
@@ -130,12 +147,12 @@
               * security/p5-Crypt-Blowfish
               * security/p5-Crypt-Rijndael
 
-  [8]MacOS X
+  [9]MacOS X
 
    Required
            XCode
 
-  [9]NetBSD
+  [10]NetBSD
 
    Required
            replace #!/usr/bin/perl with #!/usr/pkg/bin/perl in ./rsget.pl
