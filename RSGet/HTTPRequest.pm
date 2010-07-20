@@ -42,7 +42,7 @@ sub xhtml_start
 			. '<link rel="stylesheet" type="text/css" href="main.css" media="screen" />'
 			. ($js ? qq#<script type="text/javascript" src="$js"></script># : '')
 		. '</head>'
-		. '<body>'
+		. '<body class="no_rsget">'
 		;
 
 }
