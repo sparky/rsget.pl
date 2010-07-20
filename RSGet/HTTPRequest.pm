@@ -235,6 +235,9 @@ sub f_dllist
 		ADD => "orange",
 	);
 
+	my $out_uri = setting( "http_outdir" );
+	my $out_dir = setting( "outdir" );
+
 	$main_ids{file} = {};
 	$main_ids{uri} = {};
 	$r .= '<ul class="flist">';
@@ -259,6 +262,13 @@ sub f_dllist
 		$r .= qq#<li id="$fileid" class="file $color">#;
 		my $size = $g->{fsize} ? bignum( $g->{fsize} ) : "?";
 		my $fname = $g->{fname} ? sgml( $g->{fname} ) : "???";
+		if ( $out_uri and $cmd eq "DONE" ) {
+			my $file = "/" . $g->{fname};
+			$file = "/" . $g->{dir} . $file if $g->{dir};
+			if ( -r $out_dir . $file ) {
+				$fname = '<a href="' . sgml( $out_uri . $file ) . '">' . $fname . '</a>';
+			}
+		}
 		$r .= qq#<div class="info"><span class="cmd">$cmd</span><span class="size">$size bytes</span>$fname</div>#;
 
 		$r .= '<div class="tools">' . (join " | ", map "<span>$_</span>", @tools) . '</div>';
@@ -353,6 +363,7 @@ sub sgml
 	s/&/&amp;/g;
 	s/</&lt;/g;
 	s/>/&gt;/g;
+	s/"/&quot;/g;
 	s#\0#<small>(???)</small>#g;
 	return $_;
 }

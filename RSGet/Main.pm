@@ -34,6 +34,11 @@ def_settings(
 		desc => "HTTP password, as plain text, user is 'root'.",
 		allowed => qr/\S+/,
 	},
+	http_outdir => {
+		desc => "URI to outdir. Useful if you have some http server with"
+			. " access to your downloaded files.",
+		allowed => qr{\S+},
+	},
 	verbose => {
 		desc => "Verbosity level.",
 		default => 0,
