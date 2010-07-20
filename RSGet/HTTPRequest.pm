@@ -19,6 +19,9 @@ our %handlers = (
 	"main.js" => \&putfile,
 	"main.css" => \&putfile,
 	"" => \&main_page,
+	"index" => \&main_page,
+	"index.xml" => \&main_page,
+	"index.html" => \&main_page,
 	"update" => \&main_update,
 	"log" => \&log,
 	add => \&add,
@@ -36,8 +39,8 @@ sub xhtml_start
 		. '<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">'
 		. '<head>'
 			. '<title>rsget.pl</title>'
-			. '<link rel="stylesheet" type="text/css" href="/main.css" media="screen" />'
-			. ($js ? qq#<script type="text/javascript" src="/$js"></script># : '')
+			. '<link rel="stylesheet" type="text/css" href="main.css" media="screen" />'
+			. ($js ? qq#<script type="text/javascript" src="$js"></script># : '')
 		. '</head>'
 		. '<body>'
 		;
@@ -146,9 +149,9 @@ sub f_notify
 {
 	my $r = '<fieldset id="f_notify"><legend>notify</legend><ul>';
 	foreach my $md5 ( keys %RSGet::Captcha::needed ) {
-		$r .= qq#<li id="captcha_$md5" class="captcha"><img src="/captcha?md5=$md5" />#;
+		$r .= qq#<li id="captcha_$md5" class="captcha"><img src="captcha?md5=$md5" />#;
 		$r .= qq#<iframe id="ic_$md5" name="ic_$md5" src="about:blank" />#;
-		$r .= qq#<form method="post" action="/captcha" target="ic_$md5">#;
+		$r .= qq#<form method="post" action="captcha" target="ic_$md5">#;
 		$r .= qq#<input type="hidden" name="md5" value="$md5" />#;
 		$r .= qq#<input type="text" name="solve" />#;
 		$r .= qq#<input type="submit" name="ok" value="ok" />#;
@@ -340,7 +343,7 @@ sub f_log
 		$r .= qq#<li$class># . href( $line ) . '</li>';
 	}
 
-	$r .= '<li class="comment"><a href="/log">Show more</a></li>' if $max;
+	$r .= '<li class="comment"><a href="log">Show more</a></li>' if $max;
 	$r .= '</ul></fieldset>';
 }
 
@@ -475,7 +478,7 @@ sub scalar_to_js
 sub f_addform
 {
 	my $id = shift;
-	return '<form action="/add" method="POST"' . ( defined $id ? '>' : ' target="_blank">' )
+	return '<form action="add" method="POST"' . ( defined $id ? '>' : ' target="_blank">' )
 		. '<fieldset id="f_addlinks"><legend>Add links to the list</legend>'
 		. ( $id ? qq#<input type="hidden" name="id" value="$id" /># : '' )
 		. '<textarea cols="100" rows="8" name="links"></textarea>'
@@ -487,7 +490,7 @@ sub f_addform
 sub f_addcomment
 {
 	my $id = shift;
-	return '<form action="/add" method="POST">'
+	return '<form action="add" method="POST">'
 		. '<fieldset id="f_addcomment"><legend>Add comment (i.e. passwords) to the list</legend>'
 		. qq#<input type="hidden" name="id" value="$id" />#
 		. '<textarea cols="100" rows="4" name="comment"></textarea>'
@@ -643,12 +646,12 @@ sub add_update
 	if ( not $list ) {
 		$r .= '<fieldset id="f_listask"></fieldset>';
 		$r .= f_msg( "f_addlist", "ERROR: No such add list" );
-		$r .= f_msg( "f_addcomment", 'Go to <a href="/">main page</a> or <a href="/add">add more links</a>.' );
+		$r .= f_msg( "f_addcomment", 'Go to <a href=".">main page</a> or <a href="add">add more links</a>.' );
 		$r .= f_msg( "f_addlinks", "" );
 	} elsif ( $list->{msg} ) {
 		$r .= '<fieldset id="f_listask"></fieldset>';
 		$r .= f_msg( "f_addlist", $list->{msg} );
-		$r .= f_msg( "f_addcomment", 'Go to <a href="/">main page</a> or <a href="/add">add more links</a>.' );
+		$r .= f_msg( "f_addcomment", 'Go to <a href=".">main page</a> or <a href="add">add more links</a>.' );
 		$r .= f_msg( "f_addlinks", "" );
 	} else {
 		$list->command( $post->{exec} ) if $post->{exec};

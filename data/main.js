@@ -31,14 +31,14 @@ var last_update = {};
 var update_uri = null;
 function init_main()
 {
-	update_uri = "/update";
+	update_uri = "update";
 	window.setInterval( update, 750 );
 }
 
 function init_add( id )
 {
 	last_update.id = id;
-	update_uri = "/add_update";
+	update_uri = "add_update";
 	window.setInterval( update, 800 );
 }
 
