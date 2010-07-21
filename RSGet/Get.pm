@@ -326,6 +326,7 @@ sub problem
 	my $self = shift;
 	my $line = shift;
 	my $msg = $line ? "problem at line: $line" : "unknown problem";
+	$self->{_line}->clone->print( $self->{_name} . ": " . $msg ) if verbose( 4 );
 	my $retry = 6;
 	$retry = 3 if $self->{_cmd} eq "check";
 	if ( ++$self->{_try} < $retry ) {
