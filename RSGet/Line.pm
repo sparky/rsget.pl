@@ -190,6 +190,12 @@ sub linedata
 	$active{ $$self }->[2] = $data;
 }
 
+sub clone
+{
+	my $self = shift;
+	my $line = $$self;
+	return new RSGet::Line @{ $active{ $line } };
+}
 
 sub DESTROY
 {
