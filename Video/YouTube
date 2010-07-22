@@ -29,7 +29,6 @@ pre:
 	{
 		/"fmt_map"\s*:\s*"(.*?)"/ or m{&fmt_map=(\S+?)&}
 			or return undef;
-		warn "format: $1\n";
 		my %fmts = map { m{(\d+)\\?/}; $1 => $_ } split ",", uri_unescape( $1 );
 
 		foreach my $f ( @fmt ) {
