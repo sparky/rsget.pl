@@ -10,7 +10,7 @@ short: V:YouTube
 web: "http://www.youtube.com/"
 uri: qr{youtube\.com/watch\?v=.*}
 slots: max
-status: OK 2010-07-12
+status: OK 2010-07-22
 
 unify:
 	s/#.*//;
@@ -29,7 +29,8 @@ pre:
 	{
 		/"fmt_map"\s*:\s*"(.*?)"/ or m{&fmt_map=(\S+?)&}
 			or return undef;
-		my %fmts = map { m{(\d+)/}; $1 => $_ } split ",", uri_unescape( $1 );
+		warn "format: $1\n";
+		my %fmts = map { m{(\d+)\\?/}; $1 => $_ } split ",", uri_unescape( $1 );
 
 		foreach my $f ( @fmt ) {
 			return $f
@@ -77,7 +78,11 @@ stage_got_format:
 	my $fname = $name . "." . $fmt->[1];
 	INFO( name => $fname, fmt => $fmt->[0], quality => $fmt->[2] );
 
-	DOWNLOAD( "http://youtube.com/get_video?video_id=$id&t=$t$fmtstr",
-		fname => $fname );
+	/"fmt_url_map": "(.*?)"/;
+	my %uri = map /(\d+)\|(.*)/, split /,/, $1;
+	my $uri = $uri{ $fmt->[0] };
+	$uri =~ s#\\/#/#g;
+
+	DOWNLOAD( uri_unescape( $uri ), fname => $fname );
 
 # vim: filetype=perl:ts=4:sw=4
