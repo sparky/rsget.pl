@@ -1,0 +1,45 @@
+# $Id$
+# Video::SouthParkStudios - Video getter plugin for rsget.pl
+#
+# 2010 (c) Przemysław Iskra <sparky@pld-linux.org>
+#		This program is free software,
+# you may distribute it under GPL v2 or newer.
+
+name: SouthParkStudios
+short: V:SouthParkStudios
+web: "http://www.southparkstudios.com/"
+uri: qr{southparkstudios\.com/episodes/\d+}
+uri: qr{comedycentral\.com/global/feeds/entertainment/media/mediaGenEntertainment\.jhtml\?uri=mgid%3Acms%3Aitem%3Acomedycentral\.com%3A\d+&show=southpark}
+slots: max
+status: UNFINISHED 2010-07-23
+
+pre:
+	require WWW::Curl::Easy;
+
+	die "Your curl does not support CURLOPT_RTMP_SWF_*"
+		unless WWW::Curl::Easy::CURLOPT_RTMP_SWF_HASH() != 0;
+
+	my $curlopts = {
+		WWW::Curl::Easy::CURLOPT_RTMP_SWF_HASH,
+			pack ( "H*", "006d1932b84b25dccc63e582e5983bb5069332cc7dbbcf192d9fa058402e4cd4" ),
+		WWW::Curl::Easy::CURLOPT_RTMP_SWF_SIZE,
+			530287,
+		WWW::Curl::Easy::CURLOPT_RTMP_SWF_URL,
+			"http://media.mtvnservices.com/player/release/",
+	};
+
+start:
+	GET( $-{_uri} );
+
+	m#<rendition cdn="limelight" .*? bitrate="1200">\s+<src>(rtmpe://.*?)</src>\s+</rendition>#s;
+	my $file_uri = $1;
+
+	my $fname = de_ml( $file_uri );
+	$fname =~ s#.*/##;
+
+	INFO( name => $fname, quality => "720p" );
+
+	undef $-{_referer}; # because URI cannot handle rtmp:
+	DOWNLOAD( $file_uri, curlopts => $curlopts );
+
+# vim: filetype=perl:ts=4:sw=4
