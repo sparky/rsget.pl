@@ -218,6 +218,11 @@ sub new
 		$curl->setopt( CURLOPT_WRITEFUNCTION, \&body_scalar );
 		$curl->setopt( CURLOPT_WRITEDATA, \$supercurl->{body} );
 	}
+	if ( my $curlopts = $opts{curlopts} ) {
+		while ( my ( $key, $val ) = each %$curlopts ) {
+			$curl->setopt( $key, $val );
+		}
+	}
 
 	if ( $opts{keep_referer} or $opts{keep_ref} ) {
 		$supercurl->{keep_referer} = 1;
