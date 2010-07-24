@@ -1,0 +1,23 @@
+# $Id$
+# Link::HotFile - Link decrypter plugin for rsget.pl
+#
+# 2010 (c) Przemysław Iskra <sparky@pld-linux.org>
+#		This program is free software,
+# you may distribute it under GPL v2 or newer.
+
+name: HotFile
+short: L:HotFile
+web: "http://hotfile.com/"
+tos: "http://hotfile.com/terms-of-service.html"
+uri: qr{hotfile\.com/list/\d+/[0-9a-f]+}
+uri: qr{pl\.hotfile\.com/list/\d+/[0-9a-f]+}
+uri: qr{new\.hotfile\.com/list/\d+/[0-9a-f]+}
+slots: max
+status: OK 2010-07-24
+
+start:
+	GET( $-{_uri} );
+
+	LINK( /<td .*?><a href="(.*?)">/g );
+
+# vim: filetype=perl:ts=4:sw=4
