@@ -10,11 +10,13 @@ short: FS
 web: "http://freakshare.net/"
 tos: "http://freakshare.net/terms-of-service.html"
 uri: qr{freakshare\.net/files/}
-cookie: fs
+cookie: !fs
 status: OK 2010-07-13
 
 start:
 	GET( $-{_uri} );
+
+	GET( "/index.php?language=EN" );
 
 	ERROR( "file not found: $1" )
 		if m#<h1 .*?>Error</h1>\s+<div.*?>\s*(.*?)\s+<#s;
