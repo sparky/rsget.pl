@@ -1,0 +1,24 @@
+# $Id$
+# Link::RapidShare - Link decrypter plugin for rsget.pl
+#
+# 2010 (c) Przemysław Iskra <sparky@pld-linux.org>
+#		This program is free software,
+# you may distribute it under GPL v2 or newer.
+
+name: RapidShare
+short: L:RapidShare
+web: "http://rapidshare.com/"
+tos: "http://rapidshare.com/agb.html"
+uri: qr{(?:rs[a-z0-9]+\.)?rapidshare\.com/users/[A-Z0-9]+}
+slots: max
+status: OK 2010-07-25
+
+start:
+	GET( $-{_uri} );
+
+	my @list = /<a href="(.*?)" target="_blank">Start/g;
+	ERROR( "no links" ) unless @list;
+
+	LINK( @list );
+
+# vim: filetype=perl:ts=4:sw=4
