@@ -8,7 +8,8 @@
 name: FileServe
 short: FSRV
 web: "http://fileserve.com/"
-uri: qr{www\.fileserve\.com/file/[A-Za-z0-9]+(/.*)?}
+tos: "http://fileserve.com/terms.php"
+uri: qr{fileserve\.com/file/[A-Za-z0-9]+(/.*)?}
 cookie: fsrv
 status: OK 2010-07-25
 
@@ -22,14 +23,17 @@ start:
 
 	ERROR( "file not found: $1" ) if m#<span class="fail_info">\s*(.*?)\s*</span>#s;
 
-	! m#<h1>(.+)<br/></h1>#;
+	! m#<h1>(.+?)<br/></h1>#;
 	my $fname = $1;
 	! m#<span><strong>($STDSIZE)</strong> \| Uploaded on #;
 	INFO( name => $fname, asize => $1 );
 
 	CLICK( $-{_uri}, post => { downloadLink => "wait" } );
+
 	WAIT( 30, "waiting for download link" );
+
 	CLICK( $-{_uri}, post => { downloadLink => "show" } );
+
 	CLICK_DOWNLOAD( $-{_uri}, post => { download => "normal" } );
 
 # vim: filetype=perl:ts=4:sw=4
