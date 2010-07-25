@@ -16,7 +16,7 @@ uri: qr{turbobit\.net/[a-z0-9]+(/.+)?\.html}
 uri: qr{turbobit\.ru/[a-z0-9]+(/.+)?\.html}
 cookie: tb
 slots: max
-status: OK 2010-07-13
+status: OK 2010-07-26
 
 unify:
 	return "http://turbobit.net/$1.html"
@@ -34,7 +34,7 @@ start:
 	( my $size = $1 ) =~ tr/,/./;
 	INFO( name => $name, asize => $size );
 
-	! m#<td><a class="free" href="(.*?)" onclick#;
+	! m#<td><a class="free" href="(.*?)" #;
 	CLICK( $1 );
 
 stage_captcha:
