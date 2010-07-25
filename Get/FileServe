@@ -1,0 +1,35 @@
+# $Id$
+# Get::FileServe - File getter plugin for rsget.pl
+#
+# 2010 (c) Paweł Zuzelski <pawelz@pld-linux.org>
+#		This program is free software,
+# you may distribute it under GPL v2 or newer.
+
+name: FileServe
+short: FSRV
+web: "http://fileserve.com/"
+uri: qr{www\.fileserve\.com/file/[A-Za-z0-9]+(/.*)?}
+cookie: fsrv
+status: OK 2010-07-25
+
+unify:
+	s/#.*//;
+	return "http://fileserve.com/files/$1"
+		if m{fileserve\.com/files/([A-Za-z0-9]+)};
+
+start:
+	GET( $-{_uri} );
+
+	ERROR( "file not found: $1" ) if m#<span class="fail_info">\s*(.*?)\s*</span>#s;
+
+	! m#<h1>(.+)<br/></h1>#;
+	my $fname = $1;
+	! m#<span><strong>($STDSIZE)</strong> \| Uploaded on #;
+	INFO( name => $fname, asize => $1 );
+
+	CLICK( $-{_uri}, post => { downloadLink => "wait" } );
+	WAIT( 30, "waiting for download link" );
+	CLICK( $-{_uri}, post => { downloadLink => "show" } );
+	CLICK_DOWNLOAD( $-{_uri}, post => { download => "normal" } );
+
+# vim: filetype=perl:ts=4:sw=4
