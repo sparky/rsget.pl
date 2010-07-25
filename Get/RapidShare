@@ -8,6 +8,7 @@
 name: RapidShare
 short: RS
 web: "http://rapidshare.com/"
+tos: "http://rapidshare.com/agb.html"
 uri: qr{(?:rs[a-z0-9]+\.)?rapidshare\.com/files/\d+/.+}
 status: OK 2010-07-13
 
