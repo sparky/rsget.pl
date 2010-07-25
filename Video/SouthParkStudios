@@ -8,38 +8,36 @@
 name: SouthParkStudios
 short: V:SouthParkStudios
 web: "http://www.southparkstudios.com/"
-uri: qr{southparkstudios\.com/episodes/\d+}
-uri: qr{comedycentral\.com/global/feeds/entertainment/media/mediaGenEntertainment\.jhtml\?uri=mgid%3Acms%3Aitem%3Acomedycentral\.com%3A\d+&show=southpark}
-slots: max
-status: UNFINISHED 2010-07-23
+uri: qr{comedycentral\.com/global/feeds/entertainment/media/mediaGenEntertainment\.jhtml\?uri=mgid:cms:item:comedycentral.com:\d+&show=southpark}
+# limit slots bacause rtmp support is very bad
+slots: 3
+status: OK 2010-07-23
 
 pre:
-	require WWW::Curl::Easy;
-
-	die "Your curl does not support CURLOPT_RTMP_SWF_*"
-		unless WWW::Curl::Easy::CURLOPT_RTMP_SWF_HASH() != 0;
-
-	my $curlopts = {
-		WWW::Curl::Easy::CURLOPT_RTMP_SWF_HASH,
-			pack ( "H*", "006d1932b84b25dccc63e582e5983bb5069332cc7dbbcf192d9fa058402e4cd4" ),
-		WWW::Curl::Easy::CURLOPT_RTMP_SWF_SIZE,
-			530287,
-		WWW::Curl::Easy::CURLOPT_RTMP_SWF_URL,
-			"http://media.mtvnservices.com/player/release/",
-	};
+	my $rtmpopts = " swfUrl=http://media.mtvnservices.com/player/release/?v=4.5.3 swfVfy=1";
 
 start:
 	GET( $-{_uri} );
 
-	m#<rendition cdn="limelight" .*? bitrate="1200">\s+<src>(rtmpe://.*?)</src>\s+</rendition>#s;
-	my $file_uri = $1;
+	my $width = 0;
+	my $bitrate = 0;
+	my ( $size, $file_uri );
+	while ( s#<rendition .*? width="(\d+)" height="(\d+)" .*? bitrate="(\d+)">\s*<src>(rtmpe://.*?)</src>\s+</rendition>## ) {
+		if ( $1 > $width or ( $1 == $width and $3 > $bitrate ) ) {
+			$width = $1;
+			$bitrate = $3;
+			$size = "$1x$2 @ $3kbps";
+			$file_uri = $4;
+		}
+	}
+	ERROR( "file not found (this should never happen)" ) unless $file_uri;
 
 	my $fname = de_ml( $file_uri );
 	$fname =~ s#.*/##;
 
-	INFO( name => $fname, quality => "720p" );
+	INFO( name => $fname, quality => $size );
 
 	undef $-{_referer}; # because URI cannot handle rtmp:
-	DOWNLOAD( $file_uri, curlopts => $curlopts );
+	DOWNLOAD( $file_uri . $rtmpopts );
 
 # vim: filetype=perl:ts=4:sw=4
