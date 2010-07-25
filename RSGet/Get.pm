@@ -419,6 +419,7 @@ sub info
 sub link
 {
 	my $self = shift;
+	return $self->error( "plugin found 0 links" ) unless @_;
 	my %links;
 	my $i = 0;
 	foreach ( @_ ) {
