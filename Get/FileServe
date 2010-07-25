@@ -36,4 +36,7 @@ start:
 
 	CLICK_DOWNLOAD( $-{_uri}, post => { download => "normal" } );
 
+	RESTART( $1, "free limit reached" )
+		if m#You need to wait (\d+) seconds to start another download\.#;
+
 # vim: filetype=perl:ts=4:sw=4
