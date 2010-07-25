@@ -18,6 +18,9 @@ status: OK 2010-07-24
 start:
 	GET( $-{_uri} );
 
-	LINK( /<td .*?><a href="(.*?)">/g );
+	my @list = /<td .*?><a href="(.*?)">/g;
+	ERROR( "no links" ) unless @list;
+
+	LINK( @list );
 
 # vim: filetype=perl:ts=4:sw=4
