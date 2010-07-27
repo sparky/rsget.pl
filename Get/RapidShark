@@ -27,7 +27,7 @@ start:
 	ERROR( "file not found" )
 		if m{<font style="font-size:12px;">Probujesz otworzyć adres <font color="red">.*//</font> \(\)</font>};
 
-	! m{<font style="font-size:12px;">Probujesz otworzyć adres <font color="red">.*/(.*?)</font> \(($STDSIZE)\)</font>};
+	! m{<font style="font-size:12px;">Probujesz otworzyć adres <font color="red">.*/(.*?)</font> \(($STDSIZE)\)</font>}o;
 	INFO( name => $1, asize => $2 );
 
 	! my $form = $self->form( match => { body => qr/"method_free"/ } );

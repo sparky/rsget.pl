@@ -22,7 +22,7 @@ start:
 	ERROR( "file not found" ) if /File Not Found|This file has been deleted/;
 	! m{<title>(.*?) - download now for free};
 	my $name = $1;
-	! m{<div id="info" class="metadata">\s*<span>($STDSIZE) file uploaded}s;
+	! m{<div id="info" class="metadata">\s*<span>($STDSIZE) file uploaded}so;
 	my $size = $1;
 	INFO( name => $name, asize => $size );
 	

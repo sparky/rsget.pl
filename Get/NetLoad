@@ -26,7 +26,7 @@ stage_first:
 	ERROR( "file not found or something" )
 		if />Code: ER_NFF_/;
 
-	m#<div class="dl_first_filename">\s*(.+?)<span.*?>, ($STDSIZE)</span></div>#s;
+	m#<div class="dl_first_filename">\s*(.+?)<span.*?>, ($STDSIZE)</span></div>#so;
 	INFO( name => $1, asize => $2 );
 
 	RESTART( 60, "Not prepared" )

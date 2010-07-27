@@ -33,7 +33,7 @@ start:
 		my $part = $1;
 		! m{<div class="finfo">(.*?)</div>};
 		my $name = $1;
-		! m{<div class="ffileinfo">Views : \d+ \| Filesize : ($STDSIZE)</div>};
+		! m{<div class="ffileinfo">Views : \d+ \| Filesize : ($STDSIZE)</div>}o;
 		my $size = $1;
 		if ( $part ) {
 			INFO( name => "$name.$part", quality => "part of $1" );

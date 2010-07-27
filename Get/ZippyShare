@@ -24,7 +24,7 @@ start:
 
 	! m#<font.*?>Name:\s*</font>\s*<font.*?>(.+?)</font><#;
 	my $name = $1;
-	! m#<font.*?>Size:\s*</font>\s*<font.*?>($STDSIZE)</font><#;
+	! m#<font.*?>Size:\s*</font>\s*<font.*?>($STDSIZE)</font><#o;
 	INFO( name => $name, asize => $1 );
 
 	! m#var ziptime = (\d+);#s;

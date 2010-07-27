@@ -25,7 +25,7 @@ start:
 
 	! m{>File Name:\s*<font.*?>(.*?)</font></td>}s;
 	my $name = $1;
-	! m{>File Size:\s*<font.*?>($STDSIZE)</font></td>}s;
+	! m{>File Size:\s*<font.*?>($STDSIZE)</font></td>}so;
 	INFO( name => $name, asize => $1 );
 
 	! my $form = $self->form( name => "form1" );

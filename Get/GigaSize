@@ -18,7 +18,7 @@ start:
 
 	ERROR( "file not found" ) if /The file\s+has been deleted/;
 
-	! m{<strong>Name</strong>:\s*<b>(.*?)</b></p>\s*<p>Size:\s*<span>($STDSIZE)</span>};
+	! m{<strong>Name</strong>:\s*<b>(.*?)</b></p>\s*<p>Size:\s*<span>($STDSIZE)</span>}o;
 	my ( $name, $size ) = ( $1, $2 );
 	$name =~ s/\.\.\.$/\0/;
 	INFO( iname => $name, asize => $size );

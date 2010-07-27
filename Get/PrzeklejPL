@@ -19,7 +19,7 @@ start:
 	ERROR( "file not found" )
 		if /Plik nie istnieje|Plik został usunięty/;
 
-	! m{<h1><a href="(/download/.*?)" title="Pobierz plik">(.*?)</a></h1><span class="size".*?> \(($STDSIZE)\)</span>};
+	! m{<h1><a href="(/download/.*?)" title="Pobierz plik">(.*?)</a></h1><span class="size".*?> \(($STDSIZE)\)</span>}o;
 	my ( $file_uri, $name, $size ) = ( $1, $2, $3 );
 
 	$name =~ s/(.*) \./$1_www.przeklej.pl./

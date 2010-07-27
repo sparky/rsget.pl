@@ -24,7 +24,7 @@ start:
 	ERROR( "file not found" )
 		if /Your requested file is not found/;
 
-	! m#Filename:</font></b>\s*(.*?)<b><br>\s*Filesize:</font></b>\s*($STDSIZE)<b>#s;
+	! m#Filename:</font></b>\s*(.*?)<b><br>\s*Filesize:</font></b>\s*($STDSIZE)<b>#so;
 	INFO( name => $1, asize => $2 );
 
 	RESTART( - irand( 60, 300 ), "limit reached" )

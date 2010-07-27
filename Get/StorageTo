@@ -15,7 +15,7 @@ start:
 	GET( $-{_uri} );
 
 	ERROR( "file not found" ) if /File not found\./;
-	! m{<span class="orange">.*?:</span> (.*?) <span class="light">\(($STDSIZE)\)</span>};
+	! m{<span class="orange">.*?:</span> (.*?) <span class="light">\(($STDSIZE)\)</span>}o;
 	INFO( name => $1, asize => $2 );
 
 	! /onclick='javascript:startcountdown\("(.*?)",\s*"(?:.*?)",\s*"(.*?)"\);'/;

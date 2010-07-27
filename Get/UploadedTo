@@ -37,7 +37,7 @@ start:
 		! m{<tr><td style="padding-left:4px;">Filetype: &nbsp;</td><td>(.*?)</td></tr>};
 		$name .= $1;
 	}
-	! m{<tr><td style="padding-left:4px;">Filesize: &nbsp;</td><td>\s*($STDSIZE)\s*</td></tr>};
+	! m{<tr><td style="padding-left:4px;">Filesize: &nbsp;</td><td>\s*($STDSIZE)\s*</td></tr>}o;
 	INFO( name => $name, asize => $1 );
 
 	! $-{form} = $self->form( name => "download_form" );

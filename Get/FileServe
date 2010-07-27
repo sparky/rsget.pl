@@ -25,7 +25,7 @@ start:
 
 	! m#<h1>(.+?)<br/></h1>#;
 	my $fname = $1;
-	! m#<span><strong>($STDSIZE)</strong> \| Uploaded on #;
+	! m#<span><strong>($STDSIZE)</strong> \| Uploaded on #o;
 	INFO( name => $fname, asize => $1 );
 
 	CLICK( $-{_uri}, post => { downloadLink => "wait" } );
