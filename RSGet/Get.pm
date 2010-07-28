@@ -11,6 +11,7 @@ use RSGet::Tools;
 use RSGet::Captcha;
 use RSGet::Form;
 use RSGet::Wait;
+use RSGet::Hook;
 use URI;
 set_rev qq$Id$;
 
@@ -24,6 +25,10 @@ def_settings(
 	tmpdir => {
 		desc => "Directory where temporary files (cookies and dumps) are stored.",
 		type => "PATH",
+	},
+	download_fail => {
+		desc => "Command executed if download fails.",
+		type => "COMMAND",
 	},
 );
 
@@ -319,6 +324,15 @@ sub error
 	$self->print( $msg ) || $self->log( $msg );
 	RSGet::FileList::save( $self->{_uri}, options => { error => $msg } );
 	RSGet::Dispatch::finished( $self );
+	if ( my $call = setting( "download_fail" ) ) {
+		RSGet::Hook::call( $call,
+			uri => $self->{_uri},
+			error => $msg,
+			getter => $self->{_pkg},
+			interface => $self->{_outif},
+			command => $self->{_cmd},
+		);
+	}
 }
 
 sub problem
