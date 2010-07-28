@@ -39,7 +39,7 @@ start:
 	CLICK( $1 );
 
 stage_captcha:
-	MULTI ( "received empty page, restarting" ) unless length $_;
+	RESTART( irand( 10, 60 ), "received empty page, restarting" ) unless length $_;
 	RESTART ( 10, "recaptcha is not supported, restarting" ) if m#src="http://api\.recaptcha\.net/challenge.*"#;
 	if ( m#<img alt="Captcha" src="(.*?)"# ) {
 		$-{capimg} = $1;
