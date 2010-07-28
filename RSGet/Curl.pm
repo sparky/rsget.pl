@@ -9,6 +9,7 @@ use strict;
 use warnings;
 use RSGet::Tools;
 use RSGet::Line;
+use RSGet::Hook;
 use WWW::Curl::Easy 4.00;
 use WWW::Curl::Multi;
 use URI::Escape;
@@ -534,7 +535,7 @@ sub finish
 			bignum( $supercurl->{size_total} );
 
 		if ( my $post = setting( "postdownload" ) ) {
-			callback( $post,
+			RSGet::Hook::call( $post,
 				file => $outfile,
 				name => $supercurl->{fname},
 				size => $supercurl->{size_total},
@@ -658,35 +659,6 @@ sub donemsg
 	my $speed = sprintf "%.2f", $size_diff / ( $time_diff * 1024 );
 
 	return bignum( $supercurl->{size_got} ) . "; ${speed}KB/s $eta";
-}
-
-sub shquote
-{
-	local $_ = shift;
-	s/'/'"'"'/g;
-	return "'$_'";
-}
-
-sub callback
-{
-	my $hook = shift;
-	my %opts = @_;
-
-	$hook =~ s/(\$\(([a-z]*)\))/shquote( $opts{ $2 } || $1 )/eg;
-
-	my $pid = fork;
-	unless ( defined $pid ) {
-		warn "Fork failed\n";
-	}
-	if ( $pid ) {
-		p "Executing '$hook'\n" if verbose( 1 );
-	} else {
-		close STDIN;
-		close STDOUT;
-		close STDERR;
-		exec $hook;
-		die "Exec failed: $@\n";
-	}
 }
 
 
