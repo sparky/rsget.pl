@@ -7,10 +7,11 @@ package RSGet::FileList;
 
 use strict;
 use warnings;
+use RSGet::Tools;
+use RSGet::Hook;
 use URI::Escape;
 use Fcntl qw(:DEFAULT :flock SEEK_SET);
 use IO::Handle;
-use RSGet::Tools;
 set_rev qq$Id$;
 
 def_settings(
@@ -26,7 +27,15 @@ def_settings(
 		allowed => qr/.+/,
 		type => "PATH",
 		user => 1,
-	}
+	},
+	list_link_new => {
+		desc => "Command executed after adding new link directly to the list.",
+		type => "COMMAND",
+	},
+	list_link_failed => {
+		desc => "Command executed if link wasn't recognized.",
+		type => "COMMAND",
+	},
 );
 
 my $file;
@@ -292,11 +301,25 @@ sub readlist
 					$opt->{getter} = $getter->{pkg};
 					$decoded{ $newuri } = [ $getter, $opt ];
 					delete $decoded{ $uri } if $newuri ne $uri;
+
+					if ( my $call = setting( "list_link_new" ) ) {
+						RSGet::Hook::call( $call,
+							uri => $uri,
+							newuri => $newuri,
+							getter => $getter->{pkg},
+						);
+					}
 				} else {
 					my $line = "# invalid uri: $uri " . (join " ", h2a( $opt ));
 					push @new, $line . "\n";
 					push @actual, $line;
 					delete $decoded{ $uri };
+
+					if ( my $call = setting( "list_link_failed" ) ) {
+						RSGet::Hook::call( $call,
+							uri => $uri,
+						);
+					}
 				}
 			}
 		}
