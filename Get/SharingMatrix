@@ -28,7 +28,8 @@ start:
 			if /Your daily download limit is over/;
 	}
 
-	if ( /You are already downloading file/ ) {
+	if ( /You are already downloading file/ or
+			/free users may only download 1 file at a time/ ) {
 		! m#link_name = '(.*?)';#;
 		my $name = $1;
 		! m#fsize = '(.*?)';#;
