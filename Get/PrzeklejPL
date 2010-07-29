@@ -9,9 +9,13 @@ name: PrzeklejPL
 short: przeklej.pl
 web: "http://www.przeklej.pl/"
 tos: "http://www.przeklej.pl/regulamin"
-uri: qr{przeklej\.pl/plik/}
+uri: qr{(?:www\.)?przeklej\.pl/(?:plik|d)/}
 slots: max
 status: OK 2010-07-14
+
+unify:
+	return "http://przeklej.pl/$1/$2"
+	if m{/(plik|d)/(.+)};
 
 start:
 	GET( $-{_uri} );
