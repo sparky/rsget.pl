@@ -11,11 +11,11 @@ web: "http://www.przeklej.pl/"
 tos: "http://www.przeklej.pl/regulamin"
 uri: qr{przeklej\.pl/(?:plik|d)/}
 slots: max
-status: OK 2010-07-14
+status: OK 2010-07-30
 
 unify:
 	return "http://przeklej.pl/$1/$2"
-	if m{/(plik|d)/(.+)};
+		if m{/(plik|d)/(.+)};
 
 start:
 	GET( $-{_uri} );
@@ -33,7 +33,7 @@ start:
 
 	CLICK_DOWNLOAD( de_ml( $file_uri ) );
 
-	ERROR( "files larger than 50MB are available for registered users only" )
+	ERROR( "not allowed: file larger than 50MB" )
 		if /<strong>Pliki większe niż 50MB<\/strong> możesz pobrać, jeżeli jesteś zalogowany./;
 
 # vim: filetype=perl:ts=4:sw=4
