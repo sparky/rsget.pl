@@ -33,4 +33,7 @@ start:
 
 	CLICK_DOWNLOAD( de_ml( $file_uri ) );
 
+	ERROR( "files larger than 50MB are available for registered users only" )
+		if /<strong>Pliki większe niż 50MB<\/strong> możesz pobrać, jeżeli jesteś zalogowany./;
+
 # vim: filetype=perl:ts=4:sw=4
