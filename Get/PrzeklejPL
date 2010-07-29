@@ -9,7 +9,7 @@ name: PrzeklejPL
 short: przeklej.pl
 web: "http://www.przeklej.pl/"
 tos: "http://www.przeklej.pl/regulamin"
-uri: qr{(?:www\.)?przeklej\.pl/(?:plik|d)/}
+uri: qr{przeklej\.pl/(?:plik|d)/}
 slots: max
 status: OK 2010-07-14
 
