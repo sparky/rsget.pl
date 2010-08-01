@@ -8,14 +8,19 @@
 name: Delfi
 short: V:Delfi
 web: "http://tv.delfi.ee/"
-uri: qr{(tv|video)\.delfi\.ee/video/[a-zA-Z0-9]+}
+uri: qr{(?:rus\.)?tv\.delfi\.ee/video/[a-zA-Z0-9]+}
+uri: qr{video\.delfi\.ee/(?:ru/)?video/[a-zA-Z0-9]+}
 slots: max
-status: OK 2010-07-13
+status: OK 2010-08-01
+
+unify:
+	return "http://$1.delfi.ee/video/$2"
+		if m{"([^/]+)\.delfi\.ee/(?:ru/)?/video/([a-zA-Z0-9]+)};
 
 start:
 	GET( $-{_uri} );
 
-	! m{<title>(?:DELFI TV &#62; Video &#62; )?(.*?)</title>};
+	! m{<title>(?:DELFI TV &#62; (?:Video|Видео) &#62; )?(.*?)</title>};
 	my $fname = de_ml( $1 );
 	$fname =~ s{/}{_}g;
 	$fname .= ".flv";
