@@ -14,7 +14,7 @@ status: OK 2010-07-13
 
 unify:
 	s/#.*//;
-	return "http://rapidshare.com/files/$1"
+	return "http://rapidshare.com/files/$2"
 		if m{rapidshare\.(com|de)/files/(\d+/.+)};
 
 pre:
