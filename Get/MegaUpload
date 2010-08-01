@@ -60,6 +60,9 @@ stage_init:
 	DELAY( 600, "temporarily unavailable" )
 		if /The file you are trying to access is temporarily unavailable/;
 
+	ERROR( "not allowed: file larger than 1GB" )
+		if /The file that you're trying to download is larger than 1 GB/;
+
 	if ( /The file you're trying to download is password protected/ ) {
 		ERROR( "password required" ) unless exists $-{_opts}->{pass};
 
