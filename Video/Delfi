@@ -15,7 +15,7 @@ status: OK 2010-08-01
 
 unify:
 	return "http://$1.delfi.ee/video/$2"
-		if m{"([^/]+)\.delfi\.ee/(?:ru/)?/video/([a-zA-Z0-9]+)};
+		if m{([^/]+)\.delfi\.ee/(?:ru/)?video/([a-zA-Z0-9]+)};
 
 start:
 	GET( $-{_uri} );
