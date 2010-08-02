@@ -1,0 +1,27 @@
+# $Id$
+# Link:Gazeta - Link retriever plugin for rsget.pl
+#
+# 2010 (c) Paweł Zuzelski <pawelz@pld-linux.org>
+#		This program is free software,
+# you may distribute it under GPL v2 or newer.
+
+name: Gazeta
+short: L:Gazeta
+web: "http://www.gazeta.pl/"
+uri: qr{(?:[a-z]+)\.gazeta\.pl/}
+slots: max
+status: OK 2010-08-02
+
+start:
+	GET( $-{_uri} );
+
+	ERROR( "no links found." )
+		if ! m{flashvars: "pid=swfObj&m=http://serwisy\.gazeta\.pl/(.*?)\?xx=(\d+)%26xxd=(\d+)};
+
+	GET( 'http://serwisy.gazeta.pl/'.$1.'?xx='.$2.'&xxd='.$3 );
+
+	my @list = /<p>(.*?)<\/p>/g;
+
+	LINK( @list );
+
+# vim: filetype=perl:ts=4:sw=4
