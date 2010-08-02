@@ -71,7 +71,11 @@ sub list_close
 }
 
 END {
-	list_close $list_fh if $list_fh;
+	if ( $list_fh ) {
+		$update = 2;
+		readlist();
+		list_close $list_fh;
+	}
 }
 
 sub set_file
@@ -412,8 +416,11 @@ sub readlist
 		}
 	}
 	
-	# we are forced to regenerate the list if there was something added
-	unlink $file_swp if @added or $update == 2;
+	if ( ( @added or $update == 2 ) and -e $file_swp ) {
+		# we are forced to regenerate the list if there was something added
+		warn "Forced $file rewrite, your file lock will be broken\n";
+		unlink $file_swp;
+	}
 
 	unless ( -e $file_swp ) {
 		my $fh = list_open $file . ".tmp";
