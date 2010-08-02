@@ -15,6 +15,9 @@ status: OK 2010-08-02
 start:
 	GET( $-{_uri} );
 
+	RESTART( irand( 10, 60 ), "unable to parse response, restarting" )
+		if m#<param name="FlashVars"#;
+
 	ERROR( "no links found." )
 		if ! m{flashvars: "pid=swfObj&m=http://serwisy\.gazeta\.pl/(.*?)\?xx=(\d+)%26xxd=(\d+)};
 
