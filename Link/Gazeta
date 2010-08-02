@@ -8,7 +8,7 @@
 name: Gazeta
 short: L:Gazeta
 web: "http://www.gazeta.pl/"
-uri: qr{(?:[a-z]+)\.gazeta\.pl/}
+uri: qr{(?:[a-z]+)\.gazeta\.pl/Wiadomosci}
 slots: max
 status: OK 2010-08-02
 
