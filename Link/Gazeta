@@ -8,7 +8,7 @@
 name: Gazeta
 short: L:Gazeta
 web: "http://www.gazeta.pl/"
-uri: qr{(?:[a-z]+)\.gazeta\.pl/Wiadomosci}
+uri: qr{(?:[a-z]+)\.gazeta\.pl/\S+/\d+,\d+,\d+,.*?\.html}
 uri: qr{groszki\.pl/\S+/\d+,\d+,\d+,.*?\.html}
 uri: qr{lula.pl/\S+/\d+,\d+,\d+,.*?\.html}
 uri: qr{plotek\.pl/\S+/\d+,\d+,\d+,.*?\.html}
