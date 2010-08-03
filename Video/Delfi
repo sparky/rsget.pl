@@ -20,7 +20,7 @@ unify:
 start:
 	GET( $-{_uri} );
 
-	! m{<title>(?:DELFI TV &#62; (?:Video|Видео) &#62; )?(.*?)</title>};
+	! m{<title>(?:DELFI TV &#62; (?:Video|Видео) &#62;\s+)?(.*?)</title>};
 	my $fname = de_ml( $1 );
 	$fname =~ s{/}{_}g;
 	$fname .= ".flv";
