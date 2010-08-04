@@ -8,7 +8,7 @@
 name: Gazeta
 short: L:Gazeta
 web: "http://www.gazeta.pl/"
-uri: qr{(?:[a-z]+)\.gazeta\.pl/\S+/\d+,\d+,\d+}
+uri: qr{(?:[a-z]+\.)?gazeta\.pl/\S+/\d+,\d+,\d+}
 uri: qr{groszki\.pl/\S+/\d+,\d+,\d+}
 uri: qr{lula.pl/\S+/\d+,\d+,\d+}
 uri: qr{plotek\.pl/\S+/\d+,\d+,\d+}
@@ -22,11 +22,11 @@ start:
 
 	ERROR( "no video found" )
 		unless m{flashvars: "pid=swfObj&m=(.*?)&}
-			or m#<param name="FlashVars" value="m=(.*?)&#;
+			or m{<param name="FlashVars" value="m=(.*?)&};
 
 	GET( uri_unescape( $1 ) );
 
-	my @list = /<p>(.*?)<\/p>/g;
+	my @list = m{<p>(.*?)</p>}g;
 
 	LINK( @list );
 
