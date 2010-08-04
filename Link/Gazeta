@@ -22,7 +22,7 @@ start:
 
 	ERROR( "no video found" )
 		unless m{flashvars: "pid=swfObj&m=(.*?)&}
-			or m{<param name="FlashVars" value="m=(.*?)&};
+			or m{<param name="FlashVars" value="(?:.*?&)?m=(.*?)&};
 
 	GET( uri_unescape( $1 ) );
 
