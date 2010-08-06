@@ -261,7 +261,7 @@ sub add
 		my $pkg = $plugin->{pkg};
 		$getters{ $pkg } = $plugin;
 		new RSGet::Line( "INIT: ", "$pkg: Added" )
-			if verbose( 1 );
+			if verbose( 2 );
 		return 1;
 	} else {
 		warn "${type}/$file: failed\n";
