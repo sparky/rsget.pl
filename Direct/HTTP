@@ -16,15 +16,16 @@ status: OK 2010-07-12
 start:
 	GET( $-{_uri}, headonly => 1 );
 
+	if ( /^Location:\s*\s+/mi ) {
+		LINK( $-{_referer} );
+	}
+	ERROR( "file not found" ) unless m{^HTTP/[\d\.]+ 200}m;
+
 	my @type = /^Content-Type:\s*(\S+?)(?:;.*?)?\r?$/mig;
 	! my $type = pop @type;
 	my ( $len ) = /^Content-Length:\s*(\d+)\r?$/mi;
 	$len ||= -1;
 
-	if ( /^Location:\s*\s+/mi ) {
-		LINK( $-{_referer} );
-	}
-	ERROR( "file not found" ) unless m{^HTTP/1\.\d 200}m;
 	if ( $type =~ m#^text/# ) {
 		if ( /^Refresh:\s*.*?url=("|'|)(.*?)\1\s*\r$/mi ) {
 			require URI;
