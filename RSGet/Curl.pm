@@ -301,7 +301,7 @@ sub file_init
 	my $get_obj = $supercurl->{get_obj};
 	my $time = time;
 
-	hadd $supercurl,
+	hadd %$supercurl,
 		time_start => $time,
 		time_stamp => [ $time, 0, $time, 0, $time, 0 ],
 		size_start => 0,
@@ -384,7 +384,7 @@ sub file_init
 			seek $f_out, $start, SEEK_SET;
 			$get_obj->log( "Continuing at " . bignum( $start ) . $old_msg );
 
-			hadd $supercurl,
+			hadd %$supercurl,
 				file => $f_out,
 				size_start => $start,
 				size_got => $start,

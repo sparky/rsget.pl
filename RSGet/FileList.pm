@@ -126,7 +126,7 @@ sub save
 		my $val = $data{ $key };
 		if ( $key =~ /^(options|globals|clones)/ ) {
 			my $hash = $save_uri->{ $key } ||= {};
-			hadd $hash, %{ $val };
+			hadd %$hash, %{ $val };
 		} else {
 			$save_uri->{ $key } = $val;
 		}
@@ -357,8 +357,8 @@ sub readlist
 			my $options = $decoded{ $uri }->[1];
 
 			$cmd = $save->{cmd} if $save->{cmd};
-			hadd $globals, %{$save->{globals}} if $save->{globals};
-			hadd $options, %{$save->{options}} if $save->{options};
+			hadd %$globals, %{$save->{globals}} if $save->{globals};
+			hadd %$options, %{$save->{options}} if $save->{options};
 
 			if ( my $links = $save->{links} ) {
 				push @new, map { "ADD: $_\n" } @$links;
@@ -367,7 +367,7 @@ sub readlist
 			}
 
 			if ( my $clones = $save->{clones} ) {
-				hadd \%decoded, %{ $clones };
+				hadd %decoded, %{ $clones };
 				$update = 2;
 			}
 			delete $decoded{ $uri } if $save->{delete};
@@ -380,7 +380,7 @@ sub readlist
 		foreach my $uri ( keys %decoded ) {
 			if ( $all_uri{ $uri } ) {
 				warn "URI: $uri repeated, removing second one\n";
-				#hadd $options, %{ $all_uri{ $uri }->[1] };
+				#hadd %$options, %{ $all_uri{ $uri }->[1] };
 				#$all_uri{ $uri }->[1] = $options;
 				delete $decoded{ $uri };
 			} else {

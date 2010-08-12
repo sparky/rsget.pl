@@ -79,7 +79,7 @@ sub new
 	if ( verbose( 2 ) or $cmd eq "get" ) {
 		my $outifstr = $outif ? "[$outif]" :  "";
 
-		hadd $self,
+		hadd %$self,
 			_line => new RSGet::Line( "[$getter->{short}]$outifstr " );
 		$self->print( "start" );
 		$self->linedata();
@@ -420,7 +420,7 @@ sub info
 	$info{asize} =~ s/\s+//g if $info{asize};
 	RSGet::FileList::save( $self->{_uri}, options => \%info );
 
-	hadd( $self->{_opts}, %info );
+	hadd( %{$self->{_opts}}, %info );
 	$self->bestinfo();
 
 	return 0 unless $self->{_cmd} eq "check";

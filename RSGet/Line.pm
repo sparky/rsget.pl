@@ -208,7 +208,7 @@ sub DESTROY
 
 sub status
 {
-	hadd( \%status, @_ );
+	hadd( %status, @_ );
 }
 
 END {

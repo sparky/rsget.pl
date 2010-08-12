@@ -129,8 +129,8 @@ sub list_update
 				$self->{select_clone} = 0;
 			
 				$line->{cmd} = $save->{cmd} if $save->{cmd};
-				hadd $globals, %{$save->{globals}} if $save->{globals};
-				hadd $options, %{$save->{options}} if $save->{options};
+				hadd %$globals, %{$save->{globals}} if $save->{globals};
+				hadd %$options, %{$save->{options}} if $save->{options};
 
 				if ( my $links = $save->{links} ) {
 					my @new;
@@ -146,7 +146,7 @@ sub list_update
 					splice @$lines, $i+1, 0, @new;
 				}
 				if ( my $clones = $save->{clones} ) {
-					hadd $uris, %$clones;
+					hadd %$uris, %$clones;
 					# will check new ones next time
 				}
 				if ( $save->{delete} ) {
