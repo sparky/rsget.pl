@@ -53,7 +53,7 @@ sub bignum($)
 	return $_;
 }
 
-sub hadd(%@)
+sub hadd(\%@)
 {
 	my $h = shift;
 	my %new = @_;
