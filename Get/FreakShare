@@ -11,17 +11,17 @@ web: "http://freakshare.net/"
 tos: "http://freakshare.net/terms-of-service.html"
 uri: qr{freakshare\.net/files/}
 cookie: !fs
-status: OK 2010-07-13
+status: OK 2010-08-16
 
 start:
 	GET( $-{_uri} );
 
 	GET( "/index.php?language=EN" );
 
+	RESTART( - irand( 60, 300 ), "free limit reached" )
+		if /Your Traffic is used up for today/;
 	ERROR( "file not found: $1" )
 		if m#<h1 .*?>Error</h1>\s+<div.*?>\s*(.*?)\s+<#s;
-	RESTART( - irand( 60, 300 ), "free limit reached" )
-		if /Sorry, your Traffic is used up for today/;
 
 	! m#<h1 class="box_heading" style="text-align:center;">(.*?) - ($STDSIZE)yte</h1>#o;
 	INFO( name => $1, asize => $2 );
