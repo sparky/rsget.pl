@@ -21,15 +21,17 @@ start:
 	GET( $-{_uri} );
 
 	ERROR( "file not found: $1" )
-		if m#<div class="section CL1 errorMessage">.*?<p>(.*)</p>#;
+		if m#<div class="section CL1 errorMessage">.*?<p>(.*?)</p>#s;
 
 	! m#<p class="fileInfo filename">.*?<strong>(.*?)</strong>#;
-	my $fn = $1;
+	( my $fn = $1 ) =~ s/\.\.\./\0/;
 	! m#<span class="size">($STDSIZE)</span>#;
-	INFO( name => $fn, asize => $1 );
+	INFO( aname => $fn, asize => $1 );
 
 	! m#<a class="downloadNow" href="(.*?)" id="free_download">#;
 	CLICK( $1, keep_referer => 1 );
+
+	MULTI() if m#<span>Download session in progress</span>#;
 
 	! m#downloadUrl = "(.*?)"#;
 	$-{file_uri} = $1;
