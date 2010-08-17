@@ -37,7 +37,7 @@ start:
 	$-{file_uri} = $1;
 
 	! /var countDownDelay = (\d+);/;
-	WAIT( $1, "starting download" );
+	WAIT( - $1, "starting download" );
 
 	CLICK_DOWNLOAD( $-{file_uri} );
 
