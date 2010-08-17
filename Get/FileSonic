@@ -1,0 +1,42 @@
+# $Id$
+# Get::FileSonic - File getter plugin for rsget.pl
+#
+# 2010 (c) Przemysław Iskra <sparky@pld-linux.org>
+#		This program is free software,
+# you may distribute it under GPL v2 or newer.
+
+name: FileSonic
+short: FSC
+web: "http://www.filesonic.com/"
+tos: "http://www.filesonic.com/terms-and-conditions"
+uri: qr{filesonic\.com/file/\d+}
+uri: qr{(?:www\d+\.)?sharingmatrix\.com/file/\d+}
+status: OK 2010-08-17
+
+unify:
+	return "http://www.filesonic.com/file/$1"
+		if m{/file/(\d+)};
+
+start:
+	GET( $-{_uri} );
+
+	ERROR( "file not found: $1" )
+		if m#<div class="section CL1 errorMessage">.*?<p>(.*)</p>#;
+
+	! m#<p class="fileInfo filename">.*?<strong>(.*?)</strong>#;
+	my $fn = $1;
+	! m#<span class="size">($STDSIZE)</span>#;
+	INFO( name => $fn, asize => $1 );
+
+	! m#<a class="downloadNow" href="(.*?)" id="free_download">#;
+	CLICK( $1, keep_referer => 1 );
+
+	! m#downloadUrl = "(.*?)"#;
+	$-{file_uri} = $1;
+
+	! /var countDownDelay = (\d+);/;
+	WAIT( $1, "starting download" );
+
+	CLICK_DOWNLOAD( $-{file_uri} );
+
+# vim: filetype=perl:ts=4:sw=4
