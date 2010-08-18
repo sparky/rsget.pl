@@ -26,6 +26,7 @@ start:
 	GET( $-{_uri} );
 
 	MULTI( "e404" ) if m#<head><title>404 Not Found</title></head>#;
+	MULTI( "e502, will try again" ) if m#<head><title>502 Bad Gateway</title></head>#;
 	ERROR( "file not found" ) if m#<div class="code-404">404</div>#;
 	ERROR( "file not found" ) if m#Файл не найден. Возможно он был удален|File was not found. It could possibly be deleted#;
 
