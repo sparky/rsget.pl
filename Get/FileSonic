@@ -21,7 +21,7 @@ start:
 	GET( $-{_uri} );
 
 	ERROR( "file not found: $1" )
-		if m#<div class="section CL1 errorMessage">.*?<p>(.*?)</p>#s;
+		if m#<div class="section CL1">.*?<p>\s*(.*?)\s*</p>#s;
 
 	! m#<p class="fileInfo filename">.*?<strong>(.*?)</strong>#;
 	( my $fn = $1 ) =~ s/\.\.\./\0/;
