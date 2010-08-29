@@ -11,7 +11,7 @@ web: "http://fileserve.com/"
 tos: "http://fileserve.com/terms.php"
 uri: qr{fileserve\.com/file/[A-Za-z0-9]+(/.*)?}
 cookie: fsrv
-status: OK 2010-07-25
+status: BROKEN 2010-08-30
 
 unify:
 	s/#.*//;
