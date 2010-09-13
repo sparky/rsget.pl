@@ -67,6 +67,8 @@ stage_getcaptcha:
 	}
 	ERROR( "file not found" )
 		if /This file is currently unavailable/;
+	DELAY( 600, "file temporarily unavailable" )
+		if /Please retry again in a few minutes while the file is being uploaded/;
 	RESTART( $1 / 100, "free limit reached" )
 		if /You could download your next file in.*countdown\(([0-9]+)/;
 
