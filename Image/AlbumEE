@@ -26,7 +26,7 @@ start:
 	! m{<p class="f-left">user » <b><a href="user/\d+" title="View user profile.">(.+?)</a></b></p>};
 	my $user = $1;
 
-	! m{<p class="f-left">album » <a href="album/7631/50249339">(.+?)</a></p>};
+	! m{<p class="f-left">album » <a href="album/\d+/\d+">(.+?)</a></p>};
 	my $album = $1;
 
 	! m{<p class="f-left">photo » <b>(.+?)</b></p>};
