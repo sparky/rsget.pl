@@ -1,0 +1,43 @@
+# $Id$
+# Image::AlbumEE - Image getter plugin for rsget.pl
+#
+# 2010 (c) Paweł Zuzelski <pawelz@pld-linux.org>
+#		This program is free software,
+# you may distribute it under GPL v2 or newer.
+
+name: AlbumEE
+short: I:AlbumEE
+web: "http://album.ee/"
+tos: "http://keskus.ee/page/Terms"
+uri: qr{(?:(?:en|ru)\.)?album\.ee/node/\d+/\d+}
+slots: max
+status: OK 2010-09-19
+
+unify:
+	return "http://en.album.ee/node/$1/$2"
+		if m{http://(?:ru\.)?album\.ee/node/(\d+)/(\d+)};
+
+start:
+	GET( $-{_uri} );
+
+	ERROR( "file not found" )
+		if m#Page not found#;
+
+	! m{<p class="f-left">user » <b><a href="user/\d+" title="View user profile.">(.+?)</a></b></p>};
+	my $user = $1;
+
+	! m{<p class="f-left">album » <a href="album/7631/50249339">(.+?)</a></p>};
+	my $album = $1;
+
+	! m{<p class="f-left">photo » <b>(.+?)</b></p>};
+	my $name = $1;
+
+	! m{<img src="(http://.*?)" alt="\Q$name\E"};
+	my $furi = $1;
+
+	my $fname = $user."-".$album."-".$name;
+	INFO( name => $fname, quality => "image" );
+
+	DOWNLOAD( $furi, fname => $fname );
+
+# vim: filetype=perl:ts=4:sw=4
