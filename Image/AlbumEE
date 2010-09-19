@@ -32,7 +32,7 @@ start:
 	! m{<p class="f-left">photo » <b>(.+?)</b></p>};
 	my $name = $1;
 
-	! m{<img src="(http://.*?)" alt="\Q$name\E"};
+	! m{<li><a href="(http://.*?)" class="ico6">Original Size</a></li>};
 	my $furi = $1;
 
 	my $fname = $user."-".$album."-".$name;
