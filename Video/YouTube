@@ -43,7 +43,8 @@ start:
 	GET( $-{_uri} );
 
 	ERROR( "file not found: $1" )
-		if /<div\s[^>]+class="yt-alert-content">\s*(The.*?)\s*</s;
+		if /<div\s[^>]+class="yt-alert-content">\s*(The.*?)\s*</s
+			or /<div\s[^>]+class="yt-alert-content">\s*(This video contains content from .*?, who has blocked it in your country on copyright grounds\.)\s*</s;
 	ERROR( "age verification required" )
 		if $-{_referer} =~ m#/verify_age#;
 
