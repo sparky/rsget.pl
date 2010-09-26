@@ -1,0 +1,29 @@
+# $Id$
+# Get::Hostuje - File getter plugin for rsget.pl
+#
+# 2010 (c) Paweł Zuzelski <pawelz@pld-linux.org>
+#		This program is free software,
+# you may distribute it under GPL v2 or newer.
+
+name: Hostuje
+short: HS
+web: "http://hostuje.net/"
+tos: "http://hostuje.net/regulamin.php"
+uri: qr{hostuje\.net/file\.php\?id=[a-f0-9]+}
+status: OK 2010-09-26
+
+start:
+	GET( $-{_uri} );
+
+	ERROR( "file not found: $1" ) if m#<span class="fail_info">\s*(.*?)\s*</span>#s;
+
+	! m#<b>Plik:</b> (.+?)<br><b>Rozmiar:</b> ($STDSIZE)<br><b>#;
+	my $fname = $1;
+	INFO( name => $fname, asize => $2 );
+
+	! m#so\.addVariable\("file", "(http://.*?)"\);#;
+	my $download_link = $1;
+
+	CLICK_DOWNLOAD( $download_link, fname => $fname );
+
+# vim: filetype=perl:ts=4:sw=4
