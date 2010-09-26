@@ -15,7 +15,7 @@ status: OK 2010-09-26
 start:
 	GET( $-{_uri} );
 
-	ERROR( "file not found: $1" ) if m#<span class="fail_info">\s*(.*?)\s*</span>#s;
+	ERROR( "file not found: $1" ) if m#Podany plik nie został odnaleziony#s;
 
 	! m#<b>Plik:</b> (.+?)<br><b>Rozmiar:</b> ($STDSIZE)<br><b>#;
 	my $fname = $1;
