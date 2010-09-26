@@ -427,6 +427,10 @@ sub body_file
 		die "\nCannot write data: $!\n" unless $p;
 	} else {
 		$supercurl->{body} .= $chunk;
+		if ( length $supercurl->{body} > 1 * 1024 * 1024 ) {
+			warn "Tried to save large archive to memory. Aborting. (plugin may be broken)\n";
+			return 0;
+		}
 	}
 
 	return $len;
@@ -436,6 +440,10 @@ sub body_scalar
 {
 	my ($chunk, $scalar) = @_;
 	$$scalar .= $chunk;
+	if ( length $$scalar > 1 * 1024 * 1024 ) {
+		warn "Tried to save large archive to memory. Aborting. (plugin may be broken)\n";
+		return 0;
+	}
 	return length $chunk;
 }
 
