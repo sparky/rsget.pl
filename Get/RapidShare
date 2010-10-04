@@ -13,7 +13,7 @@ uri: qr{(?:rs[a-z0-9]+\.)?rapidshare\.com/files/\d+/.+}
 uri: qr{(?:rs[a-z0-9]+\.)?rapidshare\.com/?#!download\|\d+\|\d+\|.+?\|\d+}
 uri: qr{(?:rs[a-z0-9]+\.)?rapidshare\.de/files/\d+/.+}
 uri: qr{(?:rs[a-z0-9]+\.)?rapidshare\.de/?#!download\|\d+\|\d+\|.+?\|\d+}
-status: INCOMPLETE 2010-10-04
+status: OK 2010-10-04
 
 unify:
 	return $_;
@@ -27,15 +27,20 @@ start:
 	GET( "http://rapidshare.com$1" );
 
 stage_uri_complete:
-	! my ( $id, $name, $size ) = $-{_referer} =~ m{#!download\|\d+\|(\d+)\|(.+?)\|(\d+)};
-	INFO( name => $name, asize => "$size KB" );
+	! ( $-{id}, $-{name}, my $size ) = $-{_referer} =~ m{#!download\|\d+\|(\d+)\|(.+?)\|(\d+)};
+	INFO( name => $-{name}, asize => "$size KB" );
 	
-	CLICK( "http://api.rapidshare.com/cgi-bin/rsapi.cgi?sub=download_v1&try=1&fileid=$id&filename=$name" );
+	CLICK( "http://api.rapidshare.com/cgi-bin/rsapi.cgi?sub=download_v1&try=1&fileid=$-{id}&filename=$-{name}" );
 
 	RESTART( $2, "free limit reached: $1" )
 		if /^(ERROR: You need to wait (\d+) seconds.*)/;
 
-	
+	! my ( $host, $dlauth, $wait ) = m{DL:(.*?),([0-9A-F]+?),(\d+)};
 
+	$-{file_uri} = "http://$host/cgi-bin/rsapi.cgi?sub=download_v1&dlauth=$dlauth&bin=1&fileid=$-{id}&filename=$-{name}";
+
+	WAIT( $wait, "starting download" );
+
+	DOWNLOAD( $-{file_uri} );
 
 # vim: filetype=perl:ts=4:sw=4
