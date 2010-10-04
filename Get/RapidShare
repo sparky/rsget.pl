@@ -8,90 +8,34 @@
 name: RapidShare
 short: RS
 web: "http://rapidshare.com/"
-tos: "http://rapidshare.com/agb.html"
+tos: "http://rapidshare.com/#!rapidshare-ag/rapidshare-ag_agb"
 uri: qr{(?:rs[a-z0-9]+\.)?rapidshare\.com/files/\d+/.+}
+uri: qr{(?:rs[a-z0-9]+\.)?rapidshare\.com/?#!download\|\d+\|\d+\|.+?\|\d+}
 uri: qr{(?:rs[a-z0-9]+\.)?rapidshare\.de/files/\d+/.+}
-status: OK 2010-07-13
+uri: qr{(?:rs[a-z0-9]+\.)?rapidshare\.de/?#!download\|\d+\|\d+\|.+?\|\d+}
+status: INCOMPLETE 2010-10-04
 
 unify:
-	s/#.*//;
-	return "http://rapidshare.com/files/$1"
-		if m{rapidshare\.(?:com|de)/files/(\d+/.+)};
-
-pre:
-	my $match;
-
-	sub match($)
-	{
-		my $re = shift;
-		if ( ref $re ) {
-			die "Incorrect match regexp"
-				unless ref $re eq "Regexp";
-		} else {
-			$re = qr/\Q$re\E/;
-		}
-		if ( /.*>(.*?$re.*?)</s ) {
-			$match = $2;
-			$_ = $1;
-			s/\r//g;
-			s/\n/ /g;
-			return 1;
-		} else {
-			return undef;
-		}
-	}
-
+	return $_;
 
 start:
 	GET( $-{_uri} );
 
-	ERROR( "file not found: $_" )
-		if match "The file could not be found.  Please check the download link.";
-	ERROR( "file removed: $_" )
-		if match "file has been removed from the server";
-	ERROR( "file removed: $_" )
-		if match "The uploader has removed this file from the server";
-	ERROR( "file removed: $_" )
-		if match "download of this file is currently not possible";
-	ERROR( "file removed: $_" )
-		if match "This limit is reached";
-	ERROR( "not allowed: $_" )
-		if m#<h1>Error</h1># and match qr/This file is larger than /;
+	GOTO stage_uri_complete
+		unless m{<script type="text/javascript">location="(.*?)"};
+	$-{_referer} = undef;
+	GET( "http://rapidshare.com$1" );
 
-	! m#<p class="downloadlink">.*/(.+?) <font style=".*?">\| (\d+ KB)</font></p>#;
-	INFO( name => $1, asize => $2, kilo => 1000 );
+stage_uri_complete:
+	! my ( $id, $name, $size ) = $-{_referer} =~ m{#!download\|\d+\|(\d+)\|(.+?)\|(\d+)};
+	INFO( name => $name, asize => "$size KB" );
+	
+	CLICK( "http://api.rapidshare.com/cgi-bin/rsapi.cgi?sub=download_v1&try=1&fileid=$id&filename=$name" );
 
-	RESTART( $match * 60, "servers overloaded: $_" )
-		if match qr/Unfortunately you will have to wait (\d+) minutes/;
+	RESTART( $2, "free limit reached: $1" )
+		if /^(ERROR: You need to wait (\d+) seconds.*)/;
 
-	! my $form = $self->form( id => "ff" );
-	CLICK( $form->post() );
+	
 
-	MULTI( "multi-download not allowed: $_" )
-		if match "Please wait until the download is completed";
-
-	DELAY( 5 * 60, "no slots for free users: $_" )
-		if match "There are no more download slots available for free users right now"
-			or match "Unfortunately right now our servers are overloaded";
-
-	RESTART( $match * 60 + 10, "free limit reached: $_" )
-		if match qr/Instant download access! Or try again in about (\d+) minutes/;
-
-	RESTART( $match * 60, "servers overloaded: $_" )
-		if match qr/Unfortunately you will have to wait (\d+) minutes,/
-			or match qr/Please try again in (\d+) minutes/;
-
-	! $-{form} = $self->form( name => "dlf" );
-	$-{form}->set( mirror => "on" );
-	$-{form}->set( x => irand 5, 103 );
-	$-{form}->set( y => irand 5, 103 );
-
-	! /var c=(\d+);/;
-	WAIT( $1, "starting download" );
-
-	CLICK_DOWNLOAD( $-{form}->post() );
-
-	MULTI( "multi-download not allowed: $_" )
-		if match "Please wait until the download is completed";
 
 # vim: filetype=perl:ts=4:sw=4
