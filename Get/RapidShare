@@ -21,6 +21,9 @@ unify:
 start:
 	GET( $-{_uri} );
 
+	ERROR( "file not found: $1" )
+		if /^ERROR: (.*)/ and substr( $1, 0, 16 ) ne "You need to wait";
+
 	GOTO stage_uri_complete
 		unless m{<script type="text/javascript">location="(.*?)"};
 	$-{_referer} = undef;
