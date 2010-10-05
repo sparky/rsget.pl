@@ -1,0 +1,41 @@
+# $Id$
+# Get::UlozTo - File getter plugin for rsget.pl
+#
+# 2010 (c) Przemysław Iskra <sparky@pld-linux.org>
+#		This program is free software,
+# you may distribute it under GPL v2 or newer.
+
+name: UlozTo
+short: UlozTo
+web: "http://uloz.to/"
+tos: "http://img.uloz.to/podminky.pdf"
+uri: qr{uloz\.to/\d+/}
+slots: max
+status: OK 2010-10-05
+
+start:
+	GET( $-{_uri} );
+
+	ERROR( "file not found: $1" )
+		if m{<div id="errPage".*?<h2>(.*?)</h2>}s;
+
+	! m{<h2 class="nadpis" .*?><a href=".*?">(.*?)</a></h2>};
+	my $name = $1;
+
+	! m{<div class="info_velikost" .*?><div>($STDSIZE)</div></div>}o;
+	INFO( name => $name, asize => $1 );
+
+	! $-{form} = $self->form( name => "dwn" );
+
+	#! m{<img .*? src="(http://img\.uloz\.to/captcha/\d+\.png)" alt="Captcha" class="captcha" />};
+	#GET( $1 );
+	#CAPTCHA( qr/[a-z]{4}/ );
+	#$-{form}->set( captcha_user => $_ );
+	
+	# captcha hack - no need to solve captchas !
+	$-{form}->set( captcha_nb => 1 );
+	$-{form}->set( captcha_user => "rxke" );
+
+	DOWNLOAD( $-{form}->post() );
+
+# vim: filetype=perl:ts=4:sw=4
