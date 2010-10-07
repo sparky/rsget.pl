@@ -12,15 +12,15 @@ uri: qr{tok.fm/TOKFM/\d+,\d+.html}
 slots: max
 status: OK 2010-09-19
 
+pre:
+	use Encode;
+
 start:
 	GET( $-{_uri} );
 
-	use Text::Iconv;
-	my $converter = Text::Iconv->new("ISO-8859-2", "UTF-8");
-
-	my @list = map { $1."#/".uri_escape($converter->convert($2))
-		if $_ =~ /href="(.+?)" title="(.+?)"/ }
-			m{<a (href=".+?" title=".+?") class="tokfm_play">}g;
+	my @list;
+	push @list, $1 . "#/" . uri_escape( encode( "utf8", decode( "iso-8859-2", $2) ) )
+		while s{<a\s+href="(.+?)"\s+title="(.+?)"\s+class="tokfm_play">}{};
 
 	LINK( @list );
 
