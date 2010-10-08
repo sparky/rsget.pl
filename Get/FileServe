@@ -11,7 +11,7 @@ web: "http://fileserve.com/"
 tos: "http://fileserve.com/terms.php"
 uri: qr{fileserve\.com/file/[A-Za-z0-9]+(/.*)?}
 cookie: fsrv
-status: BROKEN 2010-08-30
+status: OK 2010-10-08
 
 unify:
 	s/#.*//;
@@ -28,13 +28,47 @@ start:
 	! m#<span><strong>($STDSIZE)</strong> \| Uploaded on #o;
 	INFO( name => $fname, asize => $1 );
 
-	CLICK( $-{_uri}, post => { downloadLink => "wait" } );
+	( $-{captcha_key} ) = m{var reCAPTCHA_publickey='(.*?)';};
+	( $-{captcha_encode} ) = m{"recaptcha_shortencode_field".*? value="(.*?)" />};
 
-	WAIT( 30, "waiting for download link" );
+	! m{src="(/landing/.+?/download_captcha\.js)"};
+	CLICK( $1, keep_referer => 1,
+		headers => [ "X-Requested-With: XMLHttpRequest" ] );
 
-	CLICK( $-{_uri}, post => { downloadLink => "show" } );
+stage_getcaptcha:
+	GET( "http://www.google.com/recaptcha/api/challenge?k=$-{captcha_key}&ajax=1&cachestop=" . rand,
+		keep_referer => 1 );
 
-	CLICK_DOWNLOAD( $-{_uri}, post => { download => "normal" } );
+	! ( $-{captcha_challenge} ) = m{challenge\s*:\s*'(.*?)'};
+
+	GET( "http://www.google.com/recaptcha/api/image?c=" . $-{captcha_challenge},
+   		keep_referer => 1 );
+
+	CAPTCHA(
+		qr/\S+ \S+/
+	);
+
+	CLICK( "/checkReCaptcha.php", post => {
+			recaptcha_shortencode_field => $-{captcha_encode},
+			recaptcha_response_field => $_,
+			recaptcha_challenge_field => $-{captcha_challenge},
+		}, keep_referer => 1 );
+
+	if ( /incorrect-captcha-sol/ ) {
+		CAPTCHA_RESULT( "FAIL" );
+		GOTO stage_getcaptcha;
+	} else {
+		CAPTCHA_RESULT( "OK" );
+	}
+
+	GET( "", post => { downloadLink => "wait" }, keep_referer => 1 );
+
+	! /(\d+)/;
+	WAIT( $1, "expecting for download link" );
+
+	CLICK( "", post => { downloadLink => "show" }, keep_referer => 1, );
+
+	CLICK_DOWNLOAD( "", post => { download => "normal" } );
 
 	RESTART( $1, "free limit reached" )
 		if m#You need to wait (\d+) seconds to start another download\.#;
