@@ -15,13 +15,14 @@ status: OK 2010-10-08
 
 unify:
 	s/#.*//;
-	return "http://fileserve.com/files/$1"
-		if m{fileserve\.com/files/([A-Za-z0-9]+)};
+	return "http://fileserve.com/file/$1"
+		if m{fileserve\.com/file/([A-Za-z0-9]+)};
 
 start:
 	GET( $-{_uri} );
 
-	ERROR( "file not found: $1" ) if m#<span class="fail_info">\s*(.*?)\s*</span>#s;
+	ERROR( "file not found: $1" ) if m#<span class="fail_info">\s*(.*?)\s*</span>#s
+		or m{<img src="/images/stop_error\.gif".*?<h1>.*?</h1></li><li>(.*?)</li>}s;
 
 	! m#<h1>(.+?)<br/></h1>#;
 	my $fname = $1;
