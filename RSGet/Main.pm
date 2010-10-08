@@ -63,6 +63,13 @@ $SIG{PIPE} = sub {
 	$sig_pipe = 1;
 };
 
+sub discontinuation_warning
+{
+	( "*** This is the last release of the current rsget.pl series. ***\n",
+	  "***   Find out more at:                                      ***\n",
+	  "***     http://rsget.pl/about/new-core/                      ***\n" );
+}
+
 my $http = undef;
 sub init
 {
@@ -96,6 +103,7 @@ sub init
 		my $start_dir = Cwd::getcwd();
 		require Proc::Daemon;
 		print "starting rsget.pl daemon\n" if verbose( 1 );
+		print $_ foreach discontinuation_warning;
 		Proc::Daemon::Init();
 		chdir $start_dir;
 	} elsif ( $daemon ) {
@@ -105,6 +113,8 @@ sub init
 	maybe_start_http();
 	new RSGet::Line();
 	new RSGet::Line( "rsget.pl started successfully on pid $$" );
+	new RSGet::Line();
+	warn $_ foreach discontinuation_warning;
 	new RSGet::Line();
 	RSGet::Line::update();
 
