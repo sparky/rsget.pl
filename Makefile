@@ -24,6 +24,11 @@ pkg:
 	$(MAKE) VER="$$(svn up | sed '/At revision /!d; s/At revision //; s/\.//')" pkg
 else
 pkg: clean
+	@echo "**********************************************"
+	@echo "*** There should be no new packages, check ***"
+	@echo "***    http://rsget.pl/about/new-core/     ***"
+	@echo "**********************************************"
+	$(IGNORE_DISCONTINUATION_WARNING)@false
 	rm -rf $(PKGDIR)
 	for DIR in $(DIRS); do \
 		install -d $(PKGDIR)/$$DIR; \
