@@ -43,7 +43,7 @@ stage_getcaptcha:
 	! ( $-{captcha_challenge} ) = m{challenge\s*:\s*'(.*?)'};
 
 	GET( "http://www.google.com/recaptcha/api/image?c=" . $-{captcha_challenge},
-   		keep_referer => 1 );
+		keep_referer => 1 );
 
 	CAPTCHA(
 		qr/\S+ \S+/
