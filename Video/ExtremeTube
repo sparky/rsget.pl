@@ -15,15 +15,19 @@ status: OK 2010-07-13
 start:
 	GET( $-{_uri} );
 
-	! m{<h1 class="title-video-box".+?>(.*?)</h1>};
+	! m{<h1 class="title-video-box.+?>(.*?)</h1>};
 	$-{fname} = de_ml( $1 );
 	$-{fname} =~ s{/}{_}g;
 	$-{fname} =~ s/\s*$/.flv/;
 
-	INFO( name => $-{fname}, quality => "flv" );
-
 	! m{flashvars\.video_url = '(.*?)'};
+	$-{file_uri} = uri_unescape( $1 );
 
-	DOWNLOAD( $1, fname => $-{fname} );
+	GET( $-{file_uri}, headonly => 1, keep_referer => 1 );
+
+	! m{Content-Length:\s*(\d+)};
+	INFO( name => $-{fname}, size => $1 );
+
+	DOWNLOAD( $-{file_uri}, fname => $-{fname} );
 
 # vim: filetype=perl:ts=4:sw=4
