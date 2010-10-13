@@ -29,16 +29,51 @@ start:
 	INFO( aname => $fn, asize => $1 );
 
 	! m#<a class="downloadNow" href="(.*?)" id="free_download">#;
-	CLICK( $1, keep_referer => 1 );
+	$-{dl_start} = $1;
+	CLICK( $-{dl_start}, post => "", keep_referer => 1 );
 
 	MULTI() if m#<span>Download session in progress</span>#;
 
-	! m#downloadUrl = "(.*?)"#;
-	$-{file_uri} = $1;
+stage_getlink:
+	( $-{file_uri} ) = m{<p><a href="(.*?)"><span>Start download now!</span></a></p>};
 
-	! /var countDownDelay = (\d+);/;
-	WAIT( - $1, "starting download" );
+	GOTO stage_download if $-{file_uri};
 
+	if ( /var countDownDelay = (\d+);/ ) {
+		$-{delay} = $1;
+		GOTO stage_wait;
+	}
+
+	! m{Recaptcha\.create\("(.*?)"};
+	$-{captcha_key} = $1;
+
+	GET( "http://www.google.com/recaptcha/api/challenge?k=$-{captcha_key}&ajax=1&cachestop=" . rand,
+		keep_referer => 1 );
+
+	! ( $-{captcha_challenge} ) = m{challenge\s*:\s*'(.*?)'};
+
+	GET( "http://www.google.com/recaptcha/api/image?c=" . $-{captcha_challenge},
+		keep_referer => 1 );
+
+	CAPTCHA(
+		qr/\S+ \S+/
+	);
+
+	GET( $-{dl_start}, post => {
+			recaptcha_challenge_field => $-{captcha_challenge},
+			recaptcha_response_field => $_
+		} );
+
+	GOTO stage_getlink;
+
+stage_wait:
+	WAIT( -( $-{delay} + 5 ), "expecting download link" );
+
+	GET( $-{dl_start}, post => "" );
+
+	GOTO stage_getlink;
+
+stage_download:
 	CLICK_DOWNLOAD( $-{file_uri} );
 
 # vim: filetype=perl:ts=4:sw=4
