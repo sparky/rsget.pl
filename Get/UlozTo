@@ -22,7 +22,7 @@ start:
 	! m{<h2 class="nadpis" .*?><a href=".*?">(.*?)</a></h2>};
 	my $name = $1;
 
-	! m{<div class="info_velikost" .*?><div>($STDSIZE)</div></div>}o;
+	! m{<div class="info_velikost" .*?><div>(?:[\d:]+\s*\|\s*)?($STDSIZE)</div></div>}o;
 	INFO( name => $name, asize => $1 );
 
 	! $-{form} = $self->form( name => "dwn" );
