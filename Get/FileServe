@@ -49,6 +49,8 @@ stage_getcaptcha:
 		qr/\S+ \S+/
 	);
 
+	RESTART( 1, "Captcha not solved" ) unless $_;
+
 	CLICK( "/checkReCaptcha.php", post => {
 			recaptcha_shortencode_field => $-{captcha_encode},
 			recaptcha_response_field => $_,

@@ -59,6 +59,8 @@ stage_getlink:
 		qr/\S+ \S+/
 	);
 
+	RESTART( 1, "Captcha not solved" ) unless $_;
+
 	GET( $-{dl_start}, post => {
 			recaptcha_challenge_field => $-{captcha_challenge},
 			recaptcha_response_field => $_
