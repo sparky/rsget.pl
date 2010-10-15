@@ -53,7 +53,7 @@ sub print_dead_lines
 
 	if ( $last_day != $l[3] ) {
 		$last_day = $l[3];
-		my $date = sprintf "[Actual date: %d-%.2d-%.2d]", $l[5] + 1900, $l[4] + 1, $l[3];
+		my $date = sprintf "[Current date: %d-%.2d-%.2d]", $l[5] + 1900, $l[4] + 1, $l[3];
 		push @print, "\r" . $date . "\033[J\n";
 		push @newdead, $date;
 	}
