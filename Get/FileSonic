@@ -22,7 +22,7 @@ start:
 
 	ERROR( "file not found: $1" )
 		if m#<div class="section CL1">.*?<p>\s*(.*?)\s*</p>#s
-		or m#<div id="downloadFileInfo" class="section CL.">.*?<p>\s*(.*?)\s*</p>#s;
+		or m#<div id="downloadFileInfo" class="section CL2">\s*<h2><span>[^<]*?</span></h2>\s*<p>\s*(.*?)\s*</p>#s;
 
 	! m#<p class="fileInfo filename">.*?<strong>(.*?)</strong>#;
 	( my $fn = $1 ) =~ s/\.\.\./\0/;
