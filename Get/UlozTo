@@ -10,6 +10,7 @@ short: UlozTo
 web: "http://uloz.to/"
 tos: "http://img.uloz.to/podminky.pdf"
 uri: qr{uloz\.to/\d+/}
+uri: qr{ulozto\.cz/\d+/}
 slots: max
 status: OK 2010-10-05
 
