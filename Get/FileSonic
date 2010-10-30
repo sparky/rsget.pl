@@ -11,7 +11,7 @@ web: "http://www.filesonic.com/"
 tos: "http://www.filesonic.com/terms-and-conditions"
 uri: qr{filesonic\.com/file/\d+}
 uri: qr{(?:www\d+\.)?sharingmatrix\.com/file/\d+}
-status: OK 2010-08-17
+status: OK 2010-10-30
 
 unify:
 	return "http://www.filesonic.com/file/$1"
@@ -29,7 +29,7 @@ start:
 	! m#<span class="size">($STDSIZE)</span>#;
 	INFO( aname => $fn, asize => $1 );
 
-	! m#<a class="downloadNow" href="(.*?)" id="free_download">#;
+	! m#href="(.*?)" id="free_download"#;
 	$-{dl_start} = $1;
 	CLICK( $-{dl_start}, post => "", keep_referer => 1 );
 
