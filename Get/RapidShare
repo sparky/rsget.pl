@@ -21,8 +21,8 @@ unify:
 start:
 	GET( $-{_uri} );
 
-	RESTART( 300, "must wait: $1" )
-		if /^ERROR: (Please stop floo.*)/;
+	RESTART( -300, "must wait: $1" )
+		if /^ERROR: (Please stop floo.*|All free download slots are full.*)/;
 
 	ERROR( "file not found: $1" )
 		if /^ERROR: (.*)/
