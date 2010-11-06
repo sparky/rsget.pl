@@ -39,7 +39,7 @@ stage_uri_complete:
 
 	MULTI( $1 )
 		if /^(ERROR: You need RapidPro.*)/;
-	RESTART( $2, "free limit reached: $1" )
+	RESTART( -$2, "free limit reached: $1" )
 		if /^(ERROR: You need to wait (\d+) seconds.*)/;
 
 	! my ( $host, $dlauth, $wait ) = m{DL:(.*?),([0-9A-F]+?),(\d+)};
