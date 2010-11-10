@@ -11,7 +11,7 @@ web: "http://www.filesonic.com/"
 tos: "http://www.filesonic.com/terms-and-conditions"
 uri: qr{filesonic\.com/file/\d+}
 uri: qr{(?:www\d+\.)?sharingmatrix\.com/file/\d+}
-status: OK 2010-10-30
+status: BROKEN 2010-11-10
 
 unify:
 	return "http://www.filesonic.com/file/$1"
