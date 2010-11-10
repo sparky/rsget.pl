@@ -24,10 +24,10 @@ start:
 		if m#<div class="section CL1">.*?<p>\s*(.*?)\s*</p>#s
 		or m#<div id="downloadFileInfo" class="section CL2">\s*<h2><span>[^<]*?</span></h2>\s*<p>\s*(.*?)\s*</p>#s;
 
-	! m#<p class="fileInfo filename">.*?<strong>(.*?)</strong>#;
-	( my $fn = $1 ) =~ s/\.\.\./\0/;
+	! m#<title>Download (.*?) for free on Filesonic.com</title>#;
+	my $fn = $1;
 	! m#<span class="size">($STDSIZE)</span>#;
-	INFO( aname => $fn, asize => $1 );
+	INFO( name => $fn, asize => $1 );
 
 	! m#href="(.*?)" id="free_download"#;
 	$-{dl_start} = $1;
