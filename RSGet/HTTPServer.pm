@@ -117,10 +117,14 @@ sub request
 		$print .= "HTTP/1.1 401 Authorization Required\r\n";
 		$print .= "WWW-Authenticate: Basic\r\n";
 		$print .= "Content-Type: text/plain\r\n";
+		$print .= "Connection: close\r\n";
 		$print .= "\r\nAuthorization Required\n";
 	} elsif ( my $func = $RSGet::HTTPRequest::handlers{$file} ) {
 		$print = "HTTP/1.1 200 OK\r\n";
-		my $headers = { Content_Type => "text/xml; charset=utf-8" };
+		my $headers = {
+			Content_Type => "text/xml; charset=utf-8",
+			Connection => "close"
+	   	};
 		my $data = &$func( $file, \%post, $headers );
 
 		$headers->{Content_Length} ||= length $data;
@@ -133,6 +137,7 @@ sub request
 		$print .= $data;
 	} else {
 		$print = "HTTP/1.1 404 Not found\r\n";
+		$print .= "Connection: close\r\n";
 		$print .= "\r\n";
 	}
 

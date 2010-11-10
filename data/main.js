@@ -14,7 +14,6 @@ function ajax_post( link, post, callback )
 	req.open( "POST", link, true );
 	req.setRequestHeader( 'Content-Type', 'application/x-www-form-urlencoded' );
 	req.setRequestHeader( 'Content-Length', post.length );
-	req.setRequestHeader( 'Connection', 'close' );
 	req.send( post );
 }
 
