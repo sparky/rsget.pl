@@ -35,7 +35,7 @@ start:
 	GET( "http://rapidshare.com$1" );
 
 stage_uri_complete:
-	! ( $-{id}, $-{name}, my $size ) = $-{_referer} =~ m{#!download\|\d+\|(\d+)\|(.+?)\|(\d+)};
+	! ( $-{id}, $-{name}, my $size ) = $-{_referer} =~ m{#!download\|[0-9a-z]+\|(\d+)\|(.+?)\|(\d+)};
 	INFO( name => $-{name}, asize => "$size KB" );
 	
 	CLICK( "http://api.rapidshare.com/cgi-bin/rsapi.cgi?sub=download_v1&try=1&fileid=$-{id}&filename=$-{name}" );
