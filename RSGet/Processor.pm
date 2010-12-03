@@ -180,12 +180,16 @@ EOF
 		my $err = $@;
 		return undef unless $err =~ /line \d+/;
 		my @p = split /\n/, $processed;
-		for ( my $i = 0; $i < scalar @p; $i++ ) {
-			my $n = $i + 1;
+		my $n = 1;
+		foreach ( @p ) {
+			if ( /^#line (\d+)/ ) {
+				$n = $1;
+				next;
+			}
 			p sprintf "%s%4d: %s\n",
 				($err =~ /line $n[^\d]/ ? "!" : " "),
-				$n,
-				$p[ $i ];
+				$n, $_;
+			$n++;
 		}
 		return undef;
 	}
