@@ -40,4 +40,7 @@ start:
 
 	CLICK_DOWNLOAD( $-{file_uri} );
 
+	RESTART( - irand( 60, 360 ), "free limit reached" )
+		if /Download limit exceeded/;
+
 # vim: filetype=perl:ts=4:sw=4
