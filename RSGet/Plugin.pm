@@ -31,8 +31,10 @@ sub read_file($)
 	);
 	my $parts = join "|", keys %parts;
 
+	my $line = 0;
 	my $part;
 	while ( <F_IN> ) {
+		$line++;
 		chomp;
 		next if /^\s*#/;
 		next if /^\s*$/;
@@ -58,6 +60,7 @@ sub read_file($)
 	}
 
 	while ( <F_IN> ) {
+		$line++;
 		chomp;
 		next if /^\s*#/;
 		next if /^\s*$/;
@@ -65,13 +68,12 @@ sub read_file($)
 		if ( /^($parts)\s*:/ ) {
 			$part = $1;
 			if ( $part eq "perl" ) {
-				my @perl = <F_IN>;
-				$parts{perl} = \@perl;
+				push @{ $parts{perl} }, ( qq(#line $line "$self->{file} [perl]"), <F_IN> );
 			}
 			next;
 		}
 
-		push @{ $parts{ $part } }, $_;
+		push @{ $parts{ $part } }, ( qq(#line $line "$self->{file} [$part]"), $_ );
 	}
 
 	close F_IN;

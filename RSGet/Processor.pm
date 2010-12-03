@@ -78,6 +78,7 @@ sub compile
 
 	my $unify_body = ( join "\n", @{ $parts->{unify} } ) || 's/#.*//; s{/$}{};';
 
+	pr qq(#line 1 "$opts->{pkg} preamble"\n);
 	pr "package $opts->{pkg};\n\n";
 	pr <<'EOF';
 	use strict;
@@ -100,6 +101,11 @@ EOF
 	p_sub( "stage0" );
 	my @machine = @{ $parts->{start} };
 	while ( $_ = shift @machine ) {
+		if ( /^#line/ ) {
+			pr $_ . "\n";
+			next;
+		}
+
 		$space = "";
 		$space = $1 if s/^(\s+)//;
 
@@ -163,7 +169,7 @@ EOF
 	pr @{$parts->{perl}};
 
 	pr "\npackage $opts->{pkg};\n";
-	pr "sub unify { local \$_ = shift; $unify_body;\nreturn \$_;\n};\n";
+	pr "sub unify { local \$_ = shift;\n$unify_body;\nreturn \$_;\n};\n";
 	pr '\&unify;';
 
 	my $unify = eval_it( $processed );
