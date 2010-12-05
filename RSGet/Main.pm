@@ -191,6 +191,7 @@ sub check_settings
 	my $user = shift;
 	my $die = 0;
 	foreach my $s ( sort keys %$settings ) {
+		next if $s =~ /^premium_/;
 		my $v = $settings->{ $s };
 		my $def = $main::def_settings{ $s };
 		unless ( $def ) {
@@ -292,8 +293,8 @@ sub find_getters
 	if ( setting( "use_svn" ) eq "yes" ) {
 		unshift @paths, $main::local_path;
 	}
-	foreach my $path ( @paths ) {
-		foreach my $type ( qw(Get Video Audio Image Link Direct) ) {
+	foreach my $type ( qw(Premium Get Video Audio Image Link Direct) ) {
+		foreach my $path ( @paths ) {
 			my $dir = "$path/$type";
 			next unless -d $dir;
 			my $count = 0;

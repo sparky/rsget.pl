@@ -11,6 +11,7 @@ use RSGet::Processor;
 use RSGet::Tools;
 set_rev qq$Id$;
 
+my @getters;
 my %getters;
 
 sub read_file($)
@@ -258,9 +259,24 @@ sub add
 	return 0 if m{/\.[^/]*$};
 	( my $file = $_ ) =~ s#.*/##;
 	return 0 if exists $getters{ $type . "::" . $file };
+	if ( $type eq "Premium" ) {
+		my $opt = "premium_" . lc $file;
+		def_settings(
+			$opt => {
+				desc => "Premium account information for ${type}/$file",
+			}
+		);
+
+		unless ( setting( $opt ) ) {
+			warn "${type}/$file: $opt option must be set for this plugin; failed\n"
+				if verbose( 2 );
+			return 0;
+		}
+	}
 	my $plugin = new RSGet::Plugin( $type, $_ );
 	if ( $plugin ) {
 		my $pkg = $plugin->{pkg};
+		push @getters, $plugin;
 		$getters{ $pkg } = $plugin;
 		new RSGet::Line( "INIT: ", "$pkg: Added" )
 			if verbose( 2 );
@@ -280,7 +296,7 @@ sub from_uri
 		return $from_uri_last if $from_uri_last->can_do( $uri );
 	}
 	my $direct = undef;
-	foreach my $getter ( values %getters ) {
+	foreach my $getter ( @getters ) {
 		if ( $getter->can_do( $uri ) ) {
 			if ( $getter->{class} eq "Direct" ) {
 				$direct = $getter;
