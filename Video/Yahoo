@@ -1,0 +1,43 @@
+# $Id$
+# Video::Yahoo - Video getter plugin for rsget.pl
+#
+# 2010 (c) Przemysław Iskra <sparky@pld-linux.org>
+#		This program is free software,
+# you may distribute it under GPL v2 or newer.
+
+name: Yahoo
+short: V:Yahoo
+web: "http://video.yahoo.com/"
+uri: qr{(?:[a-z]+\.)?video\.yahoo\.com/watch/\d+/\d+}
+uri: qr{(?:[a-z]+\.)?video\.yahoo\.com/network/\d+\?v=\d+}
+slots: max
+status: OK 2010-12-05
+
+start:
+	GET( $-{_uri} );
+
+	! /<meta name="title" content="(.*?)" /
+		or /<h2 id="nvi_title">(.*?)</;
+	$-{fname} = de_ml( $1 ) . ".flv";
+	$-{fname} =~ tr{/}{_};
+
+	! /so\.addVariable\("id", "(\d+)"\);/;
+	GET( "http://cosmos.bcst.yahoo.com/up/yep/process/getPlaylistFOP.php?node_id=$1&tech=flash&mode=playlist" );
+
+	! /<STREAM APP="(.*?)" FULLPATH="(.*?)" /;
+	$-{file_uri} = de_ml( $1 . $2 );
+
+	ERROR( "rtmp not supported" ) if $-{file_uri} =~ /^rtmp:/;
+
+	delete $-{_referer};
+	GET( $-{file_uri}, headonly => 1 );
+
+	# must be flash
+	! m{Content-Type: video/flash};
+
+	! m{Content-Length: (\d+)};
+	INFO( name => $-{fname}, size => $1 );
+
+	DOWNLOAD( $-{file_uri}, fname => $-{fname} );
+
+# vim: filetype=perl:ts=4:sw=4
