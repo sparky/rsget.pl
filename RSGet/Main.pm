@@ -183,7 +183,7 @@ END {
 	}
 }
 
-$SIG{HUP} = \&restart;
+$SIG{USR1} = \&restart;
 
 sub check_settings
 {
