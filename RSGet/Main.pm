@@ -71,18 +71,19 @@ sub discontinuation_warning
 }
 
 my $http = undef;
+my $argv;
 sub init
 {
 	my $help = shift;
 	my $main_rev = shift;
-	my $argv = shift;
+	$argv = shift;
 	my $ifs = shift;
 	set_rev $main_rev;
 
 	print_help() if $help;
 
 	$SIG{CHLD} = "IGNORE";
-	maybe_update( $argv );
+	maybe_update();
 
 	check_settings( \%main::settings );
 	#read_userconfig();
@@ -158,7 +159,6 @@ sub print_help
 
 sub maybe_update
 {
-	my $argv = shift;
 	if ( setting( "use_svn" ) eq "update" ) {
 		if ( RSGet::AutoUpdate::update() ) {
 			warn "Update successful, restarting\n";
@@ -167,6 +167,23 @@ sub maybe_update
 		main::set( "use_svn", "yes", "SVN updated" );
 	}
 }
+
+my $restart = 0;
+sub restart
+{
+	$restart = 1;
+	RSGet::Line::print_all_lines();
+	printf "\n\nRestarting at %s\n\n", scalar localtime;
+	exit 0;
+}
+
+END {
+	if ( $restart ) {
+		exec $0, @$argv;
+	}
+}
+
+$SIG{HUP} = \&restart;
 
 sub check_settings
 {
