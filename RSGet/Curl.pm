@@ -323,6 +323,8 @@ sub file_init
 		$supercurl->{size_total} = $supercurl->{force_size};
 	}
 
+	$get_obj->{_quota}->update( $supercurl->{size_total} );
+
 	$get_obj->dump( $supercurl->{head}, "head" ) if verbose( 5 );
 	my $fname;
 	if ( $supercurl->{force_name} ) {
@@ -479,6 +481,9 @@ sub finish
 	if ( $supercurl->{file} ) {
 		close $supercurl->{file};
 		$get_obj->print( "DONE " . donemsg( $supercurl ) );
+
+		$get_obj->{_quota}->confirm( $curl->getinfo( CURLINFO_SIZE_DOWNLOAD ) );
+
 	}
 
 	$get_obj->linedata();

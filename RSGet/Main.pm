@@ -93,6 +93,7 @@ sub init
 	RSGet::Curl::init();
 	RSGet::FileList::set_file();
 	set_interfaces( $ifs );
+	RSGet::Quota::_init();
 
 	new RSGet::Line();
 

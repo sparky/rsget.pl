@@ -12,6 +12,7 @@ use RSGet::Captcha;
 use RSGet::Form;
 use RSGet::Wait;
 use RSGet::Hook;
+use RSGet::Quota;
 use URI;
 set_rev qq$Id$;
 
@@ -83,6 +84,19 @@ sub new
 			_line => new RSGet::Line( "[$getter->{short}]$outifstr " );
 		$self->print( "start" );
 		$self->linedata();
+	}
+	if ( $cmd eq "get" ) {
+		local $SIG{__DIE__};
+		delete $SIG{__DIE__};
+		my $size = RSGet::ListManager::size_to_range( $self->{bestsize} );
+		eval {
+			hadd %$self,
+				_quota => RSGet::Quota->new( $size->[1] || 50 * 1024 * 1024 );
+		};
+		if ( $@ ) {
+			$self->delay( 600, "Quota reached: $@" );
+			return undef;
+		}
 	}
 
 	$self->start();
