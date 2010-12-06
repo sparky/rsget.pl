@@ -77,6 +77,8 @@ sub new
 	bless $self, $getter->{pkg};
 	$self->bestinfo();
 
+	RSGet::FileList::update();
+
 	if ( verbose( 2 ) or $cmd eq "get" ) {
 		my $outifstr = $outif ? "[$outif]" :  "";
 
@@ -473,6 +475,8 @@ sub started_download
 
 	my @osize;
 	@osize = ( fsize => $fsize ) if $fsize > 0;
+
+	$self->{started_download} = 1;
 
 	RSGet::FileList::save( $self->{_uri},
 		globals => { fname => $fname, fsize => $fsize },

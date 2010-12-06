@@ -29,6 +29,8 @@ def_settings(
 our %downloading;
 our %checking;
 
+my $soft_restart = 0;
+
 my %working = (
 	get => \%downloading,
 	check => \%checking,
@@ -248,11 +250,25 @@ sub process
 	}
 
 	abort_missing( \%all_uris, \%downloading );
+
+	my $downloading_num = scalar grep { $_->{started_download} } values %downloading;
 	RSGet::Line::status(
 		'to download' => $to_dl,
-		'downloading' => scalar keys %downloading,
+		'running' => scalar keys %downloading,
+		'downloading' => $downloading_num,
 		'checking URIs' => scalar keys %checking,
 	);
+
+	if ( $soft_restart ) {
+		foreach my $obj ( values %downloading ) {
+			unless ( $obj->{started_download} ) {
+				$obj->{_abort} = "Soft restart";
+			}
+		}
+		RSGet::Main::restart()
+			unless $downloading_num;
+		return 1;
+	}
 
 	my $all_checked = 1;
 	EACH_LINE: foreach my $line ( @$getlist ) {
@@ -290,6 +306,15 @@ sub process
 
 	return $all_checked;
 }
+
+sub soft_restart
+{
+	$soft_restart = 1;
+	new RSGet::Line( "NOTICE: ", "rsget.pl will restart after finishing all current downloads" );
+	RSGet::FileList::update();
+}
+
+$SIG{USR2} = \&soft_restart;
 
 sub abort_missing
 {

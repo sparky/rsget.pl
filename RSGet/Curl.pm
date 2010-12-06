@@ -392,7 +392,7 @@ sub file_init
 				size_got => $start,
 				time_stamp => [ $time, $start, $time, $start, $time, $start ];
 
-			RSGet::FileList::update(); # to update statistics
+			$get_obj->started_download( fname => $supercurl->{fname}, fsize => $supercurl->{size_total} );
 			return;
 		}
 	} else {
