@@ -12,12 +12,12 @@ set_rev qq$Id: Wait.pm 11838 2010-10-09 18:56:30Z sparky $;
 
 def_settings(
 	quota_soft => {
-		desc => "Start downloads only if ammount of downloaded data is less "
+		desc => "Start downloads only if amount of downloaded data is less "
 			. "than quota_soft bytes.",
 		allowed => qr/\d+[gmk]?b?/i,
 	},
 	quota_hard => {
-		desc => "Don't start downloads if they may excede quota_hard bytes.",
+		desc => "Don't start downloads if they may exceed quota_hard bytes.",
 		allowed => qr/\d+[gmk]?b?/i,
 	},
 );
@@ -34,7 +34,9 @@ sub _get_quota
 	my $s = setting( $name );
 	return undef unless $s;
 
-	return RSGet::ListManager::size_to_range( $s )->[0];
+	my $size = RSGet::ListManager::size_to_range( $s )->[0];
+	new RSGet::Line( "INIT: ", "Setting $name to $size" );
+	return $size;
 }
 
 sub _init
