@@ -194,7 +194,7 @@ END {
 
 sub sig_ignore
 {
-	warn "Ignoring signal @_[0]\n";
+	warn "Ignoring signal $_[0]\n";
 }
 
 foreach ( qw(USR1) ) {
