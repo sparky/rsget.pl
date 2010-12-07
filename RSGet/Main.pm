@@ -192,6 +192,15 @@ END {
 	}
 }
 
+sub sig_ignore
+{
+	warn "Ignoring signal @_[0]\n";
+}
+
+foreach ( qw(USR1) ) {
+	$SIG{$_} = \&sig_ignore;
+}
+
 sub check_settings
 {
 	my $settings = shift;
