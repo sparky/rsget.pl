@@ -309,9 +309,14 @@ sub process
 
 sub soft_restart
 {
-	$soft_restart = 1;
-	new RSGet::Line( "NOTICE: ", "rsget.pl will restart after finishing all current downloads" );
-	RSGet::FileList::update();
+	if ( $soft_restart ) {
+		RSGet::Main::restart();
+	} else {
+		$soft_restart = 1;
+		new RSGet::Line( "NOTICE: ", "rsget.pl will restart after finishing all current downloads" );
+		new RSGet::Line( "NOTICE: ", "send SIGUSR2 again to restart now" );
+		RSGet::FileList::update();
+	}
 }
 
 $SIG{USR2} = \&soft_restart;

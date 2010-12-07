@@ -184,8 +184,6 @@ END {
 	}
 }
 
-$SIG{USR1} = \&restart;
-
 sub check_settings
 {
 	my $settings = shift;
