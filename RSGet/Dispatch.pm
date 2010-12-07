@@ -29,7 +29,7 @@ def_settings(
 our %downloading;
 our %checking;
 
-my $soft_restart = 0;
+my $soft_stop = 0;
 
 my %working = (
 	get => \%downloading,
@@ -259,14 +259,19 @@ sub process
 		'checking URIs' => scalar keys %checking,
 	);
 
-	if ( $soft_restart ) {
+	if ( $soft_stop ) {
 		foreach my $obj ( values %downloading ) {
 			unless ( $obj->{started_download} ) {
 				$obj->{_abort} = "Soft restart";
 			}
 		}
-		RSGet::Main::restart()
-			unless $downloading_num;
+		unless ( $downloading_num ) {
+			if ( $soft_stop == 2 ) {
+				RSGet::Main::restart()
+			} else {
+				RSGet::Main::stop()
+			}
+		}
 		return 1;
 	}
 
@@ -309,10 +314,10 @@ sub process
 
 sub soft_restart
 {
-	if ( $soft_restart ) {
+	if ( $soft_stop == 2 ) {
 		RSGet::Main::restart();
 	} else {
-		$soft_restart = 1;
+		$soft_stop = 2;
 		new RSGet::Line( "NOTICE: ", "rsget.pl will restart after finishing all current downloads" );
 		new RSGet::Line( "NOTICE: ", "send SIGUSR2 again to restart now" );
 		RSGet::FileList::update();
@@ -320,6 +325,20 @@ sub soft_restart
 }
 
 $SIG{USR2} = \&soft_restart;
+
+sub soft_stop
+{
+	if ( $soft_stop == 1 ) {
+		RSGet::Main::stop();
+	} else {
+		$soft_stop = 1;
+		new RSGet::Line( "NOTICE: ", "rsget.pl will terminate after finishing all current downloads" );
+		new RSGet::Line( "NOTICE: ", "send SIGINT again to terminate now" );
+		RSGet::FileList::update();
+	}
+}
+
+$SIG{INT} = \&soft_stop;
 
 sub abort_missing
 {

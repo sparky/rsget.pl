@@ -233,12 +233,6 @@ sub init
 
 	return if $nooutput;
 
-	$SIG{INT} = sub {
-		print_all_lines();
-		print "\nTERMINATED\n";
-		exit 0;
-	};
-
 	$SIG{WINCH} = sub {
 		print "\033[2J\033[1;1H\n";
 		term_size();
@@ -250,8 +244,7 @@ sub init
 
 	$SIG{__DIE__} = sub {
 		print_all_lines();
-		print "\n";
-		print "DIED: ", shift, "\n\n";
+		print "\n\nDIED: ", shift, "\n\n";
 		exit 1;
 	};
 }

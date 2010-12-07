@@ -178,6 +178,14 @@ sub restart
 	exit 0;
 }
 
+sub stop
+{
+	$restart = 0;
+	RSGet::Line::print_all_lines();
+	printf "\n\nTerminating at %s\n\n", scalar localtime;
+	exit 0;
+}
+
 END {
 	if ( $restart ) {
 		exec $0, @$argv;
