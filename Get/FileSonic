@@ -11,7 +11,8 @@ web: "http://www.filesonic.com/"
 tos: "http://www.filesonic.com/terms-and-conditions"
 uri: qr{filesonic\.com/file/\d+}
 uri: qr{(?:www\d+\.)?sharingmatrix\.com/file/\d+}
-status: BROKEN 2010-11-10
+cookie: fsc
+status: OK 2010-12-18
 
 unify:
 	return "http://www.filesonic.com/file/$1"
@@ -31,7 +32,7 @@ start:
 
 	! m#href="(.*?)" id="free_download"#;
 	$-{dl_start} = $1;
-	CLICK( $-{dl_start}, post => "", keep_referer => 1 );
+	CLICK( $-{dl_start}, headers => [ "X-Requested-With: XMLHttpRequest" ], post => "", keep_referer => 1 );
 
 	MULTI() if m#<span>Download session in progress</span>#;
 
