@@ -318,8 +318,8 @@ sub soft_restart
 		RSGet::Main::restart();
 	} else {
 		$soft_stop = 2;
-		new RSGet::Line( "NOTICE: ", "rsget.pl will restart after finishing all current downloads" );
-		new RSGet::Line( "NOTICE: ", "send SIGUSR2 again to restart now" );
+		warn "* rsget.pl will restart after finishing all current downloads\n";
+		warn "* send SIGUSR2 again to restart now\n";
 		RSGet::FileList::update();
 	}
 }
@@ -332,8 +332,8 @@ sub soft_stop
 		RSGet::Main::stop();
 	} else {
 		$soft_stop = 1;
-		new RSGet::Line( "NOTICE: ", "rsget.pl will terminate after finishing all current downloads" );
-		new RSGet::Line( "NOTICE: ", "send SIGINT again to terminate now" );
+		warn "* rsget.pl will terminate after finishing all current downloads\n";
+		warn "* send SIGINT again to terminate now\n";
 		RSGet::FileList::update();
 	}
 }
