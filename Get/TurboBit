@@ -36,7 +36,7 @@ start:
 	( my $size = $1 ) =~ tr/,/./;
 	INFO( name => $name, asize => $size );
 
-	! m#<td><a class="free" href="(.*?)" #;
+	! m#<a class="free wide" href="(.*?)" #;
 	CLICK( $1 );
 
 stage_captcha:
@@ -70,7 +70,7 @@ stage_getimg:
 		GOTO stage_captcha;
 	}
 
-	! m{\$\("#timeout"\)\.load\("(/download/timeout/.*?)"\);};
+	! m{\$\("#timeoutBox"\)\.load\("(/download/timeout/.*?)"};
 	$-{dl_link} = $1;
 
 	! m#var Timeout = {\s*limit: (\d+),#;
