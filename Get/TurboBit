@@ -29,9 +29,14 @@ start:
 	MULTI( "e502, will try again" ) if m#<head><title>502 Bad Gateway</title></head>#;
 	ERROR( "file not found" ) if m#<div class="code-404">404</div>#;
 	ERROR( "file not found" ) if m#Файл не найден. Возможно он был удален|File was not found. It could possibly be deleted#;
+	ERROR( "file not found" ) if m#\Q'h1').html('File not found. Probably it was deleted\E#;
 
 	! m#<h1 class="download-file">.*?<span.*?>(.*?)</span></h1>#;
 	my $name = $1;
+	if ( $name =~ /\.\.\./ ) {
+		$name =~ s/\.\.\./\0/;
+		m#<title>\s+Download (.*?)\. Free download#s and $name = $1;
+	}
 	! m#<b>File size:</b> ([\d,\.]+ .b)</div>#;
 	( my $size = $1 ) =~ tr/,/./;
 	INFO( name => $name, asize => $size );
