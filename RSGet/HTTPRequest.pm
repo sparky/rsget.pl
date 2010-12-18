@@ -79,7 +79,7 @@ sub main_page
 	$r .= f_status();
 	$r .= f_notify();
 	$r .= f_active();
-	$r .= f_log( 6 );
+	$r .= f_log( 10 );
 	$r .= f_dllist();
 	$r .= f_addform();
 	$r .= '<script type="text/javascript">init_main();</script>';
@@ -106,7 +106,7 @@ sub main_update
 		$data->{active} = $nowactive;
 	}
 	if ( not $post->{dead} or $RSGet::Line::dead_change != $post->{dead} ) {
-		$r .= f_log( 6 );
+		$r .= f_log( 10 );
 		$data->{dead} = $RSGet::Line::dead_change;
 	}
 	if ( not $post->{dllist} or $post->{dllist} != $RSGet::FileList::listmtime ) {
