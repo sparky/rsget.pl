@@ -12,7 +12,7 @@ tos: "http://www.4shared.com/terms.jsp"
 uri: qr{4shared\.com/(account/)?file/}
 cookie: 4s
 slots: max
-status: OK 2010-07-14
+status: OK 2010-12-18
 
 unify:
 	return "http://www.4shared.com/file/$1/$2"
@@ -21,15 +21,17 @@ unify:
 start:
 	GET( $-{_uri} );
 
+	DELAY( 600, "temporarily unavailable" )
+		if m{<b>4shared servers are currently undergoing a short-time maintenance\.</b>};
+
 	ERROR( "file not found" )
 		if m{^\s*<img alt="" src="/images/spacer\.gif" class="warn" hspace="3" align="left" />\s*$}m;
 
-	! m{window\.location = ".*/(.*?)\?tsid=.*";} or m{doFullImgExpand\(this, '[^'?]+/(.*?)\?};
-	my $name = uri_unescape( $1 );
+	! m{<h1 id="fileNameText">(.*?)</h1>};
+	my $name = de_ml( $1 );
 
-	! m{<td class="finforight">(\d+(?:,\d+)? KB)</td>}s;
-	my $size = $1;
-	$size =~ tr/,/./;
+	! m{<div class="small lgrey".*<b>(\d+(?:,\d+)? KB)</b>}s;
+	( my $size = $1 ) =~ tr/,/./;
 	INFO( name => $name, asize => $size );
 
 	! m{<a href="(.*?)" class="dbtn" tabindex="1">};
@@ -46,7 +48,7 @@ start:
 	$-{file_uri} = $1;
 
 	! /var c = (\d+);/;
-	WAIT( $1, "starting download" );
+	WAIT( -$1, "starting download" );
 
 stage_download:
 	CLICK_DOWNLOAD( $-{file_uri} );
