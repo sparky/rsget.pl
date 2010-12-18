@@ -261,6 +261,10 @@ sub content_filename
 
 	s/\s*;?\s+$//; # remove at least last \r
 	my $src = $_;
+	if ( s/^\s*=\?(.+?)\?(.*)\?=\s*/$2/ ) {
+		warn "C-D: Unknown filename encoding: $1, at $src\n"
+			if uc $1 ne "UTF-8" and verbose( 1 );
+	}
 	unless ( s/^\s*attachment\s*//i ) {
 		warn "Not an attachment in C-D: '$src'\n" if verbose( 1 );
 		return;
