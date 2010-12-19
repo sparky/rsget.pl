@@ -20,6 +20,8 @@ def_settings(
 	},
 );
 
+my $captchatime = 200;
+
 our %needed;
 our %solved;
 
@@ -40,7 +42,7 @@ sub captcha
 	$self->{captcha_next} = $next_stage;
 	$self->{captcha_data} = \$data;
 
-	$self->{captcha_until} = time + 200;
+	$self->{captcha_until} = time + $captchatime;
 	delete $self->{captcha_response};
 
 	my $id = 0;
@@ -86,7 +88,8 @@ sub captcha
 
 	# add to ask list
 	$needed{ $md5 } = [ $self->{content_type}, $self->{captcha_data}, $self->{captcha_until} ];
-	$self->linedata( captcha => $md5 );
+	$self->linedata( captcha => $md5, prog => 0 );
+	$self->linecolor( "red" );
 }
 
 sub captcha_result
@@ -192,6 +195,7 @@ sub captcha_update
 				( $captcha ? "captcha solved: $captcha, delaying " : "solve captcha " )
 				. s2string( $left )
 			);
+			$obj->linedata( captcha => $md5, prog => 1 - $left / $captchatime );
 			next;
 		}
 		delete $waiting{ $id };

@@ -19,7 +19,7 @@ sub wait
 	my $msg = shift || "???";
 	my $reason = shift || "wait";
 
-	$self->linedata( wait => $reason );
+	$self->linedata( prog => 0 );
 	my %wait_to_color = (
 		restart => "orange",
 		multi => "red",
@@ -42,6 +42,7 @@ sub wait
 	$self->{wait_next} = $next_stage;
 	$self->{wait_msg} = $msg;
 	$self->{wait_until} = $time + $wait;
+	$self->{wait} = $wait;
 
 	my $id = 0;
 	++$id while exists $waiting{ $id };
@@ -84,6 +85,7 @@ sub wait_update
 			} else {
 				$obj->print( $obj->{wait_msg} . "; waiting " . s2string( $left ) );
 			}
+			$obj->linedata( prog => 1 - $left / $obj->{wait} );
 		}
 	}
 	RSGet::Line::status( 'waiting' => scalar keys %waiting );
