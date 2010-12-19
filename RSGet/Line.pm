@@ -85,7 +85,7 @@ sub print_dead_lines
 	}
 
 	print @print unless $nooutput;
-	print $log_fh join "\n", @newdead, ''
+	print $log_fh join "\n", ( map { $_->[0] } @newdead ), ''
 		if $log_fh;
 	if ( @newdead ) {
 		push @dead, @newdead;
