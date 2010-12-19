@@ -621,8 +621,8 @@ sub update_status
 
 		my $size = bignum( $size_got ) . " / " . bignum( $size_total );
 		if ( $size_total > 0 ) {
-			my $per = sprintf "%.2f%%", $size_got * 100 / $size_total;
-			$size .= " [$per]";
+			my $per = $size_got / $size_total;
+			$size .= sprintf ' [%.2f%%]', $per * 100;
 			$supercurl->{get_obj}->linedata( prog => $per );
 		}
 

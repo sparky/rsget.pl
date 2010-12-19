@@ -154,8 +154,7 @@ sub print_active_lines
 		if ( my $prog = $line->[2]->{prog} ) {
 			$thisline = $line->[0] . $text;
 			$thisline .= " " x ( $columns - length $thisline );
-			$prog =~ s/%//;
-			substr $thisline, $columns * $prog / 100, 0, "\033[0;32m";
+			substr $thisline, $columns * $prog, 0, "\033[0;32m";
 			$thisline = "\033[30;42m$thisline$endcolor";
 		}
 		push @print, "\r\n\033[K" . $thisline;

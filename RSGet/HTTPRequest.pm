@@ -193,7 +193,8 @@ sub act_info
 	$uri = sgml( $uri );
 
 	my $prog = "";
-	$prog = qq#<div style="width: $o->{prog}"></div># if $o->{prog};
+	$prog = sprintf '<div style="width: %f%%"></div>', $o->{prog} * 100
+		if $o->{prog};
 	$line =~ s/^\Q$o->{name}\E//;
 	$line =~ s/^.*?:\s+//;
 	$line = sgml( $line );
