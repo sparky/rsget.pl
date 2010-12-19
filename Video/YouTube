@@ -76,14 +76,19 @@ stage_got_format:
 	my $fmtstr = $fmt ? "&fmt=$fmt->[0]" : "";
 	$fmt ||= [ 5, "flv", "vLQ" ];
 
-	my $fname = $name . "." . $fmt->[1];
-	INFO( name => $fname, fmt => $fmt->[0], quality => $fmt->[2] );
+	$-{fname} = $name . "." . $fmt->[1];
 
 	/"fmt_url_map": "(.*?)"/;
 	my %uri = map /(\d+)\|(.*)/, split /,/, $1;
 	my $uri = $uri{ $fmt->[0] };
 	$uri =~ s#\\/#/#g;
+	$-{file_uri} = uri_unescape( $uri );
 
-	DOWNLOAD( uri_unescape( $uri ), fname => $fname );
+	GET( $-{file_uri}, headonly => 1 );
+
+	my ( $len ) = /^Content-Length:\s*(\d+)\r?$/mi;
+	INFO( name => $-{fname}, size => $len );
+
+	DOWNLOAD( $-{file_uri}, fname => $-{fname} );
 
 # vim: filetype=perl:ts=4:sw=4
