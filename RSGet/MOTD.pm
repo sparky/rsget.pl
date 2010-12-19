@@ -38,6 +38,12 @@ __DATA__
 
 - Donate/lend premium accounts to rsget.pl developers if you want premium support for some service.
 
-- Found some bug ? Tell us about it: http://bugs.rsget.pl
+- Found some bug ? Tell us about it: http://bugs.rsget.pl/ (don't forget to specify what links fail for you)
+
+- Enable http interface for convenient download list management http://rsget.pl/about/interface/
+
+- Help us with development, donate: http://rsget.pl/donate/
+
+- Help us with development: contribute your code and/or ideas.
 
 # vim: ts=4:sw=4
