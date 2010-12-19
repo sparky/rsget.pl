@@ -138,13 +138,17 @@ li.blue {
 	background: #AAF;
 	border-color: #22F;
 }
-li.bluegreen {
+li.cyan {
 	background: #AED;
 	border-color: #2EC;
 }
 li.orange {
 	background: #FCA;
 	border-color: #F82;
+}
+li.gray {
+	background: #CCC;
+	border-color: #222;
 }
 
 .error {
@@ -172,11 +176,14 @@ li.red div.progress {
 li.blue div.progress {
 	background: #DDF;
 }
-li.bluegreen div.progress {
+li.cyan div.progress {
 	background: #DFE;
 }
 li.orange div.progress {
 	background: #FDC;
+}
+li.gray div.progress {
+	background: #EEE;
 }
 
 div.progress div {

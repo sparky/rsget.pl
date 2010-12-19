@@ -181,16 +181,9 @@ sub f_active
 sub act_info
 {
 	my $act = shift;
-	my ( $logo, $line, $o ) = @$act;
+	my ( $logo, $line, $o, $color ) = @$act;
 
-	my %wait_to_color = (
-		restart => "orange",
-		multi => "red",
-		problem => "red",
-		wait => "blue",
-		delay => "bluegreen",
-	);
-	my $color = $o->{wait} ? $wait_to_color{ $o->{wait} } : "green";
+	$color ||= "gray";
 
 	my $uri = $o->{uri};
 	my $uriid = makeid( \%main_ids, "act", $uri, $uri );
