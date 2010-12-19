@@ -149,7 +149,16 @@ sub print_active_lines
 		my $tl = length $line->[0] . $text;
 		substr $text, 4, $tl - $columns + 3, '...'
 			if $tl > $columns;
-		push @print, "\r\n\033[K" . color_term( $line->[3] ) . $line->[0] . $text . $endcolor;
+
+		my $thisline = color_term( $line->[3] ) . $line->[0] . $text . $endcolor;
+		if ( my $prog = $line->[2]->{prog} ) {
+			$thisline = $line->[0] . $text;
+			$thisline .= " " x ( $columns - length $thisline );
+			$prog =~ s/%//;
+			substr $thisline, $columns * $prog / 100, 0, "\033[0;32m";
+			$thisline = "\033[30;42m$thisline$endcolor";
+		}
+		push @print, "\r\n\033[K" . $thisline;
 	}
 
 	print @print;
