@@ -22,8 +22,13 @@ start:
 	my ( $len ) = /^Content-Length:\s*(\d+)\r?$/mi;
 	$len ||= -1;
 
-	! $-{_uri} =~ m{#/([^/]+?)(?:\.mp3)?$};
-	my $fname = uri_unescape( $1 ) . ".mp3";
+	my $fname;
+	if ( $-{_uri} =~ m{#/([^/]+?)(?:\.mp3)?$} ) {
+		$fname = uri_unescape( $1 ) . ".mp3";
+	} else {
+		! $-{_uri} =~ m{.*/(.*?)(#.*?)?$};
+		$fname = uri_unescape( $1 );
+	}
 
 	INFO( name => $fname, size => $len, quality => "mp3" );
 
