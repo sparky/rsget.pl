@@ -188,7 +188,7 @@ li.gray div.progress {
 
 div.progress div {
 	position: absolute;
-	background: #2F2;
+	background: #777;
 	height: 25px;
 }
 div.progress span {
@@ -197,6 +197,25 @@ div.progress span {
 	width: 100%;
 	text-align: center;
 }
+li.green div.progress div {
+	background: #2F2;
+}
+li.red div.progress div {
+	background: #F22;
+}
+li.blue div.progress div {
+	background: #22F;
+}
+li.cyan div.progress div {
+	background: #2EC;
+}
+li.orange div.progress div {
+	background: #F82;
+}
+li.gray div.progress div {
+	background: #777;
+}
+
 
 .tools {
 	font-size: 75%;

@@ -20,6 +20,7 @@ my $term_size_columns;
 my $term_size_rows;
 
 my %color_to_term = (
+	gray => 37,
 	red => 31,
 	green => 32,
 	yellow => 33,
