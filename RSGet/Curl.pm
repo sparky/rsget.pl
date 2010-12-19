@@ -504,12 +504,15 @@ sub finish
 			my $if = $get_obj->{_outif};
 			RSGet::Dispatch::remove_interface( $if, "Interface $if is dead" );
 			$get_obj->{_abort} = "Interface $if is dead";
+			$get_obj->linecolor( "red" );
 		} elsif ( $error =~ /transfer closed with (\d+) bytes remaining to read/ ) {
 			RSGet::Dispatch::mark_used( $get_obj );
 			$get_obj->{_abort} = "PARTIAL " . donemsg( $supercurl );
+			$get_obj->linecolor( "blue" );
 		} elsif ( $err eq "aborted" ) {
 
 		} else {
+			$get_obj->linecolor( "red" );
 			$get_obj->log( "ERROR($err): $error" );
 		}
 		$get_obj->problem();

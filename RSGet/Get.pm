@@ -86,6 +86,7 @@ sub new
 			_line => new RSGet::Line( "[$getter->{short}]$outifstr ", undef, undef, "green" );
 		$self->print( "start" );
 		$self->linedata();
+		$self->linecolor();
 	}
 	if ( $cmd eq "get" ) {
 		local $SIG{__DIE__};
@@ -174,6 +175,16 @@ sub linedata
 	$line->linedata( \%data );
 }
 
+sub linecolor
+{
+	my $self = shift;
+	my $line = $self->{_line};
+	my $color = shift;
+	return unless $line;
+
+	$line->color( $color );
+}
+
 sub start
 {
 	my $self = shift;
@@ -227,6 +238,7 @@ sub get
 	$uri = URI->new( $uri )->abs( $self->{_referer} )->as_string
 		if $self->{_referer};
 
+	$self->linecolor( "green" );
 	RSGet::Curl::new( $uri, $self, @_ );
 }
 

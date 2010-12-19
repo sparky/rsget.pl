@@ -20,6 +20,14 @@ sub wait
 	my $reason = shift || "wait";
 
 	$self->linedata( wait => $reason );
+	my %wait_to_color = (
+		restart => "orange",
+		multi => "red",
+		problem => "red",
+		wait => "blue",
+		delay => "cyan",
+	);
+	$self->linecolor( $wait_to_color{ $reason } );
 
 	my $time = time;
 	delete $self->{wait_until_should};
@@ -48,6 +56,7 @@ sub wait_finish
 	$_ = undef;
 
 	$self->linedata();
+	$self->linecolor();
 	my $func = $self->{wait_next};
 	&$func( $self );
 }
