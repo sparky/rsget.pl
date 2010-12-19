@@ -19,6 +19,7 @@ use RSGet::ListManager;
 use RSGet::Plugin;
 use RSGet::Tools;
 use RSGet::Wait;
+use RSGet::MOTD;
 use Time::HiRes;
 set_rev qq$Id$;
 
@@ -117,6 +118,8 @@ sub init
 	new RSGet::Line( "rsget.pl started successfully on pid $$" );
 	new RSGet::Line();
 	warn $_ foreach discontinuation_warning;
+	new RSGet::Line();
+	RSGet::MOTD::init();
 	new RSGet::Line();
 	RSGet::Line::update();
 
