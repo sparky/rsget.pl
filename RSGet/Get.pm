@@ -83,7 +83,7 @@ sub new
 		my $outifstr = $outif ? "[$outif]" :  "";
 
 		hadd %$self,
-			_line => new RSGet::Line( "[$getter->{short}]$outifstr " );
+			_line => new RSGet::Line( "[$getter->{short}]$outifstr ", undef, undef, "green" );
 		$self->print( "start" );
 		$self->linedata();
 	}

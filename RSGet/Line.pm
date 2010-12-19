@@ -19,6 +19,23 @@ def_settings(
 my $term_size_columns;
 my $term_size_rows;
 
+my %color_to_term = (
+	red => 31,
+	green => 32,
+	yellow => 33,
+	orange => 33,
+	blue => 34,
+	magenta => 35,
+	cyan => 36,
+	bold => 1,
+	"" => 0,
+);
+sub color_term
+{
+	my $color = shift || "";
+	return "\033[" . $color_to_term{$color} . "m";
+}
+
 sub term_size
 {
 	local $SIG{__DIE__};
@@ -51,19 +68,20 @@ sub print_dead_lines
 	my @print;
 	my @newdead;
 
+	my $endcolor = color_term();
 	if ( $last_day != $l[3] ) {
 		$last_day = $l[3];
 		my $date = sprintf "[Current date: %d-%.2d-%.2d]", $l[5] + 1900, $l[4] + 1, $l[3];
-		push @print, "\r" . $date . "\033[J\n";
-		push @newdead, $date;
+		push @print, "\r" . color_term( "green" ) . $date . $endcolor . "\033[J\n";
+		push @newdead, [ $date, "green" ];
 	}
 
 	foreach my $key ( sort { $a <=> $b } keys %dead ) {
-		my $text = $dead{$key};
+		my ( $text, $color ) = @{ $dead{$key} };
 		$text = $time . $text if $text =~ /\S/;
 
-		push @print, "\r" . $text . "\033[J\n";
-		push @newdead, $text;
+		push @print, "\r" . color_term( $color ) . $text . $endcolor . "\033[J\n";
+		push @newdead, [ $text, $color ];
 	}
 
 	print @print unless $nooutput;
@@ -103,12 +121,16 @@ sub print_status_lines
 			$status[ $#status ] .= $s;
 		}
 	}
-	my @print = ( " \\$h/" );
+
+	my $endcolor = color_term();
+	my $bold = color_term( "bold" );
+
+	my @print = ( " $bold\\$h/$endcolor" );
 	foreach ( @status ) {
-		my $l = " |" . ( " " x ($columns - 4 - length $_ )) . $_ . "|";
+		my $l = " $bold|$endcolor" . ( " " x ($columns - 4 - length $_ )) . $_ . "$bold|$endcolor";
 		push @print, $l;
 	}
-	push @print, " /$horiz\\";
+	push @print, " $bold/$horiz\\$endcolor";
 	print map { "\r\n$_\033[K" } @print;
 	return scalar @print;
 }
@@ -119,6 +141,7 @@ sub print_active_lines
     my $columns = shift() - 1;
 	my @print;
 
+	my $endcolor = color_term();
 	foreach my $key ( sort { $a <=> $b } keys %active ) {
 		my $line = $active{$key};
 
@@ -126,7 +149,7 @@ sub print_active_lines
 		my $tl = length $line->[0] . $text;
 		substr $text, 4, $tl - $columns + 3, '...'
 			if $tl > $columns;
-		push @print, "\r\n\033[K" . $line->[0] . $text;
+		push @print, "\r\n\033[K" . color_term( $line->[3] ) . $line->[0] . $text . $endcolor;
 	}
 
 	print @print;
@@ -157,10 +180,11 @@ sub new
 	my $head = shift;
 	my $text = shift;
 	my $assoc = shift;
+	my $color = shift;
 	$head = "" unless defined $head;
 
 	my $line = "" . ($last_line++);
-	$active{ $line } = [ $head, "", $assoc ];
+	$active{ $line } = [ $head, "", $assoc, $color ];
 
 	my $self = \$line;
 	bless $self, $class;
@@ -190,6 +214,13 @@ sub linedata
 	$active{ $$self }->[2] = $data;
 }
 
+sub color
+{
+	my $self = shift;
+	my $color = shift;
+	$active{ $$self }->[3] = $color;
+}
+
 sub clone
 {
 	my $self = shift;
@@ -202,7 +233,7 @@ sub DESTROY
 	my $self = shift;
 	my $line = $$self;
 	my $l = $active{ $line };
-	$dead{ $line } = $l->[0] . $l->[1];
+	$dead{ $line } = [ $l->[0] . $l->[1], $l->[3] ];
 	delete $active{ $line };
 }
 
@@ -227,7 +258,7 @@ sub init
 	}
 
 	$SIG{__WARN__} = sub {
-		new RSGet::Line( "WARNING: ", shift );
+		RSGet::Line->new( "WARNING: ", shift, undef, "orange" );
 		update();
 	};
 

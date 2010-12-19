@@ -344,12 +344,9 @@ sub f_log
 	$r = '<fieldset id="log"><legend>log</legend><ul>';
 	
 	for ( my $i = $#RSGet::Line::dead; $i >= $start; $i-- ) {
-		my $line = $RSGet::Line::dead[ $i ];
+		my ( $line, $color ) = @{ $RSGet::Line::dead[ $i ] };
 		my $class = '';
-		$class = ' class="blue"' if $line =~ /PARTIAL/;
-		$class = ' class="green"' if $line =~ /DONE/;
-		$class = ' class="orange"' if $line =~ /^\[\S+\] WARNING/;
-		$class = ' class="red"' if $line =~ /ERROR/;
+		$class = qq{ class="$color"} if $color;
 		$r .= qq#<li$class># . href( $line ) . '</li>';
 	}
 
