@@ -326,6 +326,18 @@ sub soft_restart
 
 $SIG{USR2} = \&soft_restart;
 
+sub soft_segv
+{
+	warn "* segment violation detected\n";
+	if ( $soft_stop == 0 ) {
+		$soft_stop = 2;
+		warn "* rsget.pl will restart after finishing all current downloads\n";
+		warn "* send SIGUSR2 to restart now\n";
+		RSGet::FileList::update();
+	}
+}
+$SIG{SEGV} = \&soft_segv;
+
 sub soft_stop
 {
 	if ( $soft_stop == 1 ) {
