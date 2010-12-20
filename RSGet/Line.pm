@@ -279,7 +279,8 @@ sub init
 		term_size();
 		my $start = $term_size_rows ? $#dead - $term_size_rows : 0;
 		$start = 0 if $start < 0;
-		print join( "\n", @dead[($start..$#dead)] ), "\n";
+		my $colorend = color_term();
+		print join( "\n", map { color_term( $_->[1] ) . $_->[0] . $colorend } @dead[($start..$#dead)] ), "\n";
 		update();
 	};
 
