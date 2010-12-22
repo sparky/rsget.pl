@@ -73,7 +73,7 @@ sub print_dead_lines
 	if ( $last_day != $l[3] ) {
 		$last_day = $l[3];
 		my $date = sprintf "[Current date: %d-%.2d-%.2d]", $l[5] + 1900, $l[4] + 1, $l[3];
-		push @print, "\r" . color_term( "bold" ) . $date . $endcolor . "\033[J\n";
+		push @print, "\r" . color_term( "gray" ) . $date . $endcolor . "\033[J\n";
 		push @newdead, [ $date, "gray" ];
 	}
 
