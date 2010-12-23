@@ -8,6 +8,7 @@ package RSGet::Wait;
 use strict;
 use warnings;
 use RSGet::Tools;
+use Time::HiRes ();
 set_rev qq$Id$;
 
 my %waiting;
@@ -64,11 +65,11 @@ sub wait_finish
 
 sub wait_update
 {
-	my $time = time;
+	my $time = Time::HiRes::time;
 
 	foreach my $id ( keys %waiting ) {
 		my $obj = $waiting{ $id };
-		my $left = $obj->{wait_until} - $time;
+		my $left = $obj->{wait_until} - int $time;
 		if ( $left <= 0 ) {
 			delete $waiting{ $id };
 			$obj->print( $obj->{wait_msg} . "; done waiting" );
@@ -80,12 +81,12 @@ sub wait_update
 			if ( $obj->{wait_until_should} ) {
 				$obj->print( sprintf "%s; should wait %s, retrying in %s",
 					$obj->{wait_msg},
-					s2string( $obj->{wait_until_should} - $time),
+					s2string( $obj->{wait_until_should} - int $time),
 					s2string( $left ) );
 			} else {
 				$obj->print( $obj->{wait_msg} . "; waiting " . s2string( $left ) );
 			}
-			$obj->linedata( prog => 1 - $left / $obj->{wait} );
+			$obj->linedata( prog => 1 - ( $obj->{wait_until} - $time ) / $obj->{wait} );
 		}
 	}
 	RSGet::Line::status( 'waiting' => scalar keys %waiting );

@@ -339,6 +339,7 @@ sub iteration_short
 		Time::HiRes::sleep(0.250);
 	}
 	RSGet::Curl::update_status();
+	RSGet::Wait::wait_update();
 	RSGet::Line::update();
 	$http->perform() if $http;
 }
@@ -346,7 +347,6 @@ sub iteration_short
 sub iteration_long
 {
 	RSGet::Dispatch::delay_check();
-	RSGet::Wait::wait_update();
 	RSGet::MortalObject::update();
 	RSGet::Captcha::captcha_update();
 
