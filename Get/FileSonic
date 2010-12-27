@@ -26,7 +26,7 @@ start:
 		or m#<div id="downloadFileInfo" class="section CL2">\s*<h2><span>[^<]*?</span></h2>\s*<p>\s*(.*?)\s*</p>#s;
 
 	! m#<title>Download (.*?) for free on Filesonic.com</title>#;
-	my $fn = $1;
+	my $fn = de_ml( $1 );
 	! m#<span class="size">($STDSIZE)</span>#;
 	INFO( name => $fn, asize => $1 );
 
