@@ -90,8 +90,8 @@ my %active_curl;
 		foreach my $if ( split /;+/, $outif ) {
 			if ( $if =~ /^([a-z0-9]+)=(\S+)(:(\d+))?$/ ) {
 				my ($tn, $host, $port) = ($1, $2, $4);
-				if ( my $type = $proxytype{ $tn } ) {
-					$curl->setopt( CURLOPT_PROXYTYPE, $type );
+				if ( exists $proxytype{ $tn } ) {
+					$curl->setopt( CURLOPT_PROXYTYPE, $proxytype{ $tn } );
 					$curl->setopt( CURLOPT_PROXY, $host );
 					$curl->setopt( CURLOPT_PROXYPORT, $port )
 						if $port;
