@@ -102,7 +102,7 @@ sub new
 		}
 	}
 
-	$self->start();
+	$self->call( \&start );
 	return $self;
 }
 
@@ -198,6 +198,21 @@ sub start
 	return $self->stage0();
 }
 
+sub call
+{
+	my $self = shift;
+	my $func = shift;
+
+	local $SIG{__DIE__};
+	delete $SIG{__DIE__};
+	eval {
+		return &$func( $self, @_ );
+	};
+	if ( $@ ) {
+		$self->problem( "function call problem: $@" );
+	}
+}
+
 sub cookie
 {
 	my $self = shift;
@@ -257,7 +272,7 @@ sub get_finish
 		return;
 	}
 	$_ = $self->{body};
-	&$func( $self );
+	$self->call( $func );
 }
 
 sub click_download
@@ -325,8 +340,7 @@ sub finish
 	if ( $self->{is_html} ) {
 		$self->print( "is HTML" );
 		$_ = $self->{body};
-		my $func = $self->{stage_is_html};
-		return &$func( $self );
+		return $self->call( $self->{stage_is_html} );
 	}
 
 	RSGet::Dispatch::mark_used( $self );

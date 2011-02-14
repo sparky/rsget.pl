@@ -59,8 +59,7 @@ sub wait_finish
 
 	$self->linedata();
 	$self->linecolor();
-	my $func = $self->{wait_next};
-	&$func( $self );
+	$self->call( $self->{wait_next} );
 }
 
 sub wait_update
