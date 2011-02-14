@@ -210,7 +210,7 @@ sub print
 	my $text = shift;
 	$text = "" unless defined $text;
 	$text =~ s/\n+$//sg;
-	$text =~ s/\n/ /sg;
+	$text =~ s/\s+/ /sg;
 	$text =~ s/\0/***/g;
 	$active{ $line }->[1] = $text;
 
