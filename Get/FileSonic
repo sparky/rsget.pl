@@ -1,7 +1,7 @@
 # $Id$
 # Get::FileSonic - File getter plugin for rsget.pl
 #
-# 2010 (c) Przemysław Iskra <sparky@pld-linux.org>
+# 2010-2011 (c) Przemysław Iskra <sparky@pld-linux.org>
 #		This program is free software,
 # you may distribute it under GPL v2 or newer.
 
@@ -12,7 +12,7 @@ tos: "http://www.filesonic.com/terms-and-conditions"
 uri: qr{filesonic\.com/file/\d+}
 uri: qr{(?:www\d+\.)?sharingmatrix\.com/file/\d+}
 cookie: fsc
-status: OK 2010-12-18
+status: OK 2011-03-02
 
 unify:
 	return "http://www.filesonic.com/file/$1"
@@ -36,16 +36,26 @@ start:
 
 	MULTI() if m#<span>Download session in progress</span>#;
 
-stage_getlink:
 	( $-{file_uri} ) = m{<p><a href="(.*?)"><span>Start download now!</span></a></p>};
-
 	GOTO stage_download if $-{file_uri};
 
-	if ( /var countDownDelay = (\d+);/ ) {
-		$-{delay} = $1;
-		GOTO stage_wait;
-	}
+	GOTO stage_captcha unless /var countDownDelay = (\d+);/;
+	my $wait = $1;
 
+	RESTART( $wait, "download limit" ) if $wait > 300;
+
+	! /<input type='hidden' id='tm' name='tm' value='(.*?)'/;
+	my %post = ( tm => $1 );
+
+    ! /<input type='hidden' id='tm_hash' name='tm_hash' value='(.*?)'/;
+	$post{tm_hash} = $1;
+	$-{wait_post} = \%post;
+
+	WAIT( -$wait, "expecting download information" );
+
+	GET( $-{dl_start}, post => $-{wait_post} );
+
+stage_captcha:
 	! m{Recaptcha\.create\("(.*?)"};
 	$-{captcha_key} = $1;
 
@@ -68,14 +78,8 @@ stage_getlink:
 			recaptcha_response_field => $_
 		} );
 
-	GOTO stage_getlink;
-
-stage_wait:
-	WAIT( -( $-{delay} + 5 ), "expecting download link" );
-
-	GET( $-{dl_start}, post => "" );
-
-	GOTO stage_getlink;
+	! m{<p><a href="(.*?)"><span>Start download now!</span></a></p>};
+	$-{file_uri} = $1;
 
 stage_download:
 	CLICK_DOWNLOAD( $-{file_uri} );
