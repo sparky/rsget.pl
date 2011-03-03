@@ -34,7 +34,8 @@ start:
 	$-{dl_start} = $1;
 	CLICK( $-{dl_start}, headers => [ "X-Requested-With: XMLHttpRequest" ], post => "", keep_referer => 1 );
 
-	MULTI() if m#<span>Download session in progress</span>#;
+	MULTI() if m#<span>Download session in progress</span>#
+		or m#<p>Free users may only download 1 file at a time\.</p>#;
 
 	( $-{file_uri} ) = m{<p><a href="(.*?)"><span>Start download now!</span></a></p>};
 	GOTO stage_download if $-{file_uri};
