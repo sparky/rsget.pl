@@ -38,6 +38,7 @@ start:
 
 	CLICK( "", post => { checkDownload => "check" } );
 
+	MULTI() if /{"fail":"parallelDownload"}/;
 	RESTART( 900, "free limit reached" ) if /{"fail":"timeLimit"}/;
 
 	ERROR( "some error: $_" ) unless /{"success":"showCaptcha"}/;
