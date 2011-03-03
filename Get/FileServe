@@ -2,6 +2,7 @@
 # Get::FileServe - File getter plugin for rsget.pl
 #
 # 2010 (c) Paweł Zuzelski <pawelz@pld-linux.org>
+# 2011 (c) Przemysław Iskra <sparky@pld-linux.org>
 #		This program is free software,
 # you may distribute it under GPL v2 or newer.
 
@@ -11,7 +12,7 @@ web: "http://fileserve.com/"
 tos: "http://fileserve.com/terms.php"
 uri: qr{fileserve\.com/file/[A-Za-z0-9]+(/.*)?}
 cookie: fsrv
-status: OK 2010-12-19
+status: OK 2011-03-03
 
 unify:
 	s/#.*//;
@@ -33,7 +34,15 @@ start:
 	! ( $-{captcha_encode} ) = m{"recaptcha_shortencode_field".*? value="(.*?)" />};
 
 	! m{src="(/landing/.+?/download_captcha\.js)"};
-	CLICK( $1, keep_referer => 1,
+	$-{captcha_uri} = $1;
+
+	CLICK( "", post => { checkDownload => "check" } );
+
+	RESTART( 900, "free limit reached" ) if /{"fail":"timeLimit"}/;
+
+	ERROR( "some error: $_" ) unless /{"success":"showCaptcha"}/;
+
+	GET( $-{captcha_uri}, keep_referer => 1,
 		headers => [ "X-Requested-With: XMLHttpRequest" ] );
 
 stage_getcaptcha:
@@ -67,7 +76,7 @@ stage_getcaptcha:
 	GET( "", post => { downloadLink => "wait" }, keep_referer => 1 );
 
 	! /(\d+)/;
-	WAIT( $1, "expecting for download link" );
+	WAIT( $1, "expecting download link" );
 
 	CLICK( "", post => { downloadLink => "show" }, keep_referer => 1, );
 
