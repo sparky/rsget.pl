@@ -106,7 +106,17 @@ function update_notify( n_f, o_f )
 		al = 1;
 	}
 	if ( al )
-		alert( "Assist needed" );
+		window.setTimeout( ask_for_help, 500 );
+}
+
+var assist_alert = 0;
+function ask_for_help()
+{
+	if ( assist_alert )
+		return;
+	assist_alert = 1;
+	alert( "Please, solve captcha" );
+	assist_alert = 0;
 }
 
 function add_DL_commands( list )
