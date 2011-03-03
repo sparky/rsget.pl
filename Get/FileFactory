@@ -67,7 +67,7 @@ start:
 	$-{file_uri} = $1;
 
 	! m#<input type="hidden" id="startWait" value="(\d+)"#;
-	WAIT( $1, "starting download" );
+	WAIT( -$1, "starting download" );
 
 	CLICK_DOWNLOAD( $-{file_uri} );
 
