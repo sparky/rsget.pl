@@ -315,7 +315,11 @@ sub multi
 {
 	my $self = shift;
 	my $msg = shift || "multi-download not allowed";
-	return $self->wait( \&start, - irand( 60, 300 ), $msg, "multi" );
+	if ( ++$self->{_try} < 4 ) {
+		return $self->wait( \&start, - irand( 30, 120 ), $msg, "multi" );
+	} else {
+		return $self->delay( 300, $msg );
+	}
 }
 
 # TODO: make delay interface-aware
