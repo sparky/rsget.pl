@@ -37,7 +37,7 @@ sub p_subend
 
 	if ( $last_cmd and $last_cmd =~ /(?:click_)?download/ ) {
 		$last_cmd = undef;
-		pr "\treturn \${self}->delay( 15 * 60, 'download is an HTML page' );\n}\n";
+		pr "\treturn \${self}->is_html();\n}\n";
 		return;
 	}
 	$last_cmd = undef;

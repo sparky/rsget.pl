@@ -353,6 +353,16 @@ sub finish
 	RSGet::Dispatch::finished( $self );
 }
 
+sub is_html
+{
+	my $self = shift;
+
+	if ( $self->{body} and setting( "debug" ) ) {
+		$self->dump();
+	}
+	return $self->delay( 15 * 60, 'download is an HTML page' );
+}
+
 sub abort
 {
 	my $self = shift;
