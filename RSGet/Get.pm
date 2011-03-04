@@ -332,6 +332,7 @@ sub delay
 	my $until = $time + time;
 	$msg = "Delayed until " . localtime( $until ) . ": " . $msg;
 
+	$self->linecolor( "orange" );
 	$self->print( $msg ) || $self->log( $msg );
 	RSGet::FileList::save( $self->{_uri}, options => { delay => $until, error => $msg, delay_last => $time } );
 	RSGet::Dispatch::finished( $self );
@@ -367,6 +368,7 @@ sub error
 		$self->dump();
 	}
 
+	$self->linecolor( "red" );
 	$self->print( $msg ) || $self->log( $msg );
 	RSGet::FileList::save( $self->{_uri}, options => { error => $msg } );
 	RSGet::Dispatch::finished( $self );
