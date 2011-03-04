@@ -36,13 +36,13 @@ start:
 	! m{src="(/landing/.+?/download_captcha\.js)"};
 	$-{captcha_uri} = $1;
 
-	CLICK( "", post => { checkDownload => "check" } );
+	CLICK( "", post => { checkDownload => "check" }, keep_referer => 1 );
 
 	MULTI() if /{"fail":"parallelDownload"}/;
 	RESTART( 900, "free limit reached" ) if /{"fail":"timeLimit"}/;
 
 	ERROR( "some error: $_" ) if /{"fail"/;
-	ERROR( "some error" ) unless /{"success":"showCaptcha"}/;
+	! /{"success":"showCaptcha"}/;
 
 	GET( $-{captcha_uri}, keep_referer => 1,
 		headers => [ "X-Requested-With: XMLHttpRequest" ] );
@@ -68,16 +68,16 @@ stage_getcaptcha:
 			recaptcha_challenge_field => $-{captcha_challenge},
 		}, keep_referer => 1 );
 
-	if ( /incorrect-captcha-sol/ ) {
+	if ( /{"success":1}/ ) {
+		CAPTCHA_RESULT( "OK" );
+	} else {
 		CAPTCHA_RESULT( "FAIL" );
 		GOTO stage_getcaptcha;
-	} else {
-		CAPTCHA_RESULT( "OK" );
 	}
 
 	GET( "", post => { downloadLink => "wait" }, keep_referer => 1 );
 
-	! /(\d+)/;
+	! /^\xef\xbb\xbf(\d+)$/s;
 	WAIT( -$1, "expecting download link" );
 
 	CLICK( "", post => { downloadLink => "show" }, keep_referer => 1, );
@@ -89,5 +89,11 @@ stage_getcaptcha:
 
 	RESTART( 1, "download link expired" )
 		if /<li class="title">Your download link has expired/;
+
+	RESTART( 60, "captcha error, this shouldn't happen" )
+		if /<li class="title">Captcha error/;
+
+	RESTART( 1, "multi download not allowed" )
+		if m{URL=http://www\.fileserve\.com/landing-1403\.php};
 
 # vim: filetype=perl:ts=4:sw=4
