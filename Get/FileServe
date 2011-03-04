@@ -41,7 +41,8 @@ start:
 	MULTI() if /{"fail":"parallelDownload"}/;
 	RESTART( 900, "free limit reached" ) if /{"fail":"timeLimit"}/;
 
-	ERROR( "some error: $_" ) unless /{"success":"showCaptcha"}/;
+	ERROR( "some error: $_" ) if /{"fail"/;
+	ERROR( "some error" ) unless /{"success":"showCaptcha"}/;
 
 	GET( $-{captcha_uri}, keep_referer => 1,
 		headers => [ "X-Requested-With: XMLHttpRequest" ] );
@@ -77,13 +78,16 @@ stage_getcaptcha:
 	GET( "", post => { downloadLink => "wait" }, keep_referer => 1 );
 
 	! /(\d+)/;
-	WAIT( $1, "expecting download link" );
+	WAIT( -$1, "expecting download link" );
 
 	CLICK( "", post => { downloadLink => "show" }, keep_referer => 1, );
 
 	CLICK_DOWNLOAD( "", post => { download => "normal" } );
 
-	RESTART( $1, "free limit reached" )
+	RESTART( 1, "free limit reached" )
 		if m#You need to wait (\d+) seconds to start another download\.#;
+
+	RESTART( 1, "download link expired" )
+		if /<li class="title">Your download link has expired/;
 
 # vim: filetype=perl:ts=4:sw=4
