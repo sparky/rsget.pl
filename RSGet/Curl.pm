@@ -501,7 +501,7 @@ sub finish
 		#warn "error($err): $error\n";
 		$get_obj->linecolor( "red" );
 		$get_obj->print( "ERROR($err): $error" ) if $err ne "aborted";
-		if ( $error =~ /Couldn't bind to '(.*)'/ or $error =~ /bind failed/ ) {
+		if ( $error =~ /Couldn't bind to '|bind failed|Could not resolve host:|Connection timed out after \d+ milliseconds/ ) {
 			my $if = $get_obj->{_outif};
 			RSGet::Dispatch::remove_interface( $if, "Interface $if is dead" );
 			$get_obj->{_abort} = "Interface $if is dead";
