@@ -482,6 +482,7 @@ sub finish
 	my $get_obj = $supercurl->{get_obj};
 	delete $supercurl->{get_obj};
 
+	$supercurl->{speed_end} = $curl->getinfo( CURLINFO_SPEED_DOWNLOAD );
 	if ( $supercurl->{file} ) {
 		close $supercurl->{file};
 		$get_obj->print( "DONE " . donemsg( $supercurl ) );
@@ -608,7 +609,6 @@ sub perform
 	}
 }
 
-my $avg_speed = 0;
 sub update_status
 {
 	my $time = time;
@@ -642,12 +642,9 @@ sub update_status
 			next;
 		}
 
-		my $speed = "???";
-		if ( $time_diff > 0 ) {
-			my $s = $size_diff / ( $time_diff * 1024 );
-			$speed = sprintf "%.2f", $s;
-			$total_speed += $s;
-		}
+		my $s = $supercurl->{curl}->getinfo( CURLINFO_SPEED_DOWNLOAD ) / 1024;
+		my $speed = sprintf "%.2f", $s;
+		$total_speed += $s;
 
 		my $eta = "";
 		if ( $size_total > 0 and $time_diff > 0 and $size_diff > 0 ) {
@@ -658,12 +655,11 @@ sub update_status
 
 		$supercurl->{get_obj}->print( "$size; ${speed}KB/s$eta" );
 	}
-	$avg_speed = ($avg_speed * 9 + $total_speed) / 10;
 
 	my $running = scalar keys %active_curl;
 	RSGet::Line::status(
 		'running cURL' => $running,
-		'total speed' => ( sprintf '%.2fKB/s', $avg_speed )
+		'total speed' => ( sprintf '%.2fKB/s', $total_speed )
 	);
 	return;
 }
@@ -672,11 +668,10 @@ sub donemsg
 {
 	my $supercurl = shift;
 
-	my $size_diff = $supercurl->{size_got} - $supercurl->{size_start};
 	my $time_diff = time() - $supercurl->{time_start};
 	$time_diff = 1 unless $time_diff;
 	my $eta = s2string( $time_diff );
-	my $speed = sprintf "%.2f", $size_diff / ( $time_diff * 1024 );
+	my $speed = sprintf "%.2f", $supercurl->{speed_end} / 1024;
 
 	return bignum( $supercurl->{size_got} ) . "; ${speed}KB/s $eta";
 }
