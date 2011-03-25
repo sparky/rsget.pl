@@ -1,7 +1,7 @@
 # $Id$
 # Video::YouTube - Video getter plugin for rsget.pl
 #
-# 2009-2010 (c) Przemysław Iskra <sparky@pld-linux.org>
+# 2009-2011 (c) Przemysław Iskra <sparky@pld-linux.org>
 #		This program is free software,
 # you may distribute it under GPL v2 or newer.
 
@@ -10,7 +10,7 @@ short: V:YouTube
 web: "http://www.youtube.com/"
 uri: qr{youtube\.com/watch\?v=.*}
 slots: max
-status: OK 2010-07-22
+status: OK 2011-03-25
 
 unify:
 	s/#.*//;
@@ -81,6 +81,7 @@ stage_got_format:
 	/"fmt_url_map": "(.*?)"/;
 	my %uri = map /(\d+)\|(.*)/, split /,/, $1;
 	my $uri = $uri{ $fmt->[0] };
+	$uri =~ s#\\u0026#&#g;
 	$uri =~ s#\\/#/#g;
 	$-{file_uri} = uri_unescape( $uri );
 
