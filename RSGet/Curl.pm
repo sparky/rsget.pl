@@ -10,6 +10,18 @@ use warnings;
 use RSGet::Tools;
 use RSGet::Line;
 use RSGet::Hook;
+BEGIN {
+	eval { require WWW::CurlOO::Compat; };
+	if ( $@ ) {
+		warn "\nERROR::Could not load WWW::CurlOO::Compat -- " .
+			"will use WWW::Curl instead\n";
+		warn "NOTE: future rsget.pl versions will require WWW::CurlOO to run,\n" .
+			"so make sure it is available in your operating system before " .
+			"that happens.\n\n";
+	} else {
+		print "Using WWW::CurlOO, woohoo !\n";
+	}
+}
 use WWW::Curl::Easy 4.00;
 use WWW::Curl::Multi;
 use URI::Escape;
