@@ -11,15 +11,15 @@ use RSGet::Tools;
 use RSGet::Line;
 use RSGet::Hook;
 BEGIN {
-	eval { require WWW::CurlOO::Compat; };
+	eval { require Net::Curl::Compat; };
 	if ( $@ ) {
-		warn "\nERROR::Could not load WWW::CurlOO::Compat -- " .
+		warn "\nERROR::Could not load Net::Curl::Compat -- " .
 			"will use WWW::Curl instead\n";
-		warn "NOTE: future rsget.pl versions will require WWW::CurlOO to run,\n" .
+		warn "NOTE: future rsget.pl versions will require Net::Curl to run,\n" .
 			"so make sure it is available in your operating system before " .
 			"that happens.\n\n";
 	} else {
-		print "Using WWW::CurlOO, woohoo !\n";
+		print "Using Net::Curl, woohoo !\n";
 	}
 }
 use WWW::Curl::Easy 4.00;
