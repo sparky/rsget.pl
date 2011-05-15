@@ -1,0 +1,110 @@
+# $Id$
+# Get::MediaFire - File getter plugin for rsget.pl
+#
+# 2011 (c) Przemysław Iskra <sparky@pld-linux.org>
+#		This program is free software,
+# you may distribute it under GPL v2 or newer.
+
+name: MediaFire
+short: MF
+web: "http://www.mediafire.com/"
+tos: "http://www.mediafire.com/terms_of_service.php"
+uri: qr{mediafire\.com/\?[a-z0-9]+}
+cookie: mf
+status: OK 2011-05-15
+slots: max
+
+pre:
+	use JE;
+
+start:
+	GET( $-{_uri} );
+
+	m#<META NAME="description" CONTENT="(.*?)"#;
+	my $fn = $1;
+	m#<input type="hidden" id="sharedtabsfileinfo1-fs" value="($STDSIZE)">#;
+	INFO( name => $fn, asize => $1 );
+
+	! s#<script language="JavaScript" type="text/JavaScript"><!--.*?</script>##s;
+	! s#<script language="JavaScript" type="text/JavaScript"><!--(.*?)</script>##s;
+	my $script = $1;
+
+	m#<script type="text/javascript">DoShow.*?;cR\(\);\s+(\S+)\(\);\s+ap\(-1\);#s;
+	my $method = $1;
+
+	my $je = JE->new;
+	my $el = {};
+	my $div;
+	$je->new_function( DoShow => sub { } );
+	$je->new_function( aa => sub { warn "MediaFire Alert: @_\n"; } );
+	$je->new_function( _byid => sub {
+			my $name = shift;
+			$div = $name if $name =~ /^[0-9a-f]{32}$/;
+			return $el->{ $name } ||= $je->eval( 'new Object( { style: {} } )' );
+	} );
+	$je->eval( 'pk = null;' );
+	$je->{document} = $je->eval( 'new Object' );
+	$je->eval( "document.getElementById = _byid" );
+	$je->new_function( setTimeout => sub { shift->(); undef } );
+	$je->eval( $script );
+	eval {
+		$je->method( $method );
+	};
+
+	my $uri = $el->{workframe2}{src};
+
+	# minimize leaks
+	%$el = (); $el = undef;
+	$je = undef;
+
+	! $uri;
+	! $-{wanted} = $div;
+
+	GET( $uri );
+
+	! s#^.*?<!--##s;
+	! s#</script>.*$##s;
+
+	my $wanted = $-{wanted};
+	my $has_wanted;
+	my $je = JE->new;
+	my $el = {};
+	$je->new_function( aa => sub { warn "MediaFire Alert: @_\n"; } );
+	$je->new_function( _byid => sub {
+			my $name = shift;
+			if ( $name eq $wanted ) {
+				$has_wanted = 1;
+			} elsif ( $has_wanted ) {
+				die "That's enough\n";
+			}
+			return $el->{$name} ||= $je->eval( 'new Object( { style: {} } )' );
+	} );
+
+	$je->{parent} = $je->eval( 'new Object' );
+	$je->eval( "parent.document = { getElementById: _byid };" );
+	$je->{parent}{window}{location}{hash} = "";
+
+	$self->print( "extracting link, this may block for a while !" );
+	RSGet::Line::update();
+
+	$je->eval( $_ );
+	RSGet::Line::update();
+	eval {
+		$je->method( 'dz' );
+	};
+	$self->print( "extraction completed" );
+	RSGet::Line::update();
+
+	my $html = $el->{$wanted}{innerHTML};
+	%$el = (); $el = undef;
+	$je = undef;
+	
+	! $html =~ m# href="(.*?)">#;;
+	my $uri = $1;
+
+	# must not contain autodisable
+	! $uri !~ /autodisable/;
+
+	DOWNLOAD( $uri );
+
+# vim: filetype=perl:ts=4:sw=4
